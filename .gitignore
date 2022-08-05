@@ -1,0 +1,33 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Executables
+*.out
+*.app
+*.exe
+*.lib
+*.dll
+*.pdb
+*.idb
+*.obj
+*.tlog
+*.log
+*.1.tlog
+
+*.DS_STORE
+/x64
+/FluxApp/x64
+/FluxCore/x64
+/FluxUI/x64
+/.vs
+/.idea
+/cmake-build-debug
