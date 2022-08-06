@@ -28,6 +28,7 @@
 /FluxApp/x64
 /FluxCore/x64
 /FluxUI/x64
+/FluxAudio/x64
 /.vs
 /.idea
 /cmake-build-debug

@@ -1,25 +1,35 @@
-﻿#include <Flux/UI/UserInterface.h>
+﻿#include <Components/MasterView.h>
 
 #define SK_GL
 
-#include <GLFW/glfw3.h>
+#include <skia/core/SkCanvas.h>
 #include <skia/gpu/GrBackendSurface.h>
 #include <skia/gpu/GrDirectContext.h>
 #include <skia/gpu/gl/GrGLInterface.h>
 #include <skia/core/SkCanvas.h>
 #include <skia/core/SkSurface.h>
+#include <skia/core/SkFont.h>
+#include <skia/core/SkRRect.h>
 #include <skia/core/SkColorSpace.h>
+#include <skia/gpu/GrBackendSurface.h>
 
 namespace Flux::UserInterface {
 
-    void MasterView::draw() {
+    void MasterView::draw(SkCanvas*) {
 
         fassert(surface != nullptr);
 
-        SkPaint paint;
-        paint.setColor(SK_ColorGRAY);
-        canvas->drawPaint(paint);
+        Compound::draw(canvas);
+
         context->flush();
+        
+    }
+
+    void MasterView::initialize() {
+        
+        Compound::initialize();
+
+        this->setColor(LinearColor::fromHex(0x303030ff));
         
     }
 
@@ -35,7 +45,8 @@ namespace Flux::UserInterface {
         GrGLFramebufferInfo framebufferInfo;
 
         framebufferInfo.fFBOID = params.framebufferId;
-        framebufferInfo.fFormat = GL_RGBA8;
+        // 0x8058 = GL_RGBA8
+        framebufferInfo.fFormat = 0x8058;
         
         SkColorType colorType = kRGBA_8888_SkColorType;
         
@@ -48,6 +59,12 @@ namespace Flux::UserInterface {
         view->canvas = view->surface->getCanvas();
 
         fassertf(view->canvas, "Failed to get Skia Canvas.");
+
+        auto w = static_cast<Float32>(view->canvas->getBaseLayerSize().fWidth);
+        auto h = static_cast<Float32>(view->canvas->getBaseLayerSize().fHeight);
+        
+        view->setScale({w, h});
+        view->initialize();
         
         return view;
         

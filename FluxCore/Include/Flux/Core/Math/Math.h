@@ -13,7 +13,7 @@ namespace Flux {
     public:
 
         template<typename NumberType>
-        static constexpr NumberType pi = 3.14159265359;
+        static constexpr NumberType pi = static_cast<NumberType>(3.14159265359);
     
         template<typename NumberType>
         FORCEINLINE static NumberType clamp(NumberType a, NumberType min, NumberType max) {
@@ -40,6 +40,21 @@ namespace Flux {
 
         }
 
+        template<typename NumberType>
+        FORCEINLINE static NumberType max(NumberType a, NumberType b) {
+            return a > b ? a : b;
+        }
+
+        template<typename NumberType>
+        FORCEINLINE static NumberType min(NumberType a, NumberType b) {
+            return a < b ? a : b;
+        }
+
+        template<typename NumberType>
+        FORCEINLINE static NumberType max(NumberType a, NumberType b, NumberType c) {
+            return a > b ? ((a > c) ? a : c) : ((b > c) ? b : c);
+        }
+        
         FORCEINLINE static float cot(const float x) {
             return std::cos(x) / std::sin(x);
         }
@@ -60,22 +75,7 @@ namespace Flux {
             conv.f *= threehalfs - ( x2 * conv.f * conv.f );
             return conv.f;
         
-        }
-
-        template<typename NumberType>
-        FORCEINLINE static NumberType max(NumberType a, NumberType b) {
-            return a > b ? a : b;
-        }
-
-        template<typename NumberType>
-        FORCEINLINE static NumberType min(NumberType a, NumberType b) {
-            return a < b ? a : b;
-        }
-
-        template<typename NumberType>
-        FORCEINLINE static NumberType max(NumberType a, NumberType b, NumberType c) {
-            return a > b ? ((a > c) ? a : c) : ((b > c) ? b : c);
-        }
+        }        
 
         template<typename NumberType>
         FORCEINLINE static NumberType toRadians(NumberType degrees) {

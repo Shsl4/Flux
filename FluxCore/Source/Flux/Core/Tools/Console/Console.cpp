@@ -29,14 +29,21 @@ Console::Console() {
     this->commandTree = UniquePointer<CommandTree>::make();
 
     const auto helpNode = CommandNode::make("help");
+    const auto abortNode = CommandNode::make("abort");
 
     helpNode->setNodeDescription("Prints this help menu.");
+    abortNode->setNodeDescription("Terminates the program in an unsafe way.");
         
     helpNode->addExecutable([this](const auto* context) {
         consoleHelp(context);
     });
     
+    abortNode->addExecutable([this](const auto* context) {
+        fabort("Explicit termination requested.");
+    });
+    
     registerCommand(helpNode);
+    registerCommand(abortNode);
     
 }
 

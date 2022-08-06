@@ -1,9 +1,5 @@
 #include "Application.h"
 
-int main(int argc, char* argv[]) {
-
+int main() {
     Flux::Application().run();
-    
-    return 0;
-    
 }
