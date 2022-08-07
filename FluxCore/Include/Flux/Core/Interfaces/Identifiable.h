@@ -25,6 +25,10 @@ namespace Flux {
          */
         NODISCARD virtual String getDescription() const;
 
+        template <typename T>
+        T* cast() { return dynamic_cast<T*>(this); }
+
+
     };
     
 }

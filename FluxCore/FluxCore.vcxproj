@@ -188,6 +188,7 @@
   <ItemGroup>
     <ClCompile Include="Include\Flux\Core\Memory\String.cpp" />
     <ClCompile Include="Source\Flux\Core\Flux.cpp" />
+    <ClCompile Include="Source\Flux\Core\Interfaces\Identifiable.cpp" />
     <ClCompile Include="Source\Flux\Core\Tools\Console\ArgumentCommandNode.cpp" />
     <ClCompile Include="Source\Flux\Core\Tools\Console\CommandContext.cpp" />
     <ClCompile Include="Source\Flux\Core\Tools\Console\CommandNode.cpp" />

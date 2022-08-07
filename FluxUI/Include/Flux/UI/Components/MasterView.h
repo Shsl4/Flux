@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <Flux/UI/Components/Compound.h>
+#include <Flux/UI/Reactive.h>
 
 class GrDirectContext;
 
@@ -25,10 +26,10 @@ namespace Flux::UserInterface {
         
         void initialize() override;
 
-        static SharedPointer<MasterView> makeGL(Int width, Int height, OpenGLParams const& params);
+        void draw(SkCanvas* canvas, Float64 deltaTime) override;
         
-        void draw(SkCanvas* canvas = nullptr) override;
-
+        static SharedPointer<MasterView> makeGL(Int width, Int height, OpenGLParams const& params);
+    
     private:
         
         SkSurface* surface = nullptr;

@@ -45,3 +45,7 @@ namespace Flux {
 #define fassert(e) Flux::expectImpl((e), #e)
 #define fassertf(e, f) Flux::expectImpl(e, f)
 #define fabort(f) Flux::abortImpl(f)
+
+#define f32(v) static_cast<Flux::Float32>(v)
+#define f64(v) static_cast<Flux::Float64>(v)
+

@@ -16,7 +16,7 @@ namespace Flux::UserInterface {
 
     public:
 
-        LinearColor(const float r, const float g, const float b, const float a) : r(r), g(g), b(b), a(a) {
+        LinearColor(const Float32 r, const Float32 g, const Float32 b, const Float32 a) : r(r), g(g), b(b), a(a) {
             
         }
 
@@ -24,13 +24,13 @@ namespace Flux::UserInterface {
 
         NODISCARD SkColor4f toSkColor() { return *reinterpret_cast<SkColor4f*>(this); }
         
-        static float nthBit(const UInt32 number, const UInt32 n) {
+        static Float32 nthBit(const UInt32 number, const UInt32 n) {
 
-            return static_cast<float>((number >> (8*n)) & 0xff);
+            return static_cast<Float32>((number >> (8*n)) & 0xff);
         
         }
 
-        LinearColor operator*(float scale) const {
+        LinearColor operator*(Float32 scale) const {
 
             return { this->r * scale, this->g * scale, this->b * scale, this->a * scale };
 

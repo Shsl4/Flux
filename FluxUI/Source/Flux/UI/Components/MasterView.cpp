@@ -15,21 +15,22 @@
 
 namespace Flux::UserInterface {
 
-    void MasterView::draw(SkCanvas*) {
+    void MasterView::draw(SkCanvas*, Float64 deltaTime) {
 
-        fassert(surface != nullptr);
+        fassert(canvas && surface);
 
-        Compound::draw(canvas);
+        Component::draw(canvas, deltaTime);
+        Compound::draw(canvas, deltaTime);
 
         context->flush();
         
     }
-
+    
     void MasterView::initialize() {
         
         Compound::initialize();
 
-        this->setColor(LinearColor::fromHex(0x303030ff));
+        this->setColor(LinearColor::fromHex(0x151515ff));
         
     }
 
@@ -45,6 +46,7 @@ namespace Flux::UserInterface {
         GrGLFramebufferInfo framebufferInfo;
 
         framebufferInfo.fFBOID = params.framebufferId;
+        
         // 0x8058 = GL_RGBA8
         framebufferInfo.fFormat = 0x8058;
         

@@ -20,8 +20,12 @@ namespace Flux::UserInterface {
             return pointer.weak();
             
         }
+
+        Component* getComponentAtPosition(SkVector const& value);
+
+        Component* getChild(size_t index) const;
         
-        void draw(SkCanvas* canvas) override;
+        void draw(SkCanvas* canvas, Float64 deltaTime) override;
 
     private:
 
