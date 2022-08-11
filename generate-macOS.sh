@@ -10,4 +10,5 @@ fi
 
 cd .cmake
 cmake .. -G Xcode -DCMAKE_TOOLCHAIN_FILE=$HOME/vcpkg/scripts/buildsystems/vcpkg.cmake
+cd ..
 ln -s .cmake/Flux.xcodeproj Flux.xcodeproj
