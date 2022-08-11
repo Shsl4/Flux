@@ -128,11 +128,7 @@ namespace Flux {
          * \brief The managed resource.
          */
         T* pointer = nullptr;
-
-        /**
-         * \brief The allocator used to manage memory for this pointer.
-         */
-        Allocator<T> allocator;
+     
     };
  
 }

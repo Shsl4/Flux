@@ -1,6 +1,8 @@
-﻿#include <Components/MasterView.h>
+#include <Components/MasterView.h>
 
+#ifndef SK_GL
 #define SK_GL
+#endif
 
 #include <skia/core/SkCanvas.h>
 #include <skia/gpu/GrBackendSurface.h>

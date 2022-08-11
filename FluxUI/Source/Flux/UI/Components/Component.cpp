@@ -1,11 +1,20 @@
-﻿#include <Components/Component.h>
+#include <Components/Component.h>
 #include <skia/core/SkDrawable.h>
-
-#include "Components/Compound.h"
+#include <Components/Compound.h>
 
 namespace Flux::UserInterface {
 
+    Component::~Component() {
+        Console::logRuntime("Destroyed {}", getClassName());
+    }
+
     void Component::initialize() {
+
+    }
+
+    void Component::cleanup() {
+        
+        Console::logRuntime("Cleaning up {}", getClassName());
 
     }
 
@@ -32,6 +41,8 @@ namespace Flux::UserInterface {
     void Component::setPosition(SkVector const& value) { this->position = value; }
     
     void Component::setScale(SkVector const& value) { this->scale = value; }
+    
+    void Component::discard() { this->pendingDiscard = true; }
     
     SkVector Component::getPosition() const { return this->position; }
     
@@ -62,6 +73,17 @@ namespace Flux::UserInterface {
 
         return finalPos;
 
+    }
+
+    SkVector Component::getAbsoluteCenteredPosition() const {
+
+        SkVector pos = getAbsolutePosition();
+
+        pos.fX += scale.fX / 2.0f;
+        pos.fY += scale.fY / 2.0f;
+
+        return pos;
+        
     }
 
     UInt Component::getDepth() const {

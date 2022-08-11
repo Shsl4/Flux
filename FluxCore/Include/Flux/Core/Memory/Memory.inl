@@ -9,6 +9,7 @@ namespace Flux {
     template <typename T>
     void Memory::move(T* from, T* to, T* dest) {
 
+        
         if (dest > from) {
             moveForward(from, to, dest);
             return;
@@ -20,6 +21,7 @@ namespace Flux {
 
     template <typename T>
     void Memory::copy(const T* from, const T* to, T* dest) {
+        std::copy(from, to, dest);
 
         if (dest > from) {
             copyForward(from, to, dest);

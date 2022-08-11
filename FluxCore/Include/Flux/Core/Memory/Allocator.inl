@@ -17,6 +17,17 @@ namespace Flux {
         return ptr;
 
     }
+    
+    template<typename T>
+    T *Allocator<T>::construct(const size_t size) {
+
+        // Construct the new object.
+        T *ptr = new T[size]();
+
+        // Return the newly constructed object
+        return ptr;
+
+    }
 
     template<typename T>
     T *Allocator<T>::alloc(size_t size) {
@@ -56,21 +67,7 @@ namespace Flux {
         pointer = nullptr;
 
     }
-
-    template<typename T>
-    template<typename U>
-    void Allocator<T>::autoDestroy(U *&pointer) {
-
-        // If the pointer is empty, return.
-        if (!pointer) {
-            return;
-        }
-
-        // Release the pointer.
-        delete pointer;
-
-    }
-
+    
     template<typename T>
     void Allocator<T>::release(T *&pointer) {
 

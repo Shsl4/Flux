@@ -3,6 +3,10 @@
 #include <cstdint>
 #include <iostream>
 
+// Disable Windows dll-interface warnings
+#pragma warning(disable : 4251)
+#pragma warning(disable : 4275)
+
 #ifndef _WIN64
 
 #define FORCEINLINE __attribute__((always_inline)) inline
@@ -48,4 +52,7 @@ namespace Flux {
 
 #define f32(v) static_cast<Flux::Float32>(v)
 #define f64(v) static_cast<Flux::Float64>(v)
+
+#define i32(v) static_cast<Flux::Int32>(v)
+#define i64(v) static_cast<Flux::Int64>(v)
 

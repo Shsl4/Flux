@@ -9,7 +9,6 @@ namespace Flux {
  
     /*!
      *  \brief An object allowing to manage memory for objects of type T.
-     *  The object is only one byte as it does not have any member variables.
      *
      *  \tparam T Type of object to manage
      */
@@ -17,10 +16,11 @@ namespace Flux {
     class Allocator final {
 
     public:
+     
         /*!
          * The default constructor.
          */
-        Allocator() = default;
+        Allocator() = delete;
 
         /*!
          *  Constructs an object of type T.
@@ -30,41 +30,40 @@ namespace Flux {
          *  \return The newly constructed object.
          */
         template <typename ... Args>
-        T* construct(Args&&... args);
+        static T* construct(Args&&... args);
+
+        /*!
+         *  Constructs an array of objects of type T.
+         *
+         *  \param size The number of object to create
+         *  \return The newly constructed array.
+         */
+        static T* construct(size_t size);
 
         /*!
          *  Allocates a buffer containing \p size number of objects of type T.
-         *  If T is a class, objects are constructed using the empty constructor.
+         *  If T is an object class, objects are not initialized.
          *
          *  \warning If T is a class, it must have a public empty constructor.
          *
          *  \param[in] size The size of the buffer.
          *  \return The newly allocated buffer.
          */
-        T* alloc(size_t size);
+        static T* alloc(size_t size);
 
         /*!
          *  Destroys a single object allocated with construct.
          *
          *  \param[in,out] pointer The object to release
          */
-        void destroy(T*& pointer);
-
-        /*!
-         *  Destroys a single object allocated with construct.
-         *
-         *  \tparam U The type of object to destroy.
-         *  \param[in,out] pointer The object to release
-         */
-        template <typename U>
-        void autoDestroy(U*& pointer);
-
+        static void destroy(T*& pointer);
+     
         /*!
          *  Releases a buffer allocated with allocate.
          *
          *  \param[in,out] pointer The buffer to release.
          */
-        void release(T*& pointer);
+        static void release(T*& pointer);
 
         /*!
          *  Extends or shrinks a memory buffer.
@@ -73,12 +72,7 @@ namespace Flux {
          *  \param[in] oldSize The old size of the buffer.
          *  \param[in] size The new size of the buffer.
          */
-        void realloc(T*& pointer, size_t oldSize, size_t size);
-
-        /*!
-         * The Allocator destructor.
-         */
-        ~Allocator() = default;
+        static void realloc(T*& pointer, size_t oldSize, size_t size);
 
         /*!
          *  Moves memory forwards or backwards automatically.
@@ -87,7 +81,7 @@ namespace Flux {
          *  \param[in] to Where to stop reading data
          *  \param[out] dest Where move the data.
          */
-        void move(T* from, T* to, T* dest);
+        static void move(T* from, T* to, T* dest);
 
         /*!
          *  Copies memory forwards or backwards automatically.
@@ -96,12 +90,12 @@ namespace Flux {
          *  \param[in] to Where to stop reading data
          *  \param[out] dest Where copy the data.
          */
-        void copy(const T* from, const T* to, T* dest);
+        static void copy(const T* from, const T* to, T* dest);
 
         /*!
          * Swaps the contents of the two pointers by moving (no copying).
          */
-        void swapMove(T* a, T* b);
+        static void swapMove(T* a, T* b);
 
     };
  

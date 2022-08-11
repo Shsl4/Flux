@@ -2,11 +2,36 @@
 
 namespace Flux::UserInterface {
 
+    CursorManager::CursorManager() {
+
+        fassertf(!manager, "Tried to create mutiple instances of CursorManager.");
+
+        manager = this;
+        
+    }
+
     void CursorManager::onButtonDown(MouseButton button) {
         
         if (auto* component = master->getComponentAtPosition(getCursorPosition())) {
+            
             auto r = stateMap.emplace(std::pair(button, component));
             component->onButtonDown(button, cursorX, cursorY);
+
+            if(focused == component) { return; }
+            
+            if(focused) { focused->endFocus(); }
+            
+            focused = component;
+            focused->onFocus();
+            
+        }
+        
+    }
+
+    void CursorManager::onDoubleClick(MouseButton button) const {
+
+        if (auto* component = master->getComponentAtPosition(getCursorPosition())) {
+            component->onDoubleClick(button, cursorX, cursorY);
         }
         
     }
@@ -18,6 +43,7 @@ namespace Flux::UserInterface {
             Reactive* target = stateMap.at(button);
             target->onButtonUp(button, cursorX, cursorY, master->getComponentAtPosition(getCursorPosition()));
             stateMap.erase(button);
+            
         }
         catch (std::out_of_range const&) { }
         
@@ -34,17 +60,25 @@ namespace Flux::UserInterface {
     void CursorManager::onCursorMoved(Float64 x, Float64 y) {
 
         // Update the cursor position.
+        this->lastCursorX = cursorX;
+        this->lastCursorY = cursorY;
+        
         this->cursorX = x;
         this->cursorY = y;
 
-        for (auto const& elem : stateMap) { elem.second->onDrag(elem.first, x, y); }
+        const Float64 deltaX = lastCursorX - cursorX;
+        const Float64 deltaY = lastCursorY - cursorY;
+
+        for (auto const& elem : stateMap) {
+            elem.second->onDrag(elem.first, x, y, deltaX, deltaY);
+        }
 
         // If a component is under the cursor.
         if (auto* component = master->getComponentAtPosition(getCursorPosition())) {
 
             // If the component under the cursor is already hovered, send a mouse movement message.
             if (hovered == component) {
-                component->onCursorMoved(x, y);
+                component->onCursorMoved(x, y, deltaX, deltaY);
                 return;
             }
 
@@ -63,8 +97,24 @@ namespace Flux::UserInterface {
 
     }
 
+    CursorManager* CursorManager::getCursorManager() {
+        return manager;
+    }
+    
     void CursorManager::setCompound(Compound* value) { this->master = value; }
 
+    void CursorManager::notifyDestruction(const Reactive* reactive) {
+
+        if(reactive == hovered) {
+            hovered = nullptr;
+        }
+        
+        if(reactive == focused) {
+            focused = nullptr;
+        }
+        
+    }
+    
     void CursorManager::clearHoveredComponent() {
         
         if (hovered) {

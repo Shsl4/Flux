@@ -74,7 +74,6 @@ String StackFrame::format() const {
 Array<StackFrame> StackTrace::getStackTrace() {
 
     Array<StackFrame> stack;
-    Allocator<char> allocator;
     HANDLE process = GetCurrentProcess();
     HANDLE thread = GetCurrentThread();
     STACKFRAME64 frame{};
@@ -82,10 +81,10 @@ Array<StackFrame> StackTrace::getStackTrace() {
     DWORD64 displacement = 0;
     DWORD offset = 0;
 
-    char* name = allocator.alloc(MAX_PATH);
-    char* symData = allocator.alloc(sizeof(IMAGEHLP_SYMBOL64) + MAX_PATH);
-    char* lineData = allocator.alloc(sizeof(IMAGEHLP_LINE64));
-    char* moduleData = allocator.alloc(sizeof(IMAGEHLP_MODULE64));
+    char* name = Allocator<char>::alloc(MAX_PATH);
+    char* symData = Allocator<char>::alloc(sizeof(IMAGEHLP_SYMBOL64) + MAX_PATH);
+    char* lineData = Allocator<char>::alloc(sizeof(IMAGEHLP_LINE64));
+    char* moduleData = Allocator<char>::alloc(sizeof(IMAGEHLP_MODULE64));
 
     const auto symbol = reinterpret_cast<IMAGEHLP_SYMBOL64*>(symData);
     const auto line = reinterpret_cast<IMAGEHLP_LINE64*>(lineData);
@@ -136,10 +135,10 @@ Array<StackFrame> StackTrace::getStackTrace() {
         
     }
 
-    allocator.release(name);
-    allocator.release(symData);
-    allocator.release(lineData);
-    allocator.release(moduleData);
+    Allocator<char>::release(name);
+    Allocator<char>::release(symData);
+    Allocator<char>::release(lineData);
+    Allocator<char>::release(moduleData);
     
     return stack;
 
@@ -151,9 +150,8 @@ Array<StackFrame> StackTrace::getStackTrace() {
     
     constexpr Int32 maxSize = 1024;
     Array<StackFrame> stack = Array<StackFrame>(maxSize);
-    Allocator<char> allocator;
     
-    char* allocData = allocator.alloc(maxSize);
+    char* allocData = Allocator<char>::alloc(maxSize);
     void* data = reinterpret_cast<void*>(allocData);
 
     Int32 frameCount = backtrace(&data, maxSize);
@@ -183,6 +181,8 @@ Array<StackFrame> StackTrace::getStackTrace() {
         }
         
     }
+
+    Allocator<char>::release(allocData);
         
     return stack;
     

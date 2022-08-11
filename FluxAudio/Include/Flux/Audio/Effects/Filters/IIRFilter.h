@@ -15,7 +15,9 @@ namespace Flux::Audio {
         NODISCARD Float64 getArgument(Float64 omega) const;
 
         FORCEINLINE Float64 getMix() const { return this->mix; }
-        
+
+        bool process(Float64* buffer) override;
+
         void setMix(Float64 value);
         
     protected:

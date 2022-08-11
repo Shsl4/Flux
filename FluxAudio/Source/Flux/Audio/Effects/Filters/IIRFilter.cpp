@@ -49,6 +49,36 @@ namespace Flux::Audio {
         
     }
 
+    bool IIRFilter::process(Float64* buffer) {
+
+        for (UInt sample = 0; sample < getBufferSize(); ++sample) {
+
+            const Float64 xn = buffer[sample];
+            
+            const Float64& wetMix = this->mix;
+            const Float64& dryMix = 1.0 - this->mix;
+
+            const Float64 compound = wetMix * (coefficients[a0] * xn +
+                coefficients[a1] * stateArray[x_z1] +
+                coefficients[a2] * stateArray[x_z2] -
+                coefficients[b1] * stateArray[y_z1] -
+                coefficients[b2] * stateArray[y_z2]);
+        
+            const Float64 yn = dryMix * xn + compound;
+
+            stateArray[x_z2] = stateArray[x_z1];
+            stateArray[x_z1] = xn;
+            stateArray[y_z2] = stateArray[y_z1];
+            stateArray[y_z1] = yn;
+
+            buffer[sample] = yn;
+            
+        }
+
+        return true;
+        
+    }
+
     void IIRFilter::setMix(Float64 value) {
         
         this->mix = Math::clamp(value, 0.0, 1.0);

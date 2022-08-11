@@ -10,10 +10,14 @@ namespace Flux::Audio {
         
     }
 
-    void Filter::process(Float64* buffer) {
+    bool Filter::process(Float64* buffer) {
+        
         for (UInt sample = 0; sample < getBufferSize(); ++sample) {
             buffer[sample] = processSingle(buffer[sample]);
         }
+        
+        return true;
+        
     }
 
     void Filter::setCutoffFrequency(const Float64 cutoff) {

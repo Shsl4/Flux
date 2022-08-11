@@ -11,7 +11,7 @@ namespace Flux {
     template <typename T>
     SharedPointer<T>::SharedPointer(T* object) {
 
-        this->counter = refAllocator.construct();
+        this->counter = Allocator<RefCounter>::construct();
         this->pointer = object;
 
         counter->increase();
@@ -21,7 +21,7 @@ namespace Flux {
     template <typename T>
     template <typename ... Args>
     SharedPointer<T> SharedPointer<T>::make(Args&&... args) {
-        return SharedPointer<T>(Allocator<T>().construct(std::forward<Args>(args)...));
+        return SharedPointer<T>(Allocator<T>::construct(std::forward<Args>(args)...));
     }
 
     template <typename T>
@@ -159,9 +159,9 @@ namespace Flux {
         counter->decrease();
 
         if (counter->exhausted()) {
-            if (counter->exhaustedWeak()) { refAllocator.destroy(counter); }
+            if (counter->exhaustedWeak()) { Allocator<RefCounter>::destroy(counter); }
 
-            allocator.destroy(pointer);
+            Allocator<T>::destroy(pointer);
         }
 
         counter = nullptr;

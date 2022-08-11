@@ -9,7 +9,7 @@ namespace Flux {
     template<typename T>
     Array<T>::Array(const size_t capacity) : size(0), capacity(capacity) {
 
-        data = allocator.alloc(capacity);
+        data = Allocator<T>::alloc(capacity);
 
     }
 
@@ -46,17 +46,17 @@ namespace Flux {
         this->capacity = limit;
 
         // Allocate our data.
-        this->data = allocator.alloc(capacity);
+        this->data = Allocator<T>::alloc(capacity);
 
         // Copy the data.
-        allocator.copy(other.data, other.data + limit, this->data);
+        Allocator<T>::copy(other.data, other.data + limit, this->data);
     
     }
 
     template<typename T>
     Array<T>::~Array() {
 
-        allocator.release(data);
+        Allocator<T>::release(data);
         size = 0;
         capacity = 0;
 
@@ -68,7 +68,7 @@ namespace Flux {
         if (&other == this) { return *this; }
     
         // Deallocate the data in this array
-        allocator.release(data);
+        Allocator<T>::release(data);
 
         // If the other array is empty, set this array to empty.
         if (!other.data) {
@@ -80,10 +80,10 @@ namespace Flux {
         } else {
 
             // Otherwise, allocate a new data buffer.
-            this->data = allocator.alloc(other.capacity);
+            this->data = Allocator<T>::alloc(other.capacity);
 
             // Copy the array contents.
-            allocator.copy(other.data, other.data + other.size, this->data);
+            Allocator<T>::copy(other.data, other.data + other.size, this->data);
 
             // Store the new information.
             this->capacity = other.capacity;
@@ -101,7 +101,7 @@ namespace Flux {
 
         if (&other == this) { return *this; }
     
-        allocator.release(data);
+        Allocator<T>::release(data);
 
         this->data = other.data;
         this->capacity = other.capacity;
@@ -148,7 +148,7 @@ namespace Flux {
         extend(arr.getSize());
 
         // Store the new elements.
-        allocator.copy(arr.data, arr.data + arr.size, data + getSize());
+        Allocator<T>::copy(arr.data, arr.data + arr.size, data + getSize());
 
         // Increase the number of held objects.
         size += arr.getSize();
@@ -164,7 +164,7 @@ namespace Flux {
         }
     
         // Move back all the elements after the index.
-        allocator.move(data + index + 1, data + size, data + index);
+        Allocator<T>::move(data + index + 1, data + size, data + index);
 
         // Reduce the size of the array.
         --size;
@@ -180,7 +180,7 @@ namespace Flux {
         }
     
         // Move back all the elements after the index.
-        this->allocator.move(this->data + index + 1, this->data + this->size, this->data + index);
+        Memory::move(this->data + index + 1, this->data + this->size, this->data + index);
         
         // Reduce the size of the array.
         --this->size;
@@ -198,7 +198,7 @@ namespace Flux {
         }
     
         // Move back all the elements after the index.
-        this->allocator.move(this->data + index + 1, this->data + this->size, this->data + index);
+        Allocator<T>::move(this->data + index + 1, this->data + this->size, this->data + index);
         
         // Reduce the size of the array.
         --this->size;
@@ -211,7 +211,7 @@ namespace Flux {
     void Array<T>::reverse() {
 
         for (size_t i = 0; i < getSize() / 2; ++i) {
-            allocator.swapMove(data + i, data + getSize() - 1 - i);
+            Allocator<T>::swapMove(data + i, data + getSize() - 1 - i);
         }
 
     }
@@ -236,10 +236,10 @@ namespace Flux {
         if(to > size) { to = size; }
     
         // Allocate data for the new array.
-        array.data = allocator.alloc(to - from);
+        array.data = Allocator<T>::alloc(to - from);
     
         // Copy the data to the new array.
-        allocator.copy(data + from, data + to, array.data);
+        Allocator<T>::copy(data + from, data + to, array.data);
     
         // Set the size and capacity.
         array.size = to - from;
@@ -290,7 +290,7 @@ namespace Flux {
         extend();
 
         // Move all the elements forward.
-        allocator.move(data + index, data + size, data + index + 1);
+        Allocator<T>::move(data + index, data + size, data + index + 1);
 
         // Store the new element.
         data[index] = std::move(elem);
@@ -317,10 +317,10 @@ namespace Flux {
         extend(arr.getSize());
 
         // Move all the elements forward.
-        allocator.move(data + index, data + size, data + index + arr.getSize());
+        Allocator<T>::move(data + index, data + size, data + index + arr.getSize());
 
         // Store the new elements.
-        allocator.copy(arr.data, arr.data + arr.getSize(), data + index);
+        Allocator<T>::copy(arr.data, arr.data + arr.getSize(), data + index);
 
         // Increase the size of the array
         size += arr.getSize();
@@ -331,7 +331,7 @@ namespace Flux {
     void Array<T>::resize(size_t newCap) {
 
         // Resize the data buffer.
-        allocator.realloc(data, capacity, newCap);
+        Allocator<T>::realloc(data, capacity, newCap);
 
         // Set the new capacity
         this->capacity = newCap;
@@ -353,7 +353,7 @@ namespace Flux {
         }
 
         // Shrink the array to the number of elements contained.
-        allocator.realloc(data, capacity, size);
+        Allocator<T>::realloc(data, capacity, size);
         this->capacity = size;
 
     }
@@ -362,7 +362,7 @@ namespace Flux {
     void Array<T>::clear() {
 
         // Clear the array.
-        allocator.release(this->data);
+        Allocator<T>::release(this->data);
 
         // Reset the variables.
         this->size = 0;
@@ -421,7 +421,7 @@ namespace Flux {
             size_t newSize = (capacity + ext) * 2;
 
             // Resize our data buffer.
-            allocator.realloc(data, capacity, newSize);
+            Allocator<T>::realloc(data, capacity, newSize);
 
             this->capacity = newSize;
 

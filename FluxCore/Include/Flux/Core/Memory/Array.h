@@ -246,17 +246,13 @@ namespace Flux {
          * The size of the data buffer.
          */
         size_t capacity = 0;
-
-        /*!
-         * The allocator used to allocate and resize buffers.
-         */
-        Allocator<T> allocator{};
-
+    
     private:
+     
         friend class String;
 
     };
-
+ 
     template <typename T>
     class OwnedArray : public Array<SharedPointer<T>> {
 

@@ -22,13 +22,11 @@
 *.tlog
 *.log
 *.1.tlog
+*.lnk
+*.xcodeproj
+*.sln
 
 *.DS_STORE
-/x64
-/FluxApp/x64
-/FluxCore/x64
-/FluxUI/x64
-/FluxAudio/x64
-/.vs
-/.idea
+/Build
+/.cmake
 /cmake-build-debug

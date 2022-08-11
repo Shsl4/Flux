@@ -1,5 +1,7 @@
 ﻿#include <Components/Compound.h>
 
+#include "CursorManager.h"
+
 namespace Flux::UserInterface {
 
     Component* Compound::getComponentAtPosition(SkVector const& value) {
@@ -38,21 +40,45 @@ namespace Flux::UserInterface {
         return children[index];
     }
 
-    void Compound::draw(SkCanvas* canvas, Float64 deltaTime) {
-        
-        for (auto const& child :children) {
+    void Compound::cleanup() {
 
-            child->draw(canvas, deltaTime);
-            
+        Component::cleanup();
+
+        for (const auto& child : children) {
+            child->cleanup();
         }
         
     }
 
-    void Compound::internalAddChild(SharedPointer<Component> const& drawable) {
+    void Compound::draw(SkCanvas* canvas, Float64 deltaTime) {
 
-        children += drawable;
-        drawable->parent = this;
-        drawable->initialize();
+        Int size = i32(children.getSize());
+        
+        for (Int i = 0; i < size; ++i) {
+
+            auto const& child = children[i];
+
+            if(child->pendingDiscard) {
+                CursorManager::getCursorManager()->notifyDestruction(child.raw());
+                child->cleanup();
+                children.removeAt(i);
+                --size;
+                --i;
+                continue;
+            }
+            
+            child->draw(canvas, deltaTime);
+            
+        }
+
+        
+    }
+
+    void Compound::internalAddChild(SharedPointer<Component> const& component) {
+
+        children += component;
+        component->parent = this;
+        component->initialize();
         
     }
     

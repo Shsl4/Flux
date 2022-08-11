@@ -3,10 +3,12 @@
 #include <Flux/Core/Memory/Array.h>
 #include <Flux/Audio/AudioObject.h>
 
+#include "AudioEffect.h"
+
 namespace Flux::Audio {
 
     template<class ObjectType>
-    class MultiProcessor : AudioObject {
+    class MultiProcessor : AudioEffect {
         
     public:
 
@@ -46,7 +48,7 @@ namespace Flux::Audio {
             
         }
 
-        void process(Float64* buffer) override {
+        bool process(Float64* buffer) override {
 
             Float64* pointer = buffer;
             
@@ -56,6 +58,8 @@ namespace Flux::Audio {
                 pointer += getBufferSize();
                 
             }
+
+            return true;
             
         }
 

@@ -2,6 +2,7 @@
 
 #include <Flux/Core/Flux.h>
 #include <cmath>
+#include <cfloat>
 
 namespace Flux {
     
@@ -84,7 +85,7 @@ namespace Flux {
 
         template<typename NumberType>
         FORCEINLINE static NumberType toDegrees(NumberType radians) {
-            return radians * 180.0f / pi;
+            return radians * 180.0f / pi<NumberType>;
         }
 
         template<typename NumberType>

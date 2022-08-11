@@ -11,9 +11,5 @@ namespace Flux::Audio {
         
     }
 
-    Float64 AudioObject::processSingle(Float64 xn) {
-        fabort("This AudioObject does not support single sample processing.");
-    }
-
 }
 

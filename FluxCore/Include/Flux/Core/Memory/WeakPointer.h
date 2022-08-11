@@ -69,7 +69,6 @@ namespace Flux {
 
         T* pointer = nullptr;
         RefCounter* counter = nullptr;
-        Allocator<RefCounter> refAllocator {};
 
     };
 

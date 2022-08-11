@@ -9,7 +9,7 @@ namespace Flux {
     template <typename T>
     template <typename ... Args>
     UniquePointer<T> UniquePointer<T>::make(Args&&... args) {
-        return UniquePointer<T>(Allocator<T>().construct(std::forward<Args>(args)...));
+        return UniquePointer<T>(Allocator<T>::construct(std::forward<Args>(args)...));
     }
 
     template <typename T>
@@ -23,7 +23,7 @@ namespace Flux {
     }
 
     template <typename T>
-    void UniquePointer<T>::release() { allocator.destroy(pointer); }
+    void UniquePointer<T>::release() { Allocator<T>::destroy(pointer); }
 
     template <typename T>
     void UniquePointer<T>::discard() { pointer = nullptr; }

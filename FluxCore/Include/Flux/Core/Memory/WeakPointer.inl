@@ -144,7 +144,7 @@ namespace Flux {
 
         counter->decreaseWeak();
 
-        if (counter->exhausted() && counter->exhaustedWeak()) { refAllocator.destroy(counter); }
+        if (counter->exhausted() && counter->exhaustedWeak()) { Allocator<RefCounter>::destroy(counter); }
 
         counter = nullptr;
         pointer = nullptr;

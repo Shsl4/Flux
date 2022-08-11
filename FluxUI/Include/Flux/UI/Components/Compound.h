@@ -20,16 +20,26 @@ namespace Flux::UserInterface {
             return pointer.weak();
             
         }
+        
+        template<typename ComponentType>
+        void addChild(SharedPointer<ComponentType> pointer) {
+
+            static_assert(std::is_base_of_v<Component, ComponentType>, "ComponentType must be a Component.");
+            internalAddChild(pointer);
+            
+        }
 
         Component* getComponentAtPosition(SkVector const& value);
 
-        Component* getChild(size_t index) const;
-        
+        NODISCARD Component* getChild(size_t index) const;
+
+        void cleanup() override;
+
         void draw(SkCanvas* canvas, Float64 deltaTime) override;
 
     private:
 
-        void internalAddChild(SharedPointer<Component> const& drawable);
+        void internalAddChild(SharedPointer<Component> const& component);
         
         OwnedArray<Component> children;
         
