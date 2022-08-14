@@ -18,8 +18,20 @@ namespace Flux {
 
     AudioDevice::AudioDevice() {
         
-        this->audio = Allocator<RtAudio>::construct();
-        fassertf(audio, "Failed to initialize audio system.");
+        std::vector<RtAudio::Api> apis;
+        RtAudio::getCompiledApi(apis);
+        
+        if (apis.empty() || (apis.size() == 1 && apis[0] == RtAudio::Api::RTAUDIO_DUMMY)) {
+            fabort("No Audio API is available. Make sure you compiled RtAudio with at least one API.");
+        }
+        
+        try{
+            this->audio = Allocator<RtAudio>::construct();
+        }
+        catch(std::exception const& e){
+            fabort(String::format("Failed to initialize audio system. {}", e.what()).toCString());
+        }
+        
         this->currentOutputDevice = audio->getDefaultOutputDevice();
         registerAudioCommands();
         

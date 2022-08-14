@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <GLFW/glfw3.h>
 
@@ -50,17 +50,18 @@ namespace Flux {
 
         Float64 lastTime = 0.0;
 
-        UniquePointer<Console> console = nullptr;
+        Float64 lastClickTime = 0.0;
         
         GLFWwindow* mainWindow = nullptr;
 
+        UniquePointer<Console> console = nullptr;
+        
         SharedPointer<UserInterface::MasterView> masterView = nullptr;
         
         SharedPointer<MyAudioDevice> audioDevice = nullptr;
         
         SharedPointer<UserInterface::CursorManager> cursorManager = nullptr;
-
-        Float64 lastClickTime = 0.0;
+        
         UserInterface::MouseButton lastButtonPressed = UserInterface::MouseButton::Other;
         
         static inline Application* instance = nullptr;

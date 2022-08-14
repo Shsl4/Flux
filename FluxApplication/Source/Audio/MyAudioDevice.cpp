@@ -27,7 +27,6 @@ namespace Flux {
         pipeline->setPipelineView(Application::getMasterView());
         
     }
-    Audio::LowPassFilter fil;
 
     void MyAudioDevice::prepare(Float64 rate, UInt size) {
             

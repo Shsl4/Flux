@@ -9,6 +9,8 @@
 #include <Application/Node.h>
 #include <Application/Socket.h>
 
+#define GL_FRAMEBUFFER_BINDING 0x8CA6
+
 namespace Flux {
     
     class FrameInfo : public DragComponent {
@@ -133,7 +135,7 @@ namespace Flux {
         glfwSetErrorCallback(&Application::onError);
 
         fassertf(glfwInit(), "Failed to initialize GLFW");
-
+        
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
@@ -145,27 +147,33 @@ namespace Flux {
         glfwWindowHint(GLFW_DEPTH_BITS, 0);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-        this->mainWindow = glfwCreateWindow(1280, 720, "Application", nullptr, nullptr);
+        constexpr Int windowWidth = 1280;
+        constexpr Int windowHeight = 720;
+        
+        this->mainWindow = glfwCreateWindow(windowWidth, windowHeight, "Application", nullptr, nullptr);
 
         fassertf(this->mainWindow, "Failed to create window");
 
         glfwMakeContextCurrent(mainWindow);
 
         // Disable VSync
-        glfwSwapInterval(0);
+        glfwSwapInterval(1);
 
         glfwSetKeyCallback(mainWindow, &Application::inputCallback);
         glfwSetMouseButtonCallback(mainWindow, &Application::mouseCallback);
         glfwSetScrollCallback(mainWindow, &Application::scrollCallback);
         glfwSetCursorPosCallback(mainWindow, &Application::cursorCallback);
         
-        Int w, h;
-        glfwGetFramebufferSize(mainWindow, &w, &h);
+        Int framebufferWidth;
+        Int framebufferHeight;
 
-        // todo: Find the framebuffer ID with OpenGL.
-        GLint framebufferId = 0;
+        glfwGetFramebufferSize(mainWindow, &framebufferWidth, &framebufferHeight);
+
+        Int32 framebufferId = 0;
+        auto glGetIntegerv = (void(*)(UInt32, Int32*))glfwGetProcAddress("glGetIntegerv");
+        glGetIntegerv(GL_FRAMEBUFFER_BINDING, &framebufferId);
         
-        this->masterView = UserInterface::MasterView::makeGL(w, h, {framebufferId, 4, 8});
+        this->masterView = UserInterface::MasterView::makeGL(framebufferWidth, framebufferHeight, {framebufferId, 4, 8, f32(framebufferWidth) / f32(windowWidth), f32(framebufferHeight) / f32(windowHeight)});
 
         initializeAudio();
 
@@ -173,8 +181,10 @@ namespace Flux {
         cursorManager->setCompound(masterView);
         
         masterView->addChild<FrameInfo>();
-        auto we = masterView->addChild<RotaryKnob>();
-        we->setPosition({500, 500});
+        
+        auto knob = masterView->addChild<RotaryKnob>();
+        knob->setPosition({500, 500});
+        
         this->shouldRun = true;
 
         Console::logStatus("Created new Flux Application.");

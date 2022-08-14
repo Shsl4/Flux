@@ -20,12 +20,16 @@ namespace Flux::UserInterface {
     void MasterView::draw(SkCanvas*, Float64 deltaTime) {
 
         fassert(canvas && surface);
-
+        
+        canvas->save();
+        canvas->scale(xDpiScale, yDpiScale);
+        
         Component::draw(canvas, deltaTime);
         Compound::draw(canvas, deltaTime);
-
-        context->flush();
         
+        context->flush();
+        canvas->restore();
+      
     }
     
     void MasterView::initialize() {
@@ -67,6 +71,9 @@ namespace Flux::UserInterface {
         auto w = static_cast<Float32>(view->canvas->getBaseLayerSize().fWidth);
         auto h = static_cast<Float32>(view->canvas->getBaseLayerSize().fHeight);
         
+        view->xDpiScale = params.xDpiScale;
+        view->yDpiScale = params.yDpiScale;
+
         view->setScale({w, h});
         view->initialize();
         

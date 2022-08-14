@@ -67,11 +67,22 @@ namespace Flux {
 
     MidiManager::MidiManager() {
 
-        this->midiIn = Allocator<RtMidiIn>::construct();
-        fassertf(midiIn, "Failed to create MIDI Manager.");
+        std::vector<RtMidiIn::Api> apis;
+        RtMidiIn::getCompiledApi(apis);
+        
+        if (apis.empty() || (apis.size() == 1 && apis[0] == RtMidiIn::Api::RTMIDI_DUMMY)) {
+            fabort("No Audio API is available. Make sure you compiled RtMidi with at least one API.");
+        }
+        
+        try{
+            this->midiIn = Allocator<RtMidiIn>::construct();
+        }
+        catch(std::exception const& e){
+            fabort(String::format("Failed to create MIDI Manager. {}", e.what()).toCString());
+        }
         
         midiIn->setCallback(&MidiManager::eventCallback, this);
-        midiIn->ignoreTypes( false, false, false);
+        midiIn->ignoreTypes(false, false, false);
 
         registerCommands();
         
