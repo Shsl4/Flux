@@ -1,4 +1,4 @@
-﻿#include <Flux/UI/Reactive.h>
+#include <Flux/UI/Reactive.h>
 
 #include <Flux/UI/Components/Component.h>
 
@@ -14,7 +14,7 @@ namespace Flux::UserInterface {
 
         // Console::logDebug("Received mouse {} double click. {}", (UInt)button, getClassName());
 
-        if(button==MouseButton::Middle) {
+        if(button == MouseButton::Middle) {
             dynamic_cast<Component*>(this)->discard();
         }
         
@@ -58,13 +58,13 @@ namespace Flux::UserInterface {
 
     void Reactive::onFocus() {
 
-        Console::logRuntime("{} received focus", getClassName());
+        // Console::logRuntime("{} received focus", getClassName());
         
     }
     
     void Reactive::endFocus() {
 
-        Console::logRuntime("{} lost focus", getClassName());
+        // Console::logRuntime("{} lost focus", getClassName());
         
     }
 

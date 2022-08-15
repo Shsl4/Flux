@@ -81,4 +81,18 @@ namespace Flux {
         }
         
     }
+
+    SkVector Node::getOutputSocketPosition(UInt channel) {
+        SkVector e = getAbsolutePosition();
+        SkVector v = { getScale().x(), baseHeight + headerSize + socketSize * f32(channel) + socketSize / 2.0f};
+        return e + v;
+    }
+
+    SkVector Node::getInputSocketPosition(UInt channel) {
+
+        SkVector e = getAbsolutePosition();
+        SkVector v = { socketSize / 2.0f, socketSize / 2.0f + baseHeight + headerSize + socketSize * f32(channel) };
+        return e + v;
+
+    }
 }

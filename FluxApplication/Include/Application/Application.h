@@ -44,7 +44,7 @@ namespace Flux {
         
         static void cursorCallback(GLFWwindow* window, Float64 xPos, Float64 yPos);
         
-        void registerCommands();
+        static void registerCommands();
 
         bool shouldRun = true;
 

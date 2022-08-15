@@ -1,4 +1,4 @@
-﻿#include <Audio/Pipeline/Pipeline.h>
+#include <Audio/Pipeline/Pipeline.h>
 #include <Audio/Pipeline/PipelineElement.h>
 
 #include "Flux/Core/Utilities/ArrayUtils.h"
@@ -11,46 +11,76 @@ namespace Flux::Audio {
                 
     }
 
-    PipelineElement::PipelineElement(UInt inChannels, UInt outChannels) : numIns(inChannels), numOuts(outChannels) {
+    PipelineElement::PipelineElement(UInt inChannels, UInt outChannels) : numIns(inChannels), numOuts(outChannels), signalManager(inChannels) {
 
         for (UInt i = 0; i < numIns; ++i) { previous += Link(); }
 
-        for (UInt i = 0; i < numOuts; ++i) {
-            next += Array<Link>();
-            stateBuffers += Array<Float64>();
+        if(hasOutputs()){
+            
+            this->stateBuffers = Allocator<Float64*>::alloc(outChannels);
+            
+            for (size_t channel = 0; channel < numOuts; ++channel) {
+                stateBuffers[channel] = nullptr;
+            }
+            
+            for (UInt i = 0; i < numOuts; ++i) {
+                next += Array<Link>();
+            }
+        
         }
 
     }
+
+    PipelineElement::~PipelineElement(){
     
+        if (hasOutputs()) {
+            
+            for (size_t channel = 0; channel < numOuts; ++channel) {
+                Allocator<Float64>::release(stateBuffers[channel]);
+            }
+            
+            Allocator<Float64*>::release(stateBuffers);
+            
+        }
+    
+    }
+
     void PipelineElement::prepare(Float64 rate, UInt size) {
 
         AudioObject::prepare(rate, size);
 
         const size_t newSize = size * sizeof(Float64) * numOuts;
-        stateBuffers.resize(newSize);
-        memset(stateBuffers.begin(), 0, newSize);
+
+        if (hasOutputs()) {
+            
+            for (size_t channel = 0; channel < numOuts; ++channel) {
+                
+                Allocator<Float64>::release(stateBuffers[channel]);
+                stateBuffers[channel] = Allocator<Float64>::alloc(size);
+            
+            }
+            
+        }
+        
 
     }
 
     void PipelineElement::signal(const Float64* buffer, UInt channel) {
 
-        ++signalCount;
+        signalManager.signal(channel);
 
-        if(numOuts) {
-            const size_t offset = static_cast<size_t>(channel) * getBufferSize();
-            memcpy(stateBuffers.begin() + offset, buffer, sizeof(Float64) * getBufferSize());
+        if(hasOutputs()) {
+            memcpy(stateBuffers[channel], buffer, sizeof(Float64) * getBufferSize());
         }
 
-        if (signalCount >= numIns) {
+        if (signalManager.ready()) {
 
             // todo: fix this
-            if(numOuts) {
-                for (size_t i = 0; i < numOuts; ++i) {
-                    process({stateBuffers.begin(), numOuts, getBufferSize()});
-                }
+            if(hasOutputs()) {
+                process({stateBuffers, numOuts, getBufferSize()});
             }
             else {
-                process({const_cast<Float64*>(buffer), 1, getBufferSize()});
+                process({(Float64**)const_cast<Float64*>(buffer), 1, getBufferSize()});
             }
 
             UInt ch = 0;
@@ -61,8 +91,7 @@ namespace Flux::Audio {
                 
                     if (!pointer) { continue; }
 
-                    const size_t offset = static_cast<size_t>(ch) * getBufferSize();
-                    pointer->signal(stateBuffers.begin() + offset, targetChannel);
+                    pointer->signal(stateBuffers[ch], targetChannel);
                 
                 }
 
@@ -70,7 +99,8 @@ namespace Flux::Audio {
                 
             }
 
-            signalCount = 0;
+            signalManager.reset();
+            
         }
 
     }
@@ -92,7 +122,7 @@ namespace Flux::Audio {
         Link& otherLink = element->previous[toChannel];
         otherLink.pointer = this;
         otherLink.targetChannel = fromChannel;
-
+        
         element->onLink(UserInterface::Flow::Input, toChannel);
         onLink(UserInterface::Flow::Output, fromChannel);
 
@@ -123,7 +153,7 @@ namespace Flux::Audio {
             otherLink.targetChannel = 0;
 
             currentLinks.removeAt(index);
-            
+                        
         }
         
     }
@@ -141,15 +171,15 @@ namespace Flux::Audio {
             Array<Link>& otherLinks = currentLink.pointer->next[currentLink.targetChannel];
             
             for (size_t i = 0; i < otherLinks.getSize(); ++i) {
-                if(otherLinks[i].pointer == this) {
+                if (otherLinks[i].targetChannel == channel && otherLinks[i].pointer == this) {
                     otherLinks.removeAt(i);
                     break;
                 }
             }
 
             currentLink.pointer = nullptr;
-            currentLink.targetChannel = 0;
-            
+            currentLink.targetChannel = -1;
+                        
         }
         
     }
@@ -162,9 +192,20 @@ namespace Flux::Audio {
         
     }
 
+
     void PipelineElement::onUnlink(UserInterface::Flow flow, UInt channel) {
+        
         Console::logStatus("Unlinked {}. Direction: {}, Channel: {}", getClassName(), flow == UserInterface::Flow::Input ? "input" : "output", channel);
 
     }
+
+    bool PipelineElement::hasOutputs() const {
+        return numOuts > 0;
+    }
+
+    bool PipelineElement::hasInputs() const {
+        return numIns > 0;
+    }
+
     
 }

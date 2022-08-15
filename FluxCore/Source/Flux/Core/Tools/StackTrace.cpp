@@ -1,4 +1,4 @@
-﻿#include <Tools/StackTrace.h>
+#include <Tools/StackTrace.h>
 
 using namespace Flux;
 
@@ -181,8 +181,6 @@ Array<StackFrame> StackTrace::getStackTrace() {
         }
         
     }
-
-    Allocator<char>::release(allocData);
         
     return stack;
     

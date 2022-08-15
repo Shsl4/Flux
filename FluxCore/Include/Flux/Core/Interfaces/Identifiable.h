@@ -1,7 +1,7 @@
-﻿#pragma once
+#pragma once
 
-#include "../Flux.h"
-#include "../Memory/String.h"
+#include <Flux/Core/Flux.h>
+#include <Flux/Core/Memory/String.h>
 
 namespace Flux {
     
@@ -26,8 +26,7 @@ namespace Flux {
         NODISCARD virtual String getDescription() const;
 
         template <typename T>
-        T* cast() { return dynamic_cast<T*>(this); }
-
+        NODISCARD FORCEINLINE T* cast() { return dynamic_cast<T*>(this); }
 
     };
     

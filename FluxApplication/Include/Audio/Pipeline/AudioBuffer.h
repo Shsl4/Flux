@@ -9,16 +9,18 @@ namespace Flux {
 
     public:
         
-        AudioBuffer(ValueType* buffer, const UInt channelCount, const UInt bufferSize)
+        AudioBuffer(ValueType** buffer, const UInt channelCount, const UInt bufferSize)
             : channels(channelCount), bufferSize(bufferSize) { this->buffer = buffer; }
         
         NODISCARD FORCEINLINE ValueType* getChannelBuffer(const UInt channel) const {
 
             fassert(channel < channels);
-            return buffer + channel * bufferSize;
+            return buffer[channel];
             
         }
 
+        NODISCARD FORCEINLINE ValueType** getRawBuffers() const { return buffer; }
+        
         NODISCARD FORCEINLINE UInt getBufferSize() const { return bufferSize; }
 
         NODISCARD FORCEINLINE UInt getChannelCount() const { return channels; }
@@ -27,7 +29,7 @@ namespace Flux {
 
         const UInt channels;
         const UInt bufferSize;
-        ValueType* buffer;
+        ValueType** buffer;
 
     };
     

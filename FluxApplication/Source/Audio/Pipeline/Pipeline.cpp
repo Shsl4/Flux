@@ -1,4 +1,6 @@
-﻿#include <Audio/Pipeline/Pipeline.h>
+#include <Audio/Pipeline/Pipeline.h>
+#include <skia/effects/SkDashPathEffect.h>
+#include <skia/effects/SkGradientShader.h>
 
 #include "Flux/Core/Utilities/ArrayUtils.h"
 
@@ -29,12 +31,14 @@ namespace Flux::Audio {
                     inChannel->pipeline = this;
                     pipelineView->addChild(inChannel->getComponent());
                     inputChannels += inChannel;
+                    elements += inChannel;
 
                     const auto outChannel = SharedPointer<PipelineOutput>::make();
                     outChannel->pipeline = this;
                     pipelineView->addChild(outChannel->getComponent());
                     outputChannels += outChannel;
-                    
+                    elements += outChannel;
+
                 }
                 
             }
@@ -125,6 +129,10 @@ namespace Flux::Audio {
             
         }
         
+    }
+
+    void Pipeline::setPipelineView(const SharedPointer<UserInterface::MasterView> &view) {
+        this->pipelineView = view.weak();
     }
 
 }

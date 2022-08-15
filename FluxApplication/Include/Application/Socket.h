@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <Flux/UI/Components/Component.h>
+#include <skia/core/SkPath.h>
 
 namespace Flux {
     

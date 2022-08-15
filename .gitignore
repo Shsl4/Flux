@@ -29,4 +29,5 @@
 *.DS_STORE
 /Build
 /.cmake
+/.idea
 /cmake-build-debug

@@ -40,7 +40,8 @@ namespace Flux {
         pipeline->prepare(rate, size);
 
         pipeline->addElement<Audio::LPFElement>();
-        
+        pipeline->addElement<Audio::HPFElement>();
+
     }
 
     void MyAudioDevice::onMidiMessage(MidiMessage const& message) {
@@ -128,7 +129,7 @@ namespace Flux {
         frame += 1.0;
 
         if(frame >= 250) {
-            Console::logDebug("Average: {} ms", total / frame);
+            //Console::logDebug("Average: {} ms", total / frame);
             frame = 0.0;
             total = 0.0;
         }

@@ -24,6 +24,10 @@ namespace Flux {
 
         void cleanup() override;
 
+        NODISCARD SkVector getInputSocketPosition(UInt channel);
+
+        NODISCARD SkVector getOutputSocketPosition(UInt channel);
+
         NODISCARD Audio::PipelineElement* getElement() const { return this->element; }
         
         NODISCARD UserInterface::LinearColor getHeaderColor() const { return this->headerColor; }

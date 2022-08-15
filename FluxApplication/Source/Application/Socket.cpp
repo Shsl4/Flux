@@ -103,8 +103,6 @@ namespace Flux {
         
     }
 
-    SkScalar ps[] = { 10.0f, 10.0f };
-
     void Socket::draw(SkCanvas* canvas, Float64 deltaTime) {
         
         SkPaint paint;
@@ -118,6 +116,7 @@ namespace Flux {
         paint.setStyle(SkPaint::kStroke_Style);
         paint.setStrokeWidth(lineWidth);
         paint.setColor(UserInterface::LinearColor::fromHex(0xffffff55).toSkColor());
+        SkScalar ps[] = { 10.0f, 10.0f };
         paint.setPathEffect(SkDashPathEffect::Make(ps, 2, f32(linePhase)));
         linePhase -= 20.0 * deltaTime;
         
@@ -129,7 +128,7 @@ namespace Flux {
             canvas->drawPath(makeSpline(root, lineEnd, factor), paint);
             
         }        
-
+/*
         if(flowType == UserInterface::Flow::Input) { return; }
         
         paint.setColor(cableColor.toSkColor());
@@ -149,7 +148,7 @@ namespace Flux {
             canvas->drawPath(makeSpline(root, end, factor), paint);
             
         }
-
+*/
     }
 
     void Socket::onLink() {
