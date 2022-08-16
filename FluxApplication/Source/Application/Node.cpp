@@ -12,7 +12,7 @@ namespace Flux {
         const UInt count = inputs > outputs ? inputs : outputs;
         const Float32 ioHeight = socketSize * f32(count);
 
-        setScale( { baseWidth, baseHeight + headerSize + ioHeight } );
+        setScale( { baseWidth,  baseHeight + headerSize + ioHeight } );
         setColor(UserInterface::LinearColor::fromHex(0x606060ff));
 
         for (UInt i = 0; i < inputs; ++i) {
@@ -34,7 +34,7 @@ namespace Flux {
             child->setDataType(DataType::Audio, i);
             
         }
-            
+
     }
 
     void Node::draw(SkCanvas* canvas, Float64 deltaTime) {
@@ -95,4 +95,31 @@ namespace Flux {
         return e + v;
 
     }
+
+    void FilterNode::initialize() {
+        Node::initialize();
+    }
+
+    void FilterNode::draw(SkCanvas *canvas, Float64 deltaTime) {
+        Node::draw(canvas, deltaTime);
+    }
+
+    FilterNode::FilterNode(Audio::PipelineElement *element, UInt inputs, UInt outputs, Float32 socketSize,
+                           Float32 baseWidth, Float32 baseHeight, Float32 headerSize,
+                           const UserInterface::LinearColor &headerColor) : Node(element, inputs, outputs, socketSize,
+                                                                                 baseWidth, drawerHeight + baseHeight, headerSize,
+                                                                                 headerColor) {
+
+
+        this->drawer = addChild<FilterDrawer>();
+        this->drawer->setScale({ baseWidth, drawerHeight });
+        this->drawer->setPosition({0, headerSize});
+
+    }
+
+    void FilterNode::setPosition(const SkVector &value) {
+        Component::setPosition(value);
+        drawer->recalculatePath();
+    }
+
 }

@@ -4,6 +4,7 @@
 #include <Flux/Core/Math/Math.h>
 #include "Socket.h"
 #include "../Audio/Pipeline/PipelineElement.h"
+#include "FilterDrawer.h"
 
 namespace Flux {
 
@@ -46,6 +47,26 @@ namespace Flux {
         UserInterface::LinearColor headerColor = UserInterface::LinearColor::fromHex(0x8814f6ff);
 
         Audio::PipelineElement* element;
+
+    };
+
+    class FilterNode : public Node{
+
+    public:
+
+        FilterNode(Audio::PipelineElement *element, UInt inputs, UInt outputs, Float32 socketSize, Float32 baseWidth,
+                   Float32 baseHeight, Float32 headerSize, const UserInterface::LinearColor &headerColor);
+
+        void initialize() override;
+
+        void draw(SkCanvas *canvas, Float64 deltaTime) override;
+
+        void setPosition(const SkVector &value) override;
+
+    private:
+
+        WeakPointer<FilterDrawer> drawer;
+        static constexpr Float32 drawerHeight = 100.0f;
 
     };
     

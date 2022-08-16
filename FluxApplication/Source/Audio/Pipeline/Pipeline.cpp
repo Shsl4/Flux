@@ -135,5 +135,18 @@ namespace Flux::Audio {
         this->pipelineView = view.weak();
     }
 
+    FilterElement::FilterElement(UInt inChannels, UInt outChannels) : PipelineElement(inChannels, outChannels) {}
+
+    LPFNode::LPFNode(FilterElement *elem) : FilterNode(elem, 2, 2, 25.0, 200.0, 50.0, 5.0, UserInterface::Colors::green) {}
+
+    HPFNode::HPFNode(FilterElement *elem) : FilterNode(elem, 2, 2, 25.0, 200.0, 50.0, 5.0, UserInterface::Colors::red) {}
+
+    LPFElement::LPFElement() : FilterElement(2, 2) {
+
+        component = SharedPointer<LPFNode>::make(this);
+        filters += SharedPointer<LowPassFilter>::make();
+        filters += SharedPointer<LowPassFilter>::make();
+
+    }
 }
 

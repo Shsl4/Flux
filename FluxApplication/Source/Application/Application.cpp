@@ -10,6 +10,7 @@
 #include <Application/Socket.h>
 
 #include <Application/LinkResolver.h>
+#include <Application/FilterDrawer.h>
 
 #define GL_FRAMEBUFFER_BINDING 0x8CA6
 
@@ -135,177 +136,6 @@ namespace Flux {
         
     };
 
-    template<typename NumberType>
-    struct Range{
-
-    public:
-
-        Range(NumberType min, NumberType max) : min(min), max(max) {}
-
-        NODISCARD static Range makeLinearRange() { return { static_cast<NumberType>(0), static_cast<NumberType>(1) }; }
-
-        NODISCARD FORCEINLINE NumberType getMin() const{ return this->min; }
-
-        NODISCARD FORCEINLINE NumberType getMax() const{ return this->max; }
-
-    private:
-
-        NumberType min;
-        NumberType max;
-
-    };
-
-    template<typename NumberType>
-    NumberType translateValue(NumberType value, Range<NumberType> fromRange, Range<NumberType> toRange){
-
-        NumberType fromValue = fromRange.getMax() - fromRange.getMin();
-        NumberType toValue = toRange.getMax() - toRange.getMin();
-        return (((value - fromRange.getMin()) * toValue) / fromValue) + toRange.getMin();
-
-    }
-
-
-    class FilterDrawer : public UserInterface::Component {
-
-    public:
-
-        void initialize() override {
-            
-            Component::initialize();
-            setScale({ 400, 200 });
-            setPosition({ 500, 300 });
-            setColor(UserInterface::LinearColor::fromHex(0x303030ff));
-            filter.prepare(44100, 512);
-            filter.setResonance(10);
-            
-        }
-
-        Float64 freqToRad(Float64 f, Float64 ny){
-            return (f * Math::pi<Float64>) / ny;
-        }
-
-        Float64 t = 0.0;
-        Float64 f = 10.0;
-        Float64 dir = 1.0;
-        
-        void drawGrid(SkCanvas* canvas){
-            
-            SkPaint paint;
-            paint.setStrokeWidth(2.5);
-            paint.setColor(UserInterface::LinearColor::fromHex(0x454545ff).toSkColor());
-
-            const Range<Float64> logRange = { log10(10), log10(44100.0 / 2.0) };
-            const Range<Float64> linRange = Range<Float64>::makeLinearRange();
-            const SkVector position = getAbsolutePosition();
-            const SkVector scale = getScale();
-            
-            canvas->drawLine(position.fX, position.fY + scale.fY / 2.0, position.fX + scale.fX, position.fY + scale.fY / 2.0, paint);
-            paint.setStrokeWidth(1.0);
-
-            for (size_t p = 1; p <= 4; ++p) {
-                
-                Float64 pw = std::pow(10.0, f64(p));
-                
-                for (size_t d = 1; d <= 9; ++d) {
-                    
-                    Float64 f = pw * f64(d);
-                    
-                    const Float64 drawX = translateValue(log10(f), logRange, linRange) * scale.fX + position.fX;
-                    
-                    if(drawX > position.fX + scale.fX) return;
-                    
-                    canvas->drawLine(drawX, position.fY, drawX, position.fY + scale.fY, paint);
-                    
-                }
-                
-            }
-            
-        }
-
-        void draw(SkCanvas *canvas, Float64 deltaTime) override {
-
-            UserInterface::Component::draw(canvas, deltaTime);
-            drawGrid(canvas);
-
-            SkPaint paint;
-            
-            paint.setStyle(SkPaint::kStroke_Style);
-            paint.setStrokeWidth(2.0f);
-            paint.setColor(SK_ColorWHITE);
-
-            SkPath path;
-
-            constexpr Float64 sr = 44100;
-            constexpr Float64 nyquist = sr / 2.0;
-            constexpr Float64 pi = Math::pi<Float64>;
-            constexpr UInt points = nyquist / 2;
-            constexpr Float64 interval = pi / f64(points);
-            constexpr Float64 mindB = -40.0;
-            constexpr Float64 maxdB = 40.0;
-            
-            f = Math::easeIn(10.0, nyquist, f32(t), 5);
-
-            t += deltaTime / 2.0;
-
-            if(t >= 1.0){
-                t = 0.0;
-            }
-
-            filter.setCutoffFrequency(f);
-
-            const SkVector pos = getPosition();
-
-            Float64 omega = freqToRad(10.0, nyquist);
-
-            SkVector lastPoint = getPosition();
-            lastPoint.fY += getScale().fY;
-
-            // todo: Find a correct distribution algorithm
-            for (UInt i = 0; i <= points; ++i) {
-
-                const Float64 mag = filter.getMagnitude(omega);
-                const Float64 response = 20.0 * log10(mag);
-                const Float64 f = (omega / pi) * nyquist;
-                const Float64 finalResponse = Math::clamp(response, mindB, maxdB);
-                const Range<Float64> logRange = { log10(10), log10(nyquist) };
-                const Range<Float64> linRange = Range<Float64>::makeLinearRange();
-
-                const Float64 normalizedResponse = ((finalResponse - mindB)) / (maxdB - mindB);
-                const Float64 normalizedFrequency = translateValue(log10(f), logRange, linRange);
-
-                omega += interval;
-
-                if(!isfinite(normalizedResponse)) continue;
-
-                Float32 drawX = pos.fX + f32(normalizedFrequency * getScale().fX);
-                Float32 drawY = pos.fY + getScale().fY - f32(normalizedResponse * getScale().fY);
-
-                SkVector newPoint = { drawX, drawY };
-
-                // todo: Fix this
-                if(i == 0){
-                    path.moveTo(newPoint);
-                }
-                else{
-                    path.moveTo(lastPoint);
-                    if(finalResponse != mindB)
-                        path.lineTo(newPoint);
-                }
-
-                lastPoint = newPoint;
-
-            }
-
-            canvas->drawPath(path, paint);
-
-        }
-
-    private:
-
-        Audio::LowPassFilter filter;
-
-    };
-
     void Application::run() {
 
         fassertf(!instance, "Tried to run multiple Applications at the same time");
@@ -376,7 +206,6 @@ namespace Flux {
         this->shouldRun = true;
 
         this->masterView->addChild<LinkResolver>()->pipeline = audioDevice->getPipeline();
-        this->masterView->addChild<FilterDrawer>();
 
         Console::logStatus("Created new Flux Application.");
 

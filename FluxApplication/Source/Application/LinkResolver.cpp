@@ -28,7 +28,7 @@ namespace Flux{
                 for(auto const& link : element->next[channel]){
 
                     auto fromNode = element->getComponent()->cast<Node>();
-                    auto toNode = link.pointer->getComponent().raw()->cast<Node>();
+                    auto toNode = link.pointer->getComponent()->cast<Node>();
 
                     auto pA = fromNode->getOutputSocketPosition(channel);
                     auto pB = toNode->getInputSocketPosition(link.targetChannel);
