@@ -71,8 +71,6 @@ namespace Flux::Audio {
         PipelineElement() = delete;
 
         void prepare(Float64 rate, UInt size) override;
-
-        void extracted();
         
         void signal(const Float64* buffer, UInt channel);
         
@@ -93,8 +91,6 @@ namespace Flux::Audio {
         
         NODISCARD bool isInPipeline(const PipelineElement* other) const;
         
-        NODISCARD virtual SharedPointer<UserInterface::Component> getComponent() const = 0;
-        
         NODISCARD FORCEINLINE bool hasOutputs() const;
         
         NODISCARD FORCEINLINE bool hasInputs() const;
@@ -108,6 +104,10 @@ namespace Flux::Audio {
         virtual void onUnlink(UserInterface::Flow flow, UInt channel);
 
         virtual void process(AudioBuffer<Float64> const& buffer) = 0;
+
+        virtual void createComponent(UserInterface::Compound* parent) = 0;
+        
+        NODISCARD virtual WeakPointer<UserInterface::Component> getComponent() const = 0;
 
         virtual void discard();
     

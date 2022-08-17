@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Flux/UI/Components/Component.h>
-#include "../Audio/Pipeline/Pipeline.h"
+#include <Audio/Pipeline/Pipeline.h>
 
 namespace Flux {
 

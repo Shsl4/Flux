@@ -27,17 +27,8 @@ namespace Flux::Audio {
 
                 for (size_t i = 0; i < diff; ++i) {
 
-                    const auto inChannel = SharedPointer<PipelineInput>::make();
-                    inChannel->pipeline = this;
-                    pipelineView->addChild(inChannel->getComponent());
-                    inputChannels += inChannel;
-                    elements += inChannel;
-
-                    const auto outChannel = SharedPointer<PipelineOutput>::make();
-                    outChannel->pipeline = this;
-                    pipelineView->addChild(outChannel->getComponent());
-                    outputChannels += outChannel;
-                    elements += outChannel;
+                    inputChannels += addElement<PipelineInput>();
+                    outputChannels += addElement<PipelineOutput>();
 
                 }
                 
@@ -134,18 +125,22 @@ namespace Flux::Audio {
     void Pipeline::setPipelineView(const SharedPointer<UserInterface::MasterView> &view) {
         this->pipelineView = view.weak();
     }
+    
+    LPFNode::LPFNode() : FilterNode(2, 2, 25.0, 200.0, 50.0, 5.0, UserInterface::Colors::green) {}
 
-    FilterElement::FilterElement(UInt inChannels, UInt outChannels) : PipelineElement(inChannels, outChannels) {}
-
-    LPFNode::LPFNode(FilterElement *elem) : FilterNode(elem, 2, 2, 25.0, 200.0, 50.0, 5.0, UserInterface::Colors::green) {}
-
-    HPFNode::HPFNode(FilterElement *elem) : FilterNode(elem, 2, 2, 25.0, 200.0, 50.0, 5.0, UserInterface::Colors::red) {}
+    HPFNode::HPFNode() : FilterNode(2, 2, 25.0, 200.0, 50.0, 5.0, UserInterface::Colors::red) {}
 
     LPFElement::LPFElement() : FilterElement(2, 2) {
 
-        component = SharedPointer<LPFNode>::make(this);
         filters += SharedPointer<LowPassFilter>::make();
         filters += SharedPointer<LowPassFilter>::make();
+
+    }
+
+    HPFElement::HPFElement(): FilterElement(2, 2) {
+
+        filters += SharedPointer<HighPassFilter>::make();
+        filters += SharedPointer<HighPassFilter>::make();
 
     }
 }

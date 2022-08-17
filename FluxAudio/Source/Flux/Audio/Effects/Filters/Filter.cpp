@@ -20,6 +20,14 @@ namespace Flux::Audio {
         
     }
 
+    Float64 Filter::getMagnitude(Float64 omega) const {
+        return 0.0;
+    }
+
+    Float64 Filter::getArgument(Float64 omega) const {
+        return 0.0;
+    }
+
     void Filter::setCutoffFrequency(const Float64 cutoff) {
 
         fassert(cutoff >= 0.0);

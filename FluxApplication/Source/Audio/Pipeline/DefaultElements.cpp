@@ -3,8 +3,6 @@
 namespace Flux::Audio {
 
     PipelineInput::PipelineInput(): PipelineElement(0, 1) {
-
-        this->component = SharedPointer<InputNode>::make(this);
         
     }
 
@@ -12,12 +10,15 @@ namespace Flux::Audio {
             
     }
 
-    SharedPointer<UserInterface::Component> PipelineInput::getComponent() const {
+    void PipelineInput::createComponent(UserInterface::Compound* parent) {
+        this->component = parent->addChild<InputNode>();
+    }
+
+    WeakPointer<UserInterface::Component> PipelineInput::getComponent() const {
         return this->component;
     }
 
     PipelineOutput::PipelineOutput(): PipelineElement(1, 0) {
-        this->component = SharedPointer<OutputNode>::make(this);
     }
 
     void PipelineOutput::process(AudioBuffer<Float64> const& buffer) {
@@ -28,7 +29,11 @@ namespace Flux::Audio {
             
     }
 
-    SharedPointer<UserInterface::Component> PipelineOutput::getComponent() const { return this->component; }
+    void PipelineOutput::createComponent(UserInterface::Compound* parent) {
+        this->component = parent->addChild<OutputNode>();
+    }
+
+    WeakPointer<UserInterface::Component> PipelineOutput::getComponent() const { return this->component; }
 
     void PipelineOutput::prepareOutput(Float64* buffer) {
         this->outputBuffer = buffer;

@@ -5,6 +5,8 @@
 
 namespace Flux::Audio {
 
+    void PipelineElement::createComponent(UserInterface::Compound* parent) {}
+
     void PipelineElement::discard() {
 
         pipeline->removeElement(this);

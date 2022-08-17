@@ -23,7 +23,7 @@ namespace Flux {
     template <typename Y>
     WeakPointer<T>::WeakPointer(WeakPointer<Y> const& other) {
 
-        static_assert(std::is_convertible_v<T*, Y*>);
+        //static_assert(std::is_convertible_v<T*, Y*>);
 
         if (other.pointer) {
             

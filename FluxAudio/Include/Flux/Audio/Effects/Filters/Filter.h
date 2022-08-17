@@ -18,7 +18,10 @@ namespace Flux::Audio {
         void prepare(Float64 rate, UInt size) override;
 
         bool process(Float64* buffer) override;
-
+        
+        NODISCARD virtual Float64 getMagnitude(Float64 omega) const;
+        NODISCARD virtual Float64 getArgument(Float64 omega) const;
+        
         virtual void setCutoffFrequency(Float64 cutoff);
         virtual void setResonance(Float64 value);
         

@@ -198,7 +198,7 @@ namespace Flux {
         }
     
         // Move back all the elements after the index.
-        Allocator<T>::move(this->data + index + 1, this->data + this->size, this->data + index);
+        Memory::move(this->data + index + 1, this->data + this->size, this->data + index);
         
         // Reduce the size of the array.
         --this->size;

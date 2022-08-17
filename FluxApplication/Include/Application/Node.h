@@ -4,7 +4,8 @@
 #include <Flux/Core/Math/Math.h>
 #include "Socket.h"
 #include "../Audio/Pipeline/PipelineElement.h"
-#include "FilterDrawer.h"
+#include "FilterGraph.h"
+#include "Audio/Pipeline/FilterElement.h"
 
 namespace Flux {
 
@@ -12,7 +13,7 @@ namespace Flux {
 
     public:
         
-        Node(Audio::PipelineElement* element, UInt inputs, UInt outputs, Float32 socketSize, Float32 baseWidth,
+        Node(UInt inputs, UInt outputs, Float32 socketSize, Float32 baseWidth,
              Float32 baseHeight, Float32 headerSize, const UserInterface::LinearColor& headerColor);
 
         void initialize() override;
@@ -29,10 +30,22 @@ namespace Flux {
 
         NODISCARD SkVector getOutputSocketPosition(UInt channel);
 
+        void setElement(Audio::PipelineElement* value) { this->element = value; onElementSet(); }
+
+        virtual void onElementSet();
+        
         NODISCARD Audio::PipelineElement* getElement() const { return this->element; }
         
         NODISCARD UserInterface::LinearColor getHeaderColor() const { return this->headerColor; }
 
+    protected:
+
+        const Float32 socketSize = 25.0f;
+        const Float32 baseWidth = 200.0f;
+        const Float32 baseHeight = 50.0f;
+        const Float32 headerSize = 5.0f;
+        UserInterface::LinearColor headerColor = UserInterface::LinearColor::fromHex(0x8814f6ff);
+        
     private:
         
         SkVector lastClickPos = {};
@@ -40,22 +53,18 @@ namespace Flux {
         const UInt inputs = 2;
         const UInt outputs = 2;
 
-        const Float32 socketSize = 25.0f;
-        const Float32 baseWidth = 200.0f;
-        const Float32 baseHeight = 50.0f;
-        const Float32 headerSize = 5.0f;
-        UserInterface::LinearColor headerColor = UserInterface::LinearColor::fromHex(0x8814f6ff);
-
-        Audio::PipelineElement* element;
+        Audio::PipelineElement* element = nullptr;
 
     };
 
-    class FilterNode : public Node{
+    class FilterNode : public Node, public FilterGraphListener {
 
     public:
 
-        FilterNode(Audio::PipelineElement *element, UInt inputs, UInt outputs, Float32 socketSize, Float32 baseWidth,
+        FilterNode(UInt inputs, UInt outputs, Float32 socketSize, Float32 baseWidth,
                    Float32 baseHeight, Float32 headerSize, const UserInterface::LinearColor &headerColor);
+
+        void onElementSet() override;
 
         void initialize() override;
 
@@ -63,9 +72,12 @@ namespace Flux {
 
         void setPosition(const SkVector &value) override;
 
+        void onValueChange(Float64 frequency, Float64 resonance) override;
+
     private:
 
-        WeakPointer<FilterDrawer> drawer;
+        FilterElement* filterElement = nullptr;
+        WeakPointer<FilterGraph> drawer;
         static constexpr Float32 drawerHeight = 100.0f;
 
     };

@@ -11,9 +11,7 @@ namespace Flux{
 
     template<typename NumberType>
     struct Range{
-
-    public:
-
+        
         Range(NumberType min, NumberType max) : min(min), max(max) {}
 
         NODISCARD static Range makeLinearRange() { return { static_cast<NumberType>(0), static_cast<NumberType>(1) }; }
@@ -26,7 +24,7 @@ namespace Flux{
 
             NumberType fromValue = fromRange.getMax() - fromRange.getMin();
             NumberType toValue = toRange.getMax() - toRange.getMin();
-            return (((value - fromRange.getMin()) * toValue) / fromValue) + toRange.getMin();
+            return (value - fromRange.getMin()) * toValue / fromValue + toRange.getMin();
 
         }
 
@@ -50,19 +48,18 @@ namespace Flux{
             if (k < (1.0 / 2.75)) {
                 return 7.5625 * k * k;
             }
-            else if (k < (2.0 / 2.75)) {
+            if (k < (2.0 / 2.75)) {
                 const Float64 v = k - (1.5 / 2.75);
                 return 7.5625 * v * v + 0.75;
             }
-            else if (k < (2.5f/2.75f)) {
+            if (k < (2.5 / 2.75)) {
                 const Float64 v = k - (2.25 / 2.75);
                 return 7.5625 * v * v + 0.9375;
             }
-            else {
-                const Float64 v = k - (2.625 / 2.75);
-                return 7.5625f * v * v + 0.984375;
-            }
-
+            
+            const Float64 v = k - (2.625 / 2.75);
+            return 7.5625 * v * v + 0.984375;
+            
         }
 
         static Float64 InOut (Float64 k) {
@@ -71,7 +68,17 @@ namespace Flux{
         }
     };
 
-    class FilterDrawer : public UserInterface::Component {
+    class FilterGraphListener {
+        
+    public:
+        
+        virtual ~FilterGraphListener() = default;
+
+        virtual void onValueChange(Float64 frequency, Float64 resonance) = 0;
+        
+    };
+
+    class FilterGraph : public UserInterface::Component {
 
     public:
 
@@ -81,7 +88,7 @@ namespace Flux{
 
         static Array<Float64> distributeAround(Float64 freq, Float64 ny, UInt count);
 
-        void drawGrid(SkCanvas* canvas);
+        void drawGrid(SkCanvas* canvas) const;
 
         void recalculatePath();
 
@@ -89,15 +96,18 @@ namespace Flux{
 
         void draw(SkCanvas *canvas, Float64 deltaTime) override;
 
+        void addListener(FilterGraphListener* listener);
+
+        const Audio::Filter* filterRef = nullptr;
+        
     private:
 
-        Float64 t = 0.0;
-        Float64 f = 10.0;
+        Float32 t = 0.0;
+        Float32 f = 10.0;
         SkPath path;
 
-        Audio::LowPassFilter filter;
-
-
+        Array<FilterGraphListener*> listeners;
+        
     };
 
 }

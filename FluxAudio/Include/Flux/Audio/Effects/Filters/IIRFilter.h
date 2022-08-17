@@ -10,9 +10,9 @@ namespace Flux::Audio {
 
     public:
 
-        NODISCARD Float64 getMagnitude(Float64 omega) const;
+        NODISCARD Float64 getMagnitude(Float64 omega) const override;
         
-        NODISCARD Float64 getArgument(Float64 omega) const;
+        NODISCARD Float64 getArgument(Float64 omega) const override;
 
         FORCEINLINE Float64 getMix() const { return this->mix; }
 

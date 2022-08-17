@@ -1,11 +1,13 @@
 #include <Application/Node.h>
 
+#include "Audio/Pipeline/FilterElement.h"
+
 namespace Flux {
     
-    Node::Node(Audio::PipelineElement* element, const UInt inputs, const UInt outputs, const Float32 socketSize, const Float32 baseWidth,
+    Node::Node(const UInt inputs, const UInt outputs, const Float32 socketSize, const Float32 baseWidth,
                const Float32 baseHeight, const Float32 headerSize, const UserInterface::LinearColor& headerColor)
         : inputs(inputs), outputs(outputs), socketSize(socketSize), baseWidth(baseWidth), baseHeight(baseHeight),
-          headerSize(headerSize), headerColor(headerColor), element(element) { }
+          headerSize(headerSize), headerColor(headerColor) { }
 
     void Node::initialize() {
             
@@ -88,6 +90,8 @@ namespace Flux {
         return e + v;
     }
 
+    void Node::onElementSet() {}
+
     SkVector Node::getInputSocketPosition(UInt channel) {
 
         SkVector e = getAbsolutePosition();
@@ -97,29 +101,53 @@ namespace Flux {
     }
 
     void FilterNode::initialize() {
+        
         Node::initialize();
+
+        this->drawer = addChild<FilterGraph>();
+        this->drawer->setScale({ baseWidth, drawerHeight });
+        this->drawer->setPosition({0, headerSize});
+        
     }
 
     void FilterNode::draw(SkCanvas *canvas, Float64 deltaTime) {
         Node::draw(canvas, deltaTime);
     }
 
-    FilterNode::FilterNode(Audio::PipelineElement *element, UInt inputs, UInt outputs, Float32 socketSize,
+    FilterNode::FilterNode(UInt inputs, UInt outputs, Float32 socketSize,
                            Float32 baseWidth, Float32 baseHeight, Float32 headerSize,
-                           const UserInterface::LinearColor &headerColor) : Node(element, inputs, outputs, socketSize,
+                           const UserInterface::LinearColor &headerColor) : Node(inputs, outputs, socketSize,
                                                                                  baseWidth, drawerHeight + baseHeight, headerSize,
                                                                                  headerColor) {
 
+        
 
-        this->drawer = addChild<FilterDrawer>();
-        this->drawer->setScale({ baseWidth, drawerHeight });
-        this->drawer->setPosition({0, headerSize});
+    }
 
+    void FilterNode::onElementSet() {
+
+        this->filterElement = getElement()->cast<FilterElement>();
+        this->drawer->filterRef = filterElement->getFilters()[0];
+        drawer->addListener(this);
+        
     }
 
     void FilterNode::setPosition(const SkVector &value) {
         Component::setPosition(value);
         drawer->recalculatePath();
+    }
+
+    void FilterNode::onValueChange(Float64 frequency, Float64 resonance) {
+
+        auto& filters = filterElement->getFilters();
+
+        for (const auto& filter : filters) {
+
+            filter->setCutoffFrequency(frequency);
+            filter->setResonance(resonance);
+            
+        }
+        
     }
 
 }

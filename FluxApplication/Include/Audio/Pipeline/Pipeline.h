@@ -1,11 +1,12 @@
 #pragma once
 
 #include <Flux/Audio/AudioObject.h>
-
 #include <Flux/Core/Memory/Array.h>
+#include <Flux/Audio/Effects/Filters/IIRFilter.h>
+#include <Flux/UI/Components/MasterView.h>
 
-#include "Flux/Audio/Effects/Filters/IIRFilter.h"
-#include "Flux/UI/Components/MasterView.h"
+#include "FilterElement.h"
+
 #include "DefaultElements.h"
 
 namespace Flux::Audio {
@@ -30,7 +31,8 @@ namespace Flux::Audio {
             auto element = SharedPointer<T>::make(std::forward<Args>(args)...);
             this->elements += element;
             element->pipeline = this;
-            pipelineView->addChild(element->getComponent());
+            element->createComponent(pipelineView.raw());
+            element->getComponent()->template cast<Node>()->setElement(element.raw());
 
             if(getBufferSize() > 0) {
                 element->prepare(getSampleRate(), getBufferSize());
@@ -50,29 +52,20 @@ namespace Flux::Audio {
 
         WeakPointer<UserInterface::MasterView> pipelineView;
 
-        OwnedArray<PipelineInput> inputChannels;
-        OwnedArray<PipelineOutput> outputChannels;
+        WeakArray<PipelineInput> inputChannels;
+        WeakArray<PipelineOutput> outputChannels;
         OwnedArray<PipelineElement> elements;
 
         Float64* processBuffers = nullptr;
 
     };
 
-    class FilterElement : public PipelineElement{
-
-    public:
-
-        FilterElement(UInt inChannels, UInt outChannels);
-
-        NODISCARD virtual Array<IIRFilter*> getFilters() const = 0;
-
-    };
 
     class LPFNode : public FilterNode {
 
     public:
 
-        explicit LPFNode(FilterElement* elem);
+        LPFNode();
 
     };
 
@@ -80,7 +73,7 @@ namespace Flux::Audio {
 
     public:
 
-        explicit HPFNode(FilterElement* elem);
+        HPFNode();
 
     };
 
@@ -89,18 +82,6 @@ namespace Flux::Audio {
 
         LPFElement();
 
-        NODISCARD Array<IIRFilter*> getFilters() const override{
-            Array<IIRFilter*> ar;
-            for(auto& e : filters){
-                ar += e.raw();
-            }
-            return ar;
-        }
-
-        NODISCARD SharedPointer<UserInterface::Component> getComponent() const override {
-            return this->component;
-        }
-
         void prepare(Float64 rate, UInt size) override {
 
             PipelineElement::prepare(rate, size);
@@ -109,6 +90,14 @@ namespace Flux::Audio {
                 filter->prepare(rate, size);
             }
 
+        }
+
+        void createComponent(UserInterface::Compound* parent) override {
+            this->component = parent->addChild<LPFNode>();
+        }
+
+        NODISCARD WeakPointer<UserInterface::Component> getComponent() const override {
+            return this->component;
         }
 
         void process(AudioBuffer<Float64> const& buffer) override {
@@ -120,34 +109,23 @@ namespace Flux::Audio {
 
     private:
 
-        SharedPointer<LPFNode> component;
-        OwnedArray<LowPassFilter> filters;
+        WeakPointer<LPFNode> component;
 
     };
 
     class HPFElement : public FilterElement {
     public:
 
-        HPFElement() : FilterElement(2, 2) {
+        HPFElement();
 
-            component = SharedPointer<HPFNode>::make(this);
-            filters += SharedPointer<HighPassFilter>::make();
-            filters += SharedPointer<HighPassFilter>::make();
-
+        void createComponent(UserInterface::Compound* parent) override {
+            this->component = parent->addChild<HPFNode>();
         }
 
-        NODISCARD SharedPointer<UserInterface::Component> getComponent() const override {
+        NODISCARD WeakPointer<UserInterface::Component> getComponent() const override {
             return this->component;
         }
-
-        NODISCARD Array<IIRFilter*> getFilters() const override{
-            Array<IIRFilter*> ar;
-            for(auto& e : filters){
-                ar += e.raw();
-            }
-            return ar;
-        }
-
+        
         void prepare(Float64 rate, UInt size) override {
 
             PipelineElement::prepare(rate, size);
@@ -167,8 +145,7 @@ namespace Flux::Audio {
 
     private:
 
-        SharedPointer<HPFNode> component;
-        OwnedArray<HighPassFilter> filters;
+        WeakPointer<HPFNode> component;
 
     };
 

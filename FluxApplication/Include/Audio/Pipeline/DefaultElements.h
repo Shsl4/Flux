@@ -8,7 +8,7 @@ namespace Flux::Audio {
         
     public:
         
-        InputNode(PipelineElement* elem) : Node(elem, 0, 1, 25.0, 100.0, 0.0, 5.0, UserInterface::Colors::white) {}
+        InputNode() : Node(0, 1, 25.0, 100.0, 0.0, 5.0, UserInterface::Colors::white) {}
         
         
     };
@@ -17,7 +17,7 @@ namespace Flux::Audio {
         
     public:
         
-        OutputNode(PipelineElement* elem) : Node(elem, 1, 0, 25.0, 100.0, 0.0, 5.0, UserInterface::Colors::white) {}
+        OutputNode() : Node(1, 0, 25.0, 100.0, 0.0, 5.0, UserInterface::Colors::white) {}
         
     };
         
@@ -29,11 +29,13 @@ namespace Flux::Audio {
 
         void process(AudioBuffer<Float64> const& buffer) override;
 
-        NODISCARD SharedPointer<UserInterface::Component> getComponent() const override;
+        void createComponent(UserInterface::Compound* parent) override;
+
+        NODISCARD WeakPointer<UserInterface::Component> getComponent() const override;
 
     private:
 
-        SharedPointer<InputNode> component;
+        WeakPointer<InputNode> component;
 
     };
 
@@ -45,7 +47,9 @@ namespace Flux::Audio {
 
         void process(AudioBuffer<Float64> const& buffer) override;
 
-        NODISCARD SharedPointer<UserInterface::Component> getComponent() const override;
+        void createComponent(UserInterface::Compound* parent) override;
+
+        NODISCARD WeakPointer<UserInterface::Component> getComponent() const override;
 
     private:
         
@@ -54,7 +58,7 @@ namespace Flux::Audio {
         void prepareOutput(Float64* buffer);
         
         Float64* outputBuffer = nullptr;
-        SharedPointer<OutputNode> component;
+        WeakPointer<OutputNode> component;
 
     };
     

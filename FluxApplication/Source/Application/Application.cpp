@@ -10,20 +10,20 @@
 #include <Application/Socket.h>
 
 #include <Application/LinkResolver.h>
-#include <Application/FilterDrawer.h>
+#include <Application/FilterGraph.h>
 
 #define GL_FRAMEBUFFER_BINDING 0x8CA6
 
 namespace Flux {
     
-    class FrameInfo : public DragComponent {
+    class FrameInfo : public UserInterface::Component {
 
     public:
         
         void initialize() override {
 
-            setScale({150, 45});
-            setColor(UserInterface::LinearColor::fromHex(0x606060ff));
+            setScale({300, 30});
+            setColor(UserInterface::LinearColor::fromHex(0x60606060));
 
         }
         
@@ -47,20 +47,16 @@ namespace Flux {
             const SkVector pos = getAbsolutePosition();
             SkRect rect = SkRect::MakeXYWH(pos.x(), pos.y(), getScale().x(), getScale().y());
 
-            canvas->drawRect(rect, paint);
-            
-            paint.setColor(UserInterface::LinearColor::fromHex(0x147ff6ff).toSkColor());
-            rect = SkRect::MakeXYWH(pos.x(), pos.y(), getScale().x(), 5.0f);
-            canvas->drawRect(rect, paint);
+            canvas->drawRoundRect(rect, 10, 10, paint);
             
             paint.setColor(SK_ColorWHITE);
 
-            String text = String::format("Frame time: {}ms", lastFrameTime);
+            String text = String::format("Draw: {} FPS ({}ms)", 1000.0 * (1.0 / lastFrameTime), lastFrameTime);
             SkFont font;
             font.setSize(12.0);
 
             canvas->drawSimpleText(text.toCString(), text.getSize(), SkTextEncoding::kUTF8, pos.fX + 10.0f,
-                                   pos.fY + 30.0f, font, paint);
+                                   pos.fY + 20.0f, font, paint);
 
             
         }
@@ -175,7 +171,7 @@ namespace Flux {
         glfwMakeContextCurrent(mainWindow);
 
         // Disable VSync
-        glfwSwapInterval(1);
+        glfwSwapInterval(0);
 
         glfwSetKeyCallback(mainWindow, &Application::inputCallback);
         glfwSetMouseButtonCallback(mainWindow, &Application::mouseCallback);
@@ -188,7 +184,7 @@ namespace Flux {
         glfwGetFramebufferSize(mainWindow, &framebufferWidth, &framebufferHeight);
 
         Int32 framebufferId = 0;
-        auto glGetIntegerv = (void(*)(UInt32, Int32*))glfwGetProcAddress("glGetIntegerv");
+        const auto glGetIntegerv = reinterpret_cast<void(*)(UInt32, Int32*)>(glfwGetProcAddress("glGetIntegerv"));
         glGetIntegerv(GL_FRAMEBUFFER_BINDING, &framebufferId);
         
         this->masterView = UserInterface::MasterView::makeGL(framebufferWidth, framebufferHeight, {framebufferId, 4, 8, f32(framebufferWidth) / f32(windowWidth), f32(framebufferHeight) / f32(windowHeight)});
@@ -198,10 +194,8 @@ namespace Flux {
         this->cursorManager = SharedPointer<UserInterface::CursorManager>::make();
         cursorManager->setCompound(masterView);
         
-        masterView->addChild<FrameInfo>();
-        
-        auto knob = masterView->addChild<RotaryKnob>();
-        knob->setPosition({100, 100});
+        auto frameInfo = masterView->addChild<FrameInfo>();
+        frameInfo->setPosition({ f32(windowWidth) - frameInfo->getScale().fX - 10.0f, f32(windowHeight) - frameInfo->getScale().fY - 10.0f});
         
         this->shouldRun = true;
 
@@ -222,7 +216,6 @@ namespace Flux {
     void Application::stop() { shouldRun = false; }
 
     void Application::draw() {
-
         
         const Float64 currentTime = glfwGetTime();
         const Float64 deltaTime = currentTime - lastTime;

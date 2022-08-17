@@ -11,7 +11,7 @@ namespace Flux{
 
     SkScalar ps[] = { 10.0f, 10.0f };
 
-    void LinkResolver::draw(SkCanvas *canvas, Float64 deltaTime) {
+    void LinkResolver::draw(SkCanvas *canvas, const Float64 deltaTime) {
 
         Component::draw(canvas, deltaTime);
 
@@ -26,17 +26,17 @@ namespace Flux{
             for(size_t channel = 0; channel < element->next.getSize(); ++channel){
 
                 for(auto const& link : element->next[channel]){
+                    
+                    const auto fromNode = element-> getComponent()->cast<Node>();
+                    const auto toNode = link.pointer->getComponent()->cast<Node>();
 
-                    auto fromNode = element->getComponent()->cast<Node>();
-                    auto toNode = link.pointer->getComponent()->cast<Node>();
-
-                    auto pA = fromNode->getOutputSocketPosition(channel);
+                    auto pA = fromNode->getOutputSocketPosition(static_cast<UInt>(channel));
                     auto pB = toNode->getInputSocketPosition(link.targetChannel);
 
-                    SkVector points[2] = { pA, pB };
-                    SkColor colors[2] = { fromNode->getHeaderColor().toSkColor().toSkColor(), toNode->getHeaderColor().toSkColor().toSkColor() };
+                    const SkVector points[2] = { pA, pB };
+                    const SkColor colors[2] = { fromNode->getHeaderColor().toSkColor().toSkColor(), toNode->getHeaderColor().toSkColor().toSkColor() };
 
-                    auto shader = SkGradientShader::MakeLinear(points, colors, nullptr, 2, SkTileMode::kClamp);
+                    const auto shader = SkGradientShader::MakeLinear(points, colors, nullptr, 2, SkTileMode::kClamp);
                     paint.setShader(shader);
                     
                     const Float32 factor = pA.x() > pB.x() ? -0.5f : 0.5f;
