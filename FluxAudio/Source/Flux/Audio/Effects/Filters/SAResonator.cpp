@@ -1,5 +1,4 @@
-﻿#include <Effects/Filters/SAResonator.h>
-#include <Flux/Core/Math/Math.h>
+#include <Effects/Filters/SAResonator.h>
 
 namespace Flux::Audio {
 

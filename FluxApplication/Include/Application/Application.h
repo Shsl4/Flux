@@ -2,13 +2,9 @@
 
 #include <GLFW/glfw3.h>
 
-#include <Flux/Core/Flux.h>
-#include <Flux/Core/Memory/UniquePointer.h>
-#include <Flux/Core/Tools/Console/Console.h>
-
-#include "../Audio/MyAudioDevice.h"
-#include "Flux/UI/CursorManager.h"
-#include "Flux/UI/UserInterface.h"
+#include <Audio/MyAudioDevice.h>
+#include <Flux/UI/CursorManager.h>
+#include <Flux/UI/UserInterface.h>
 
 namespace Flux {
     
@@ -22,7 +18,7 @@ namespace Flux {
 
         void stop();
 
-        NODISCARD static SharedPointer<UserInterface::MasterView> getMasterView() { return instance->masterView; }
+        NODISCARD static Shared<UserInterface::MasterView> getMasterView() { return instance->masterView; }
         
     private:
         
@@ -54,13 +50,13 @@ namespace Flux {
         
         GLFWwindow* mainWindow = nullptr;
 
-        UniquePointer<Console> console = nullptr;
+        Unique<Console> console = nullptr;
         
-        SharedPointer<UserInterface::MasterView> masterView = nullptr;
+        Shared<UserInterface::MasterView> masterView = nullptr;
         
-        SharedPointer<MyAudioDevice> audioDevice = nullptr;
+        Shared<MyAudioDevice> audioDevice = nullptr;
         
-        SharedPointer<UserInterface::CursorManager> cursorManager = nullptr;
+        Shared<UserInterface::CursorManager> cursorManager = nullptr;
         
         UserInterface::MouseButton lastButtonPressed = UserInterface::MouseButton::Other;
         

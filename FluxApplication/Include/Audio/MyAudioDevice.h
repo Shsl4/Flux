@@ -2,14 +2,16 @@
 
 #include "AudioDevice.h"
 #include "../MIDI/MidiManager.h"
+
+#include <Nucleus/Nucleus.h>
 #include <Flux/Audio/Effects/MultiProcessor.h>
-#include "Flux/Audio/Effects/Filters/IIRFilter.h"
+#include <Flux/Audio/Effects/Filters/IIRFilter.h>
 #include <Audio/Pipeline/Pipeline.h>
-#include "Flux/Core/Math/Math.h"
-#include "Flux/Core/Memory/UniquePointer.h"
+
+using namespace Nucleus;
 
 namespace Flux {
-    
+
     class SawVoice : public Audio::AudioEffect {
 
     public:
@@ -97,11 +99,11 @@ namespace Flux {
 
         void process(Float64* buffer) override;
 
-        NODISCARD Audio::Pipeline* getPipeline() const { return pipeline.raw(); }
+        NODISCARD Audio::Pipeline* getPipeline() const { return pipeline.pointer(); }
 
     private:
 
-        UniquePointer<Audio::Pipeline> pipeline = nullptr;
+        Unique<Audio::Pipeline> pipeline = nullptr;
         Audio::MultiProcessor<Audio::LowPassFilter> filter;
         Audio::MultiProcessor<SawVoice> voice;
         Int pressCount = 0;

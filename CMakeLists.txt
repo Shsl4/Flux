@@ -18,7 +18,7 @@ function(filterSources LIST)
     endforeach()
 endfunction()
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/FluxCore)
+add_subdirectory(${CMAKE_SOURCE_DIR}/Nucleus)
 add_subdirectory(${CMAKE_SOURCE_DIR}/FluxUI)
 add_subdirectory(${CMAKE_SOURCE_DIR}/FluxAudio)
 add_subdirectory(${CMAKE_SOURCE_DIR}/FluxApplication)

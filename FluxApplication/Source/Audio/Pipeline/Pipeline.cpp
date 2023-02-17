@@ -2,8 +2,6 @@
 #include <skia/effects/SkDashPathEffect.h>
 #include <skia/effects/SkGradientShader.h>
 
-#include "Flux/Core/Utilities/ArrayUtils.h"
-
 namespace Flux::Audio {
 
     Pipeline::Pipeline() {
@@ -18,8 +16,8 @@ namespace Flux::Audio {
             if(channelCount > inCount) {
                 
                 for (size_t i = 0; i < diff; ++i) {
-                    inputChannels.removeAt(inputChannels.getSize() - 1);
-                    outputChannels.removeAt(outputChannels.getSize() - 1);
+                    inputChannels.removeAt(inputChannels.size() - 1);
+                    outputChannels.removeAt(outputChannels.size() - 1);
                 }
                 
             }
@@ -44,7 +42,7 @@ namespace Flux::Audio {
 
         AudioObject::prepare(rate, size);
 
-        for (size_t i = 0; i < inputChannels.getSize(); ++i) {
+        for (size_t i = 0; i < inputChannels.size(); ++i) {
             
             inputChannels[i]->prepare(getSampleRate(), getBufferSize());
             outputChannels[i]->prepare(getSampleRate(), getBufferSize());
@@ -58,7 +56,7 @@ namespace Flux::Audio {
         }
 
         Allocator<Float64>::release(processBuffers);
-        processBuffers = Allocator<Float64>::alloc(static_cast<size_t>(channelCount) * size);
+        processBuffers = Allocator<Float64>::allocate(static_cast<size_t>(channelCount) * size);
         
     }
 
@@ -77,7 +75,7 @@ namespace Flux::Audio {
         
         buffer = processBuffers;
         
-        for (const auto& channel : inputChannels) {
+        for (auto* channel : inputChannels) {
             channel->signal(buffer, 0);
             buffer += getBufferSize();
         }
@@ -92,9 +90,9 @@ namespace Flux::Audio {
 
     void Pipeline::removeElement(PipelineElement* element) {
 
-        for (size_t i = 0; i < elements.getSize(); ++i) {
+        for (size_t i = 0; i < elements.size(); ++i) {
 
-            if(elements[i].raw() == element) {
+            if(elements[i] == element) {
 
                 for (UInt channel = 0; channel < element->numIns; ++channel) {
                     element->unlinkInput(channel);
@@ -102,7 +100,7 @@ namespace Flux::Audio {
                 
                 for (UInt channel = 0; channel < element->numOuts; ++channel) {
 
-                    const UInt sz = static_cast<UInt>(element->next.getSize());
+                    const UInt sz = static_cast<UInt>(element->next.size());
                     
                     for (UInt out = 0; out < sz; ++out) {
                         
@@ -122,8 +120,8 @@ namespace Flux::Audio {
         
     }
 
-    void Pipeline::setPipelineView(const SharedPointer<UserInterface::MasterView> &view) {
-        this->pipelineView = view.weak();
+    void Pipeline::setPipelineView(UserInterface::MasterView* view) {
+        this->pipelineView = view;
     }
     
     LPFNode::LPFNode() : FilterNode(2, 2, 25.0, 200.0, 50.0, 5.0, UserInterface::Colors::green) {}
@@ -132,15 +130,15 @@ namespace Flux::Audio {
 
     LPFElement::LPFElement() : FilterElement(2, 2) {
 
-        filters += SharedPointer<LowPassFilter>::make();
-        filters += SharedPointer<LowPassFilter>::make();
+        filters += Allocator<LowPassFilter>::construct();
+        filters += Allocator<LowPassFilter>::construct();
 
     }
 
     HPFElement::HPFElement(): FilterElement(2, 2) {
 
-        filters += SharedPointer<HighPassFilter>::make();
-        filters += SharedPointer<HighPassFilter>::make();
+        filters += Allocator<HighPassFilter>::construct();
+        filters += Allocator<HighPassFilter>::construct();
 
     }
 }

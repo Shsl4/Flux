@@ -1,4 +1,4 @@
-﻿#include <Effects/Filters/Filter.h>
+#include <Effects/Filters/Filter.h>
 #include <memory>
 
 namespace Flux::Audio {
@@ -30,7 +30,7 @@ namespace Flux::Audio {
 
     void Filter::setCutoffFrequency(const Float64 cutoff) {
 
-        fassert(cutoff >= 0.0);
+        assert(cutoff >= 0.0);
         this->cutoffFrequency = cutoff;
         recalculateCoefficients();
         
@@ -38,7 +38,7 @@ namespace Flux::Audio {
 
     void Filter::setResonance(const Float64 value) {
         
-        fassert(value >= 0.0);
+        assert(value >= 0.0);
         this->resonance = value;
         recalculateCoefficients();
         

@@ -1,9 +1,5 @@
 #include <Audio/AudioDevice.h>
-
 #include <rtaudio/RtAudio.h>
-
-#include "Flux/Core/Tools/Console/Console.h"
-#include "Flux/Core/Tools/Console/CommandContext.h"
 
 namespace Flux {
 
@@ -22,14 +18,14 @@ namespace Flux {
         RtAudio::getCompiledApi(apis);
         
         if (apis.empty() || (apis.size() == 1 && apis[0] == RtAudio::Api::RTAUDIO_DUMMY)) {
-            fabort("No Audio API is available. Make sure you compiled RtAudio with at least one API.");
+            throw Exceptions::Exception("No Audio API is available. Make sure you compiled RtAudio with at least one API.\n");
         }
         
         try{
             this->audio = Allocator<RtAudio>::construct();
         }
         catch(std::exception const& e){
-            fabort(String::format("Failed to initialize audio system. {}", e.what()).toCString());
+            throw Exceptions::Exception("Failed to initialize audio system.\n");
         }
         
         this->currentOutputDevice = audio->getDefaultOutputDevice();
@@ -48,22 +44,22 @@ namespace Flux {
 
         if(count == 0) {
 
-            Console::logRuntime("There are no audio devices available.");
+            Console::log("There are no audio devices available.\n");
             return;
             
         }
 
-        Console::logStatus("Listing audio devices:");
+        Console::log("Listing audio devices:\n");
 
         for (UInt index = 0; index < count; ++index) {
 
             RtAudio::DeviceInfo info = audio->getDeviceInfo(index);
 
             if(audio->isStreamOpen() && index == currentOutputDevice) {
-                Console::logStatus("[{}] -> {} (In: {}, Out: {}) (Active)", index, info.name, info.inputChannels, info.outputChannels);
+                Console::log("[{}] -> {} (In: {}, Out: {}) (Active)\n", index, info.name.c_str(), info.inputChannels, info.outputChannels);
             }
             else {
-                Console::logStatus("[{}] -> {} (In: {}, Out: {})", index, info.name, info.inputChannels, info.outputChannels);
+                Console::log("[{}] -> {} (In: {}, Out: {})\n", index, info.name.c_str(), info.inputChannels, info.outputChannels);
             }
             
         }
@@ -72,8 +68,8 @@ namespace Flux {
 
     void AudioDevice::initialize(const Float64 rate, const UInt size) {
 
-        fassert(rate > 0.0);
-        fassert(size >= 16);
+        assert(rate > 0.0);
+        assert(size >= 16);
                 
         this->sampleRate = rate;
         this->bufferSize = size;
@@ -105,13 +101,13 @@ namespace Flux {
         }
         catch(RtAudioError&){
             
-            Console::logRuntime("Tried to open an invalid output device ({})", deviceId);
+            Console::log("Tried to open an invalid output device ({})\n", deviceId);
             return;
             
         }
 
         if (info.outputChannels == 0) {
-            Console::logRuntime("The selected device is not an output device ({})", info.name);
+            Console::log("The selected device is not an output device ({})\n", info.name.c_str());
             return;
         }
         
@@ -133,7 +129,7 @@ namespace Flux {
         }
         catch (RtAudioError& e) {
             
-            Console::logRuntime("Failed to open audio device: {}", e.getMessage());
+            Console::log("Failed to open audio device: {}\n", e.getMessage().c_str());
             return;
             
         }
@@ -142,13 +138,13 @@ namespace Flux {
 
         prepare(sampleRate, bufferSize);
         
-        Console::logStatus("Now using audio output device {} ({})", deviceId, info.name);
+        Console::log("Now using audio output device {} ({})\n", deviceId, info.name.c_str());
         
     }
 
     void AudioDevice::setSampleRate(Float64 value) {
 
-        fassert(value > 0.0);
+        assert(value > 0.0);
         this->sampleRate = value;
         openAudioOutputDevice(currentOutputDevice);
         
@@ -156,7 +152,7 @@ namespace Flux {
     
     void AudioDevice::setBufferSize(UInt value) {
 
-        fassert(value >= 16);
+        assert(value >= 16);
         this->bufferSize = value;
         openAudioOutputDevice(currentOutputDevice);
 
@@ -164,6 +160,7 @@ namespace Flux {
 
     void AudioDevice::registerAudioCommands() {
 
+        /*
         const auto openNode = CommandNode::make("Audio.Device.Open");
         const auto listNode = CommandNode::make("Audio.Device.List");
         const auto closeNode = CommandNode::make("Audio.Device.Close");
@@ -197,7 +194,7 @@ namespace Flux {
         Console::registerCommand(openNode);
         Console::registerCommand(listNode);
         Console::registerCommand(closeNode);
-        
+        */
     }
     
     UInt AudioDevice::getOutputChannelCount() const { return this->outputChannelCount; }

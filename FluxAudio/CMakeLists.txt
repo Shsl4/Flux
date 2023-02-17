@@ -9,11 +9,11 @@ filterSources("${FLUXAUDIO_HEADERS}")
 filterSources("${FLUXAUDIO_INLINE}")
 
 add_library(FluxAudio STATIC ${FLUXAUDIO_SOURCES} ${FLUXAUDIO_HEADERS} ${FLUXAUDIO_INLINE})
-add_dependencies(FluxAudio FluxCore)
+add_dependencies(FluxAudio Nucleus)
 set_target_properties(FluxAudio PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Build/)
 
 set(FLUXAUDIO_INCLUDE "${CMAKE_CURRENT_LIST_DIR}/Include" PARENT_SCOPE)
 set(FLUXAUDIO_INCLUDE "${CMAKE_CURRENT_LIST_DIR}/Include")
 
-target_include_directories(FluxAudio PUBLIC ${FLUXAUDIO_INCLUDE} ${FLUXCORE_INCLUDE})
+target_include_directories(FluxAudio PUBLIC ${FLUXAUDIO_INCLUDE} ${NUCLEUS_INCLUDE})
 target_include_directories(FluxAudio PRIVATE "${CMAKE_CURRENT_LIST_DIR}/Include/Flux/Audio")

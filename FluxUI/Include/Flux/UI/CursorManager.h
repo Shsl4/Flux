@@ -1,9 +1,11 @@
 ﻿#pragma once
 
-#include <map>
-#include <Flux/Core/Flux.h>
+#include <Nucleus/Nucleus.h>
+
 #include "Reactive.h"
 #include "Components/Compound.h"
+
+using namespace Nucleus;
 
 namespace Flux::UserInterface {
 
@@ -37,7 +39,7 @@ namespace Flux::UserInterface {
 
         NODISCARD SkVector getCursorPosition() const;
 
-        std::map<MouseButton, Reactive*> stateMap;
+        Map<MouseButton, Reactive*> stateMap;
         
         Float64 cursorX = 0.0;
         Float64 cursorY = 0.0;

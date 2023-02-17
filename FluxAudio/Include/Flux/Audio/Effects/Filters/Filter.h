@@ -25,11 +25,11 @@ namespace Flux::Audio {
         virtual void setCutoffFrequency(Float64 cutoff);
         virtual void setResonance(Float64 value);
         
-        FORCEINLINE Float64 getCutoffFrequency() const { return cutoffFrequency; }
-        FORCEINLINE Float64 getResonance() const { return resonance; }
-        
-        FORCEINLINE const Float64* getCoefficients() const { return this->coefficients; }
-        FORCEINLINE const Float64* getStateArray() const { return this->stateArray; }
+        NODISCARD FORCEINLINE Float64 getCutoffFrequency() const { return cutoffFrequency; }
+        NODISCARD FORCEINLINE Float64 getResonance() const { return resonance; }
+
+        NODISCARD FORCEINLINE const Float64* getCoefficients() const { return this->coefficients; }
+        NODISCARD FORCEINLINE const Float64* getStateArray() const { return this->stateArray; }
     
     protected:
 

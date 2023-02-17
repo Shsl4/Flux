@@ -11,11 +11,11 @@ namespace Flux{
 
         FilterElement(UInt inChannels, UInt outChannels);
 
-        NODISCARD OwnedArray<Audio::Filter> const& getFilters() const { return this->filters; }
+        NODISCARD SmartArray<Audio::Filter> const& getFilters() const { return this->filters; }
 
     protected:
 
-        OwnedArray<Audio::Filter> filters;
+        SmartArray<Audio::Filter> filters;
 
     };
 

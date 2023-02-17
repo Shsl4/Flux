@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <Flux/UI/Components/Compound.h>
-#include <Flux/Core/Math/Math.h>
 #include "Socket.h"
 #include "../Audio/Pipeline/PipelineElement.h"
 #include "FilterGraph.h"
@@ -77,7 +76,7 @@ namespace Flux {
     private:
 
         FilterElement* filterElement = nullptr;
-        WeakPointer<FilterGraph> drawer;
+        FilterGraph* drawer;
         static constexpr Float32 drawerHeight = 100.0f;
 
     };

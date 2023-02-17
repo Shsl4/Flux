@@ -1,11 +1,13 @@
 #pragma once
 
-#include <Flux/Core/Flux.h>
+#include <Nucleus/Nucleus.h>
+
+using namespace Nucleus;
 
 namespace Flux {
 
     template<typename ValueType>
-    class AudioBuffer : public Identifiable {
+    class AudioBuffer {
 
     public:
         
@@ -14,7 +16,7 @@ namespace Flux {
         
         NODISCARD FORCEINLINE ValueType* getChannelBuffer(const UInt channel) const {
 
-            fassert(channel < channels);
+            assert(channel < channels);
             return buffer[channel];
             
         }

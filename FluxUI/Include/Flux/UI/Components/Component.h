@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Flux/Core/Flux.h>
 #include <Flux/UI/LinearColor.h>
 #include <Flux/UI/Reactive.h>
 

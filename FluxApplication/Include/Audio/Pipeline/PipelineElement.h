@@ -18,11 +18,11 @@ namespace Flux::Audio {
 
         struct SignalManager {
             
-            SignalManager(UInt channelCount){
+            explicit SignalManager(UInt channelCount){
             
                 if(channelCount == 0) channelCount = 1;
                 
-                signals = Array<bool>(channelCount);
+                signals = MutableArray<bool>(channelCount);
                 
                 for (size_t i = 0; i < channelCount; ++i) {
                     signals += false;
@@ -47,10 +47,10 @@ namespace Flux::Audio {
             }
             
             FORCEINLINE void reset(){
-                memset(signals.begin(), 0, sizeof(bool) * signals.getCapacity());
+                memset(signals.begin().get(), 0, sizeof(bool) * signals.capacity());
             }
-            
-            Array<bool> signals;
+
+            MutableArray<bool> signals;
             
         };
         
@@ -60,7 +60,9 @@ namespace Flux::Audio {
             
             Link(PipelineElement* const pointer, const UInt targetChannel)
                 : pointer(pointer), targetChannel(targetChannel) {}
-            
+
+            bool operator==(Link const& other) const = default;
+
             PipelineElement* pointer = nullptr;
             UInt targetChannel = 0;
 
@@ -107,7 +109,7 @@ namespace Flux::Audio {
 
         virtual void createComponent(UserInterface::Compound* parent) = 0;
         
-        NODISCARD virtual WeakPointer<UserInterface::Component> getComponent() const = 0;
+        NODISCARD virtual UserInterface::Component* getComponent() const = 0;
 
         virtual void discard();
     
@@ -125,9 +127,9 @@ namespace Flux::Audio {
         Pipeline* pipeline = nullptr;
 
         Float64** stateBuffers = nullptr;
-        
-        Array<Array<Link>> next = {};
-        Array<Link> previous = {};
+
+        MutableArray<MutableArray<Link>> next = {};
+        MutableArray<Link> previous = {};
         
     };
     

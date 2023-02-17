@@ -1,5 +1,4 @@
-﻿#include <Effects/Filters/Resonator.h>
-#include <Flux/Core/Math/Math.h>
+#include <Effects/Filters/Resonator.h>
 
 namespace Flux::Audio {
 

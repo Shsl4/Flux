@@ -6,11 +6,11 @@ namespace Flux::UserInterface {
 
     Component* Compound::getComponentAtPosition(SkVector const& value) {
         
-        for (size_t i = children.getSize(); i > 0; --i) {
+        for (size_t i = children.size(); i > 0; --i) {
 
             auto const& child = children[i - 1];
 
-            if (auto* compound = dynamic_cast<Compound*>(child.raw())) {
+            if (auto* compound = dynamic_cast<Compound*>(child)) {
                 
                 if(auto* comp = compound->getComponentAtPosition(value)) {
                     
@@ -22,7 +22,7 @@ namespace Flux::UserInterface {
 
             if(child->isInBounds(value)) {
                 
-                return child.raw();
+                return child;
                 
             }
             
@@ -52,14 +52,14 @@ namespace Flux::UserInterface {
 
     void Compound::draw(SkCanvas* canvas, Float64 deltaTime) {
 
-        Int size = i32(children.getSize());
+        Int size = i32(children.size());
         
         for (Int i = 0; i < size; ++i) {
 
             auto const& child = children[i];
 
             if(child->pendingDiscard) {
-                CursorManager::getCursorManager()->notifyDestruction(child.raw());
+                CursorManager::getCursorManager()->notifyDestruction(child);
                 child->cleanup();
                 children.removeAt(i);
                 --size;
@@ -74,16 +74,18 @@ namespace Flux::UserInterface {
         
     }
 
-    void Compound::internalAddChild(SharedPointer<Component> const& component) {
+    Component* Compound::internalAddChild(Component* component) {
 
         children += component;
         component->parent = this;
         component->initialize();
+        return component;
         
     }
     
 }
 
+/*
 template<>
 class Flux::Formatter<SkVector> {
 
@@ -93,3 +95,4 @@ public:
     }
         
 };
+*/

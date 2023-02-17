@@ -10,7 +10,7 @@ namespace Flux{
 
     }
 
-    void FilterGraph::draw(SkCanvas *canvas, Flux::Float64 deltaTime) {
+    void FilterGraph::draw(SkCanvas *canvas, Float64 deltaTime) {
 
         Component::draw(canvas, deltaTime);
         drawGrid(canvas);
@@ -110,9 +110,9 @@ namespace Flux{
         return (f * Math::pi<Float64>) / ny;
     }
 
-    Array<Float64> FilterGraph::distributeAround(Float64 freq, Float64 ny, UInt count) {
+    MutableArray<Float64> FilterGraph::distributeAround(Float64 freq, Float64 ny, UInt count) {
 
-        Array<Float64> values = Array<Float64>(count);
+        auto values = MutableArray<Float64>(count);
         const Float64 baseRad = freqToRad(10.0, ny);
 
         // todo: distribute around f

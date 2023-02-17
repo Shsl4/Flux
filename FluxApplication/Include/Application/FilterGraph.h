@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Flux/Core/Flux.h>
 #include <Flux/UI/Components/Component.h>
 #include <Flux/Audio/Effects/Filters/IIRFilter.h>
 #include <skia/core/SkPath.h>
@@ -86,7 +85,7 @@ namespace Flux{
 
         static Float64 freqToRad(Float64 f, Float64 ny);
 
-        static Array<Float64> distributeAround(Float64 freq, Float64 ny, UInt count);
+        static MutableArray<Float64> distributeAround(Float64 freq, Float64 ny, UInt count);
 
         void drawGrid(SkCanvas* canvas) const;
 
@@ -106,7 +105,7 @@ namespace Flux{
         Float32 f = 10.0;
         SkPath path;
 
-        Array<FilterGraphListener*> listeners;
+        MutableArray<FilterGraphListener*> listeners;
         
     };
 

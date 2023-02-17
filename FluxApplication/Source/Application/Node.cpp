@@ -126,7 +126,7 @@ namespace Flux {
 
     void FilterNode::onElementSet() {
 
-        this->filterElement = getElement()->cast<FilterElement>();
+        this->filterElement = dynamic_cast<FilterElement*>(getElement());
         this->drawer->filterRef = filterElement->getFilters()[0];
         drawer->addListener(this);
         

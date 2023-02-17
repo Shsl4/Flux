@@ -5,7 +5,6 @@
 #include <skia/effects/SkDashPathEffect.h>
 #include <skia/effects/SkGradientShader.h>
 
-#include <Flux/Core/Utilities/ArrayUtils.h>
 #include <Application/Application.h>
 #include <Application/Node.h>
 
@@ -48,7 +47,7 @@ namespace Flux {
                     
                 }
 
-                if(flowType == UserInterface::Flow::Input && connections.getSize() > 0) {
+                if(flowType == UserInterface::Flow::Input && connections.size() > 0) {
                     unlinkAll();
                 }
                 
@@ -153,13 +152,13 @@ namespace Flux {
 
     void Socket::onLink() {
 
-        Console::logDebug("Socket linked");
+        Console::log("Socket linked\n");
         
     }
 
     void Socket::onUnlink() {
         
-        Console::logDebug("Socket unlinked");
+        Console::log("Socket unlinked\n");
         
     }
 
@@ -212,7 +211,7 @@ namespace Flux {
 
         if(!canLink(socket)) { return false; }
 
-        if(ArrayUtils::contains(connections, socket)) { return true; }
+        if(connections.contains(socket)) { return true; }
 
         if(flowType == UserInterface::Flow::Input) {
 
@@ -251,10 +250,10 @@ namespace Flux {
         if(socket) {
 
             // If the socket was linked
-            if(ArrayUtils::removeFirstOf(socket->connections, this)) {
+            if(socket->connections.remove(this)) {
 
                 node->getElement()->unlinkInput(channelId);
-                ArrayUtils::removeFirstOf(connections, socket);
+                connections.remove(socket);
                 socket->onUnlink();
                 this->onUnlink();
                 
@@ -283,19 +282,13 @@ namespace Flux {
     }
 
     bool Socket::hasLink() const {
-        return connections.getSize() > 0;
+        return connections.size() > 0;
     }
 
     bool Socket::isLinked(const Socket* socket) const {
 
-        try {
-            ArrayUtils::firstIndexOf<Socket*>(connections, const_cast<Socket*>(socket));
-            ArrayUtils::firstIndexOf(socket->connections, const_cast<Socket*>(this));
-            return true;
-        }
-        catch (std::logic_error const&) {
-            return false;
-        }
+        return connections.contains(const_cast<Socket*>(socket)) &&
+            socket->connections.contains(const_cast<Socket*>(this));
         
     }
 

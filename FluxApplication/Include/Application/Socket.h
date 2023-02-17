@@ -59,7 +59,7 @@ namespace Flux {
 
         void setCableColor(UserInterface::LinearColor const& value);
         
-        Array<Socket*> connections = {};
+        MutableArray<Socket*> connections = {};
 
         UserInterface::LinearColor cableColor = UserInterface::LinearColor::fromHex(0x147ff6ff);
         

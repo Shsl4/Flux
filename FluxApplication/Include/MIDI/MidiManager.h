@@ -1,10 +1,9 @@
 #pragma once
 
-#include <Flux/Core/Flux.h>
+#include <Nucleus/Nucleus.h>
 #include <vector>
 
-#include "Flux/Core/Memory/Allocator.h"
-#include "Flux/Core/Memory/String.h"
+using namespace Nucleus;
 
 class RtMidiIn;
 

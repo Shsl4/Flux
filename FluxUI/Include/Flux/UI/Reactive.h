@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include <Flux/Core/Flux.h>
-#include <Flux/Core/Tools/Console/Console.h>
-#include <Flux/Core/Interfaces/Identifiable.h>
+#include <Nucleus/Nucleus.h>
+
+using namespace Nucleus;
 
 namespace Flux::UserInterface {
 
@@ -15,7 +15,7 @@ namespace Flux::UserInterface {
         
     };
 
-    class Reactive : public Identifiable {
+    class Reactive {
         
     public:
         

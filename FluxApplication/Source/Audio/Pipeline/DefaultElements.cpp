@@ -14,7 +14,7 @@ namespace Flux::Audio {
         this->component = parent->addChild<InputNode>();
     }
 
-    WeakPointer<UserInterface::Component> PipelineInput::getComponent() const {
+    UserInterface::Component* PipelineInput::getComponent() const {
         return this->component;
     }
 
@@ -23,7 +23,7 @@ namespace Flux::Audio {
 
     void PipelineOutput::process(AudioBuffer<Float64> const& buffer) {
 
-        fassert(outputBuffer);
+        assert(outputBuffer);
         memcpy(outputBuffer, (Float64*)buffer.getRawBuffers(), getBufferSize() * sizeof(Float64));
         outputBuffer = nullptr;
             
@@ -33,7 +33,7 @@ namespace Flux::Audio {
         this->component = parent->addChild<OutputNode>();
     }
 
-    WeakPointer<UserInterface::Component> PipelineOutput::getComponent() const { return this->component; }
+    UserInterface::Component* PipelineOutput::getComponent() const { return this->component; }
 
     void PipelineOutput::prepareOutput(Float64* buffer) {
         this->outputBuffer = buffer;

@@ -5,7 +5,7 @@
 namespace Flux::UserInterface {
 
     Component::~Component() {
-        Console::logRuntime("Destroyed {}", getClassName());
+        Console::log("Destroyed {}\n", Type::name(*this));
     }
 
     void Component::initialize() {
@@ -14,7 +14,7 @@ namespace Flux::UserInterface {
 
     void Component::cleanup() {
         
-        Console::logRuntime("Cleaning up {}", getClassName());
+        Console::log("Cleaning up {}\n", Type::name(*this));
 
     }
 

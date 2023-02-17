@@ -1,5 +1,4 @@
-﻿#include <Effects/Filters/IIRFilter.h>
-#include <Flux/Core/Math/Math.h>
+#include <Effects/Filters/IIRFilter.h>
 
 namespace Flux::Audio {
 

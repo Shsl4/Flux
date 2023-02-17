@@ -19,7 +19,7 @@ namespace Flux::UserInterface {
 
     void MasterView::draw(SkCanvas*, Float64 deltaTime) {
 
-        fassert(canvas && surface);
+        assert(canvas && surface);
         
         canvas->save();
         canvas->scale(xDpiScale, yDpiScale);
@@ -40,15 +40,15 @@ namespace Flux::UserInterface {
         
     }
 
-    SharedPointer<MasterView> MasterView::makeGL(Int width, Int height, OpenGLParams const& params) {
+    Shared<MasterView> MasterView::makeGL(Int width, Int height, OpenGLParams const& params) {
 
-        auto view = SharedPointer<MasterView>::make();
+        auto view = Shared<MasterView>::make();
 
         const auto interface = GrGLMakeNativeInterface();
         view->context = GrDirectContext::MakeGL(interface).release();
 
-        fassertf(view->context, "Failed to create Skia GL context.");
-        
+        if(!view->context) throw Exceptions::Exception("Failed to create Skia GL context.");
+
         GrGLFramebufferInfo framebufferInfo;
 
         framebufferInfo.fFBOID = params.framebufferId;
@@ -62,11 +62,11 @@ namespace Flux::UserInterface {
 
         view->surface = SkSurface::MakeFromBackendRenderTarget(view->context, backendRenderTarget, kBottomLeft_GrSurfaceOrigin, colorType, nullptr, nullptr).release();
 
-        fassertf(view->surface, "Failed to create Skia Surface.");
+        if(!view->surface) throw Exceptions::Exception("Failed to create Skia Surface.");
 
         view->canvas = view->surface->getCanvas();
 
-        fassertf(view->canvas, "Failed to get Skia Canvas.");
+        if(!view->surface) throw Exceptions::Exception("Failed to get Skia Canvas.");
 
         auto w = static_cast<Float32>(view->canvas->getBaseLayerSize().fWidth);
         auto h = static_cast<Float32>(view->canvas->getBaseLayerSize().fHeight);

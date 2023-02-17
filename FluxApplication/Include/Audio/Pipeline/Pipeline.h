@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Flux/Audio/AudioObject.h>
-#include <Flux/Core/Memory/Array.h>
 #include <Flux/Audio/Effects/Filters/IIRFilter.h>
 #include <Flux/UI/Components/MasterView.h>
 
@@ -26,35 +25,35 @@ namespace Flux::Audio {
         void render(Float64** outBuffers);
 
         template<typename T, typename ... Args>
-        WeakPointer<T> addElement(Args&&... args) {
+        T* addElement(Args&&... args) {
 
-            auto element = SharedPointer<T>::make(std::forward<Args>(args)...);
+            auto element = Allocator<T>::construct(std::forward<Args>(args)...);
             this->elements += element;
             element->pipeline = this;
-            element->createComponent(pipelineView.raw());
-            element->getComponent()->template cast<Node>()->setElement(element.raw());
+            element->createComponent(pipelineView);
+            dynamic_cast<Node*>(element->getComponent())->setElement(element);
 
             if(getBufferSize() > 0) {
                 element->prepare(getSampleRate(), getBufferSize());
             }
 
-            return element.weak();
+            return element;
 
         }
 
         void removeElement(PipelineElement* element);
 
-        void setPipelineView(SharedPointer<UserInterface::MasterView> const& view);
+        void setPipelineView(UserInterface::MasterView* view);
 
         // private:
 
         UInt channelCount = 0;
 
-        WeakPointer<UserInterface::MasterView> pipelineView;
+        UserInterface::MasterView* pipelineView;
 
-        WeakArray<PipelineInput> inputChannels;
-        WeakArray<PipelineOutput> outputChannels;
-        OwnedArray<PipelineElement> elements;
+        MutableArray<PipelineInput*> inputChannels;
+        MutableArray<PipelineOutput*> outputChannels;
+        SmartArray<PipelineElement> elements;
 
         Float64* processBuffers = nullptr;
 
@@ -84,7 +83,7 @@ namespace Flux::Audio {
 
         void prepare(Float64 rate, UInt size) override {
 
-            PipelineElement::prepare(rate, size);
+            FilterElement::prepare(rate, size);
 
             for (auto& filter : filters) {
                 filter->prepare(rate, size);
@@ -96,7 +95,7 @@ namespace Flux::Audio {
             this->component = parent->addChild<LPFNode>();
         }
 
-        NODISCARD WeakPointer<UserInterface::Component> getComponent() const override {
+        NODISCARD UserInterface::Component* getComponent() const override {
             return this->component;
         }
 
@@ -109,7 +108,7 @@ namespace Flux::Audio {
 
     private:
 
-        WeakPointer<LPFNode> component;
+        LPFNode* component;
 
     };
 
@@ -122,7 +121,7 @@ namespace Flux::Audio {
             this->component = parent->addChild<HPFNode>();
         }
 
-        NODISCARD WeakPointer<UserInterface::Component> getComponent() const override {
+        NODISCARD UserInterface::Component* getComponent() const override {
             return this->component;
         }
         
@@ -145,7 +144,7 @@ namespace Flux::Audio {
 
     private:
 
-        WeakPointer<HPFNode> component;
+        HPFNode* component;
 
     };
 

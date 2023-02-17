@@ -4,7 +4,9 @@ namespace Flux::UserInterface {
 
     CursorManager::CursorManager() {
 
-        fassertf(!manager, "Tried to create mutiple instances of CursorManager.");
+        if(manager){
+            throw Exceptions::Exception("Tried to create multiple instances of CursorManager.");
+        }
 
         manager = this;
         
@@ -14,7 +16,7 @@ namespace Flux::UserInterface {
         
         if (auto* component = master->getComponentAtPosition(getCursorPosition())) {
             
-            auto r = stateMap.emplace(std::pair(button, component));
+            stateMap.add(button, component);
             component->onButtonDown(button, cursorX, cursorY);
 
             if(focused == component) { return; }
@@ -40,9 +42,9 @@ namespace Flux::UserInterface {
         
         try {
 
-            Reactive* target = stateMap.at(button);
+            Reactive* target = stateMap[button];
             target->onButtonUp(button, cursorX, cursorY, master->getComponentAtPosition(getCursorPosition()));
-            stateMap.erase(button);
+            stateMap.removeByKey(button);
             
         }
         catch (std::out_of_range const&) { }
@@ -70,7 +72,7 @@ namespace Flux::UserInterface {
         const Float64 deltaY = lastCursorY - cursorY;
 
         for (auto const& elem : stateMap) {
-            elem.second->onDrag(elem.first, x, y, deltaX, deltaY);
+            elem.getValue()->onDrag(elem.getKey(), x, y, deltaX, deltaY);
         }
 
         // If a component is under the cursor.
@@ -129,9 +131,9 @@ namespace Flux::UserInterface {
         // Simply search through the map by value
         for (auto it = stateMap.begin(); it != stateMap.end(); ++it) {
             
-            if (it->second == value) {
+            if (it->getValue() == value) {
                 
-                out = it->first;
+                out = it->getKey();
                 return true;
                 
             }
@@ -144,7 +146,7 @@ namespace Flux::UserInterface {
 
     SkVector CursorManager::getCursorPosition() const {
         
-        return {f32(cursorX), f32(cursorY)};
+        return { f32(cursorX), f32(cursorY) };
         
     }
 

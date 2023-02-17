@@ -1,8 +1,6 @@
 #include <Audio/Pipeline/Pipeline.h>
 #include <Audio/Pipeline/PipelineElement.h>
 
-#include "Flux/Core/Utilities/ArrayUtils.h"
-
 namespace Flux::Audio {
 
     void PipelineElement::createComponent(UserInterface::Compound* parent) {}
@@ -19,14 +17,14 @@ namespace Flux::Audio {
 
         if(hasOutputs()){
             
-            this->stateBuffers = Allocator<Float64*>::alloc(outChannels);
+            this->stateBuffers = Allocator<Float64*>::allocate(outChannels);
             
             for (size_t channel = 0; channel < numOuts; ++channel) {
                 stateBuffers[channel] = nullptr;
             }
             
             for (UInt i = 0; i < numOuts; ++i) {
-                next += Array<Link>();
+                next += MutableArray<Link>();
             }
         
         }
@@ -58,7 +56,7 @@ namespace Flux::Audio {
             for (size_t channel = 0; channel < numOuts; ++channel) {
                 
                 Allocator<Float64>::release(stateBuffers[channel]);
-                stateBuffers[channel] = Allocator<Float64>::alloc(size);
+                stateBuffers[channel] = Allocator<Float64>::allocate(size);
             
             }
             
@@ -117,7 +115,7 @@ namespace Flux::Audio {
 
         element->unlinkInput(toChannel);
         
-        Array<Link>& currentLinks = next[fromChannel];
+        MutableArray<Link>& currentLinks = next[fromChannel];
         
         currentLinks += { element, toChannel };
         
@@ -138,9 +136,9 @@ namespace Flux::Audio {
     
     void PipelineElement::unlinkOutput(UInt channel, UInt index) {
 
-        Array<Link>& currentLinks = next[channel];
+        MutableArray<Link>& currentLinks = next[channel];
 
-        if (index < currentLinks.getSize() && currentLinks[index].pointer) {
+        if (index < currentLinks.size() && currentLinks[index].pointer) {
 
             const Link& currentLink = currentLinks[index];
             
@@ -170,9 +168,9 @@ namespace Flux::Audio {
             currentLink.pointer->onUnlink(UserInterface::Flow::Output, currentLink.targetChannel);
             onUnlink(UserInterface::Flow::Input, channel);
 
-            Array<Link>& otherLinks = currentLink.pointer->next[currentLink.targetChannel];
+            MutableArray<Link>& otherLinks = currentLink.pointer->next[currentLink.targetChannel];
             
-            for (size_t i = 0; i < otherLinks.getSize(); ++i) {
+            for (size_t i = 0; i < otherLinks.size(); ++i) {
                 if (otherLinks[i].targetChannel == channel && otherLinks[i].pointer == this) {
                     otherLinks.removeAt(i);
                     break;
@@ -190,14 +188,14 @@ namespace Flux::Audio {
 
     void PipelineElement::onLink(UserInterface::Flow flow, UInt channel) {
 
-        Console::logStatus("Linked {}. Direction: {}, Channel: {}", getClassName(), flow == UserInterface::Flow::Input ? "input" : "output", channel);
+        Console::log("Linked {}. Direction: {}, Channel: {}\n", Type::name(*this), flow == UserInterface::Flow::Input ? "input" : "output", channel);
         
     }
 
 
     void PipelineElement::onUnlink(UserInterface::Flow flow, UInt channel) {
         
-        Console::logStatus("Unlinked {}. Direction: {}, Channel: {}", getClassName(), flow == UserInterface::Flow::Input ? "input" : "output", channel);
+        Console::log("Unlinked {}. Direction: {}, Channel: {}\n", Type::name(*this), flow == UserInterface::Flow::Input ? "input" : "output", channel);
 
     }
 

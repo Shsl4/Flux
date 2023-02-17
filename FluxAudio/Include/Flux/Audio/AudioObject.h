@@ -1,19 +1,20 @@
 #pragma once
 
-#include <Flux/Core/Flux.h>
-#include <Flux/Core/Interfaces/Identifiable.h>
+#include <Nucleus/Nucleus.h>
+
+using namespace Nucleus;
 
 namespace Flux::Audio {
         
-    class AudioObject : public Identifiable {
+    class AudioObject {
 
     public:
         
         virtual void prepare(Float64 rate, UInt size);
         
-        FORCEINLINE Float64 getSampleRate() const { return sampleRate; }
-        
-        FORCEINLINE UInt getBufferSize() const { return bufferSize; }
+        NODISCARD FORCEINLINE Float64 getSampleRate() const { return sampleRate; }
+
+        NODISCARD FORCEINLINE UInt getBufferSize() const { return bufferSize; }
         
         virtual ~AudioObject() = default;
 

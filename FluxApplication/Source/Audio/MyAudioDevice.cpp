@@ -2,7 +2,6 @@
 #include <chrono>
 
 #include <Application/Application.h>
-#include "Flux/Core/Tools/Console/Console.h"
 
 namespace Flux {
 
@@ -23,8 +22,8 @@ namespace Flux {
 
     MyAudioDevice::MyAudioDevice() {
 
-        pipeline = UniquePointer<Audio::Pipeline>::make();
-        pipeline->setPipelineView(Application::getMasterView());
+        pipeline = Unique<Audio::Pipeline>::make();
+        pipeline->setPipelineView(Application::getMasterView().pointer());
         
     }
 

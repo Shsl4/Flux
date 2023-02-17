@@ -1,10 +1,5 @@
 #include <MIDI/MidiManager.h>
-
 #include <rtmidi/RtMidi.h>
-
-#include "Flux/Core/Math/Math.h"
-#include "Flux/Core/Tools/Console/Console.h"
-#include "Flux/Core/Tools/Console/CommandContext.h"
 
 namespace Flux {
     
@@ -71,14 +66,14 @@ namespace Flux {
         RtMidiIn::getCompiledApi(apis);
         
         if (apis.empty() || (apis.size() == 1 && apis[0] == RtMidiIn::Api::RTMIDI_DUMMY)) {
-            fabort("No Audio API is available. Make sure you compiled RtMidi with at least one API.");
+            throw Exceptions::Exception("No Audio API is available. Make sure you compiled RtMidi with at least one API.");
         }
         
         try{
             this->midiIn = Allocator<RtMidiIn>::construct();
         }
         catch(std::exception const& e){
-            fabort(String::format("Failed to create MIDI Manager. {}", e.what()).toCString());
+            throw Exceptions::Exception("Failed to create MIDI Manager.");
         }
         
         midiIn->setCallback(&MidiManager::eventCallback, this);
@@ -96,14 +91,14 @@ namespace Flux {
 
             midiIn->openPort(deviceIndex);
             String deviceName = midiIn->getPortName(deviceIndex);
-            deviceName = deviceName.substring(0, deviceName.getSize() - 2);
+            deviceName = deviceName.substring(0, deviceName.size() - 2);
             currentDevice = deviceIndex;
-            Console::logStatus("Now using MIDI device on port {} ({}).", deviceIndex, deviceName);
+            Console::log("Now using MIDI device on port {} ({}).\n", deviceIndex, deviceName);
             
         }
         catch(std::exception const&) {
 
-            Console::logRuntime("Failed to open MIDI device on port {}.", deviceIndex);
+            Console::log("Failed to open MIDI device on port {}.\n", deviceIndex);
 
         }
         
@@ -121,23 +116,23 @@ namespace Flux {
 
         if(count == 0) {
 
-            Console::logRuntime("There are no MIDI devices available.");
+            Console::log("There are no MIDI devices available.\n");
             return;
             
         }
 
-        Console::logStatus("Listing MIDI devices:");
+        Console::log("Listing MIDI devices:\n");
 
         for (UInt index = 0; index < count; ++index) {
 
             String deviceName = midiIn->getPortName(index);
-            deviceName = deviceName.substring(0, deviceName.getSize() - 2);
+            deviceName = deviceName.substring(0, deviceName.size() - 2);
 
             if(midiIn->isPortOpen() && index == currentDevice) {
-                Console::logStatus("[{}] -> {} (Active)", index, deviceName);
+                Console::log("[{}] -> {} (Active)\n", index, deviceName);
             }
             else {
-                Console::logStatus("[{}] -> {}", index, deviceName);
+                Console::log("[{}] -> {}\n", index, deviceName);
             }
             
             
@@ -209,39 +204,7 @@ namespace Flux {
     }
 
     void MidiManager::registerCommands() {
-        
-        const auto openNode = CommandNode::make("MIDI.Device.Open");
-        const auto listNode = CommandNode::make("MIDI.Device.List");
-        const auto closeNode = CommandNode::make("MIDI.Device.Close");
 
-        openNode->setNodeDescription("Opens a MIDI device.");
-        listNode->setNodeDescription("Lists the available MIDI devices.");
-        closeNode->setNodeDescription("Closes the current MIDI device.");
-
-        openNode->addArgument("port", ArgumentType::Int64)
-                ->addExecutable([this](const CommandContext* context) {
-
-                    UInt id = static_cast<UInt>(abs(context->getInt64("port")));
-
-                    openMidiDevice(id);
-                    
-                });
-
-        listNode->addExecutable([this](const auto*) {
-
-            listMidiDevices();
-            
-        });
-
-        closeNode->addExecutable([this](const auto*) {
-
-            closeMidiDevice();
-            
-        });
-
-        Console::registerCommand(openNode);
-        Console::registerCommand(listNode);
-        Console::registerCommand(closeNode);
         
     }
 

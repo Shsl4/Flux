@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <Flux/Audio/Effects/Filters/Filter.h>
 
@@ -9,10 +9,10 @@ namespace Flux::Audio {
     public:
 
         Resonator() = default;
-        
-        Float64 getMagnitude(Float64 omega) const;
-        
-        Float64 getArgument(Float64 omega) const;
+
+        NODISCARD Float64 getMagnitude(Float64 omega) const override;
+
+        NODISCARD Float64 getArgument(Float64 omega) const override;
 
     protected:
 

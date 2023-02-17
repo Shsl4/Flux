@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include <Flux/Core/Memory/Array.h>
 #include <Flux/Audio/AudioObject.h>
 
 #include "AudioEffect.h"
@@ -19,13 +18,15 @@ namespace Flux::Audio {
         }
 
         void initialize(UInt channelCount) {
-            
-            fassertf(channelCount > 0, "The number of channels must be greater than 0.");
+
+            if(channelCount == 0){
+                throw Exceptions::Exception("The number of channels must be greater than 0.");
+            }
 
             destroy();
             
             for (UInt i = 0; i < channelCount; ++i) {
-                this->objects += SharedPointer<ObjectType>::make();
+                this->objects += Allocator<ObjectType>::construct();
             }
             
         }
@@ -80,7 +81,7 @@ namespace Flux::Audio {
 
             for (auto& object : objects) {
 
-                function(object.raw());
+                function(object);
 
             }
             
@@ -90,7 +91,7 @@ namespace Flux::Audio {
     
     private:
 
-        OwnedArray<ObjectType> objects;
+        SmartArray<ObjectType> objects;
         
     };
     

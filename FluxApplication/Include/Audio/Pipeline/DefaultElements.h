@@ -31,11 +31,11 @@ namespace Flux::Audio {
 
         void createComponent(UserInterface::Compound* parent) override;
 
-        NODISCARD WeakPointer<UserInterface::Component> getComponent() const override;
+        NODISCARD UserInterface::Component* getComponent() const override;
 
     private:
 
-        WeakPointer<InputNode> component;
+        InputNode* component;
 
     };
 
@@ -49,7 +49,7 @@ namespace Flux::Audio {
 
         void createComponent(UserInterface::Compound* parent) override;
 
-        NODISCARD WeakPointer<UserInterface::Component> getComponent() const override;
+        NODISCARD UserInterface::Component* getComponent() const override;
 
     private:
         
@@ -58,7 +58,7 @@ namespace Flux::Audio {
         void prepareOutput(Float64* buffer);
         
         Float64* outputBuffer = nullptr;
-        WeakPointer<OutputNode> component;
+        OutputNode* component;
 
     };
     

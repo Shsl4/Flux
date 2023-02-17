@@ -9,23 +9,24 @@ namespace Flux::UserInterface {
     public:
 
         template<typename ComponentType>
-        WeakPointer<ComponentType> addChild() {
+        ComponentType* addChild() {
 
             static_assert(std::is_base_of_v<Component, ComponentType>, "ComponentType must be a Component.");
-            
-            auto pointer = SharedPointer<ComponentType>::make();
 
-            internalAddChild(pointer);
+            auto* comp = Allocator<ComponentType>::construct();
 
-            return pointer.weak();
-            
+            internalAddChild(comp);
+
+            return comp;
+
         }
         
         template<typename ComponentType>
-        void addChild(SharedPointer<ComponentType> pointer) {
+        ComponentType* addChild(ComponentType* pointer) {
 
             static_assert(std::is_base_of_v<Component, ComponentType>, "ComponentType must be a Component.");
             internalAddChild(pointer);
+            return pointer;
             
         }
 
@@ -39,9 +40,9 @@ namespace Flux::UserInterface {
 
     private:
 
-        void internalAddChild(SharedPointer<Component> const& component);
+        Component* internalAddChild(Component* component);
         
-        OwnedArray<Component> children;
+        SmartArray<Component> children;
         
     };
     

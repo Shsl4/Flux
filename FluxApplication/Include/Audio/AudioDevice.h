@@ -1,8 +1,6 @@
 #pragma once
 
-#include <Flux/Core/Flux.h>
-
-#include "../MIDI/MidiManager.h"
+#include <MIDI/MidiManager.h>
 
 class RtAudio;
 

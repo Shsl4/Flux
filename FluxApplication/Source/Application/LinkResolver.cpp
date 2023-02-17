@@ -23,12 +23,12 @@ namespace Flux{
 
         for(auto const& element : pipeline->elements){
 
-            for(size_t channel = 0; channel < element->next.getSize(); ++channel){
+            for(size_t channel = 0; channel < element->next.size(); ++channel){
 
                 for(auto const& link : element->next[channel]){
-                    
-                    const auto fromNode = element-> getComponent()->cast<Node>();
-                    const auto toNode = link.pointer->getComponent()->cast<Node>();
+
+                    const auto fromNode = dynamic_cast<Node*>(element->getComponent());
+                    const auto toNode = dynamic_cast<Node*>(link.pointer->getComponent());
 
                     auto pA = fromNode->getOutputSocketPosition(static_cast<UInt>(channel));
                     auto pB = toNode->getInputSocketPosition(link.targetChannel);

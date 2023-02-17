@@ -1,10 +1,9 @@
 ﻿#pragma once
 
-#include <Flux/Core/Utilities/Random.h>
-#include <Flux/Core/Interfaces/Formatter.h>
-#include <Flux/Core/Math/Math.h>
-
+#include <Nucleus/Nucleus.h>
 #include <skia/core/SkColor.h>
+
+using namespace Nucleus;
 
 namespace Flux::UserInterface {
 
@@ -115,19 +114,4 @@ namespace Flux::UserInterface {
     };
 
     
-}
-
-namespace Flux {
-
-    template <>
-    class Formatter<UserInterface::LinearColor> {
-
-    public:
-        static void format(std::ostream& stream, UserInterface::LinearColor const& elem) {
-            stream << "{ r: " << elem.getRed() << ", g: " << elem.getGreen() << ", b: " << elem.getBlue() << ", a: " <<
-                elem.getAlpha() << " }";
-        }
-
-    };
-
 }

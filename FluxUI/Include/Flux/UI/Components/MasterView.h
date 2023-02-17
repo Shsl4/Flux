@@ -29,7 +29,7 @@ namespace Flux::UserInterface {
 
         void draw(SkCanvas* canvas, Float64 deltaTime) override;
         
-        static SharedPointer<MasterView> makeGL(Int width, Int height, OpenGLParams const& params);
+        static Shared<MasterView> makeGL(Int width, Int height, OpenGLParams const& params);
     
     private:
         

@@ -55,7 +55,7 @@ namespace Flux {
             SkFont font;
             font.setSize(12.0);
 
-            canvas->drawSimpleText(text.toCString(), text.getSize(), SkTextEncoding::kUTF8, pos.fX + 10.0f,
+            canvas->drawSimpleText(text.begin().get(), text.size(), SkTextEncoding::kUTF8, pos.fX + 10.0f,
                                    pos.fY + 20.0f, font, paint);
 
             
@@ -77,7 +77,7 @@ namespace Flux {
 
             rotation = Math::clamp(rotation + deltaY * 0.35, -120.0, 120.0);
 
-            Console::logDebug("{} {}", rotation, deltaY);
+            Console::log("{} {}\n", rotation, deltaY);
             
         }
 
@@ -134,22 +134,24 @@ namespace Flux {
 
     void Application::run() {
 
-        fassertf(!instance, "Tried to run multiple Applications at the same time");
+        if(instance) throw Exceptions::Exception( "Tried to run multiple Applications at the same time");
 
         instance = this;
 
-        this->console = UniquePointer<Console>::make();
-
+        this->console = Unique<Console>::make();
+/*
         console->init();
 
         setTerminationCallback(&Application::onApplicationTerminate);
 
-        registerCommands();
+        registerCommands();*/
 
         glfwSetErrorCallback(&Application::onError);
 
-        fassertf(glfwInit(), "Failed to initialize GLFW");
-        
+        if(!glfwInit()){
+            throw Exceptions::Exception( "Failed to initialize GLFW");
+        }
+
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
@@ -166,7 +168,9 @@ namespace Flux {
         
         this->mainWindow = glfwCreateWindow(windowWidth, windowHeight, "Application", nullptr, nullptr);
 
-        fassertf(this->mainWindow, "Failed to create window");
+        if(!mainWindow){
+            throw Exceptions::Exception("Failed to create window");
+        }
 
         glfwMakeContextCurrent(mainWindow);
 
@@ -191,8 +195,8 @@ namespace Flux {
 
         initializeAudio();
 
-        this->cursorManager = SharedPointer<UserInterface::CursorManager>::make();
-        cursorManager->setCompound(masterView);
+        this->cursorManager = Shared<UserInterface::CursorManager>::make();
+        cursorManager->setCompound(masterView.pointer());
         
         auto frameInfo = masterView->addChild<FrameInfo>();
         frameInfo->setPosition({ f32(windowWidth) - frameInfo->getScale().fX - 10.0f, f32(windowHeight) - frameInfo->getScale().fY - 10.0f});
@@ -201,11 +205,11 @@ namespace Flux {
 
         this->masterView->addChild<LinkResolver>()->pipeline = audioDevice->getPipeline();
 
-        Console::logStatus("Created new Flux Application.");
+        Console::log("Created new Flux Application.\n");
 
         update();
 
-        Console::logStatus("Exiting Application.");
+        Console::log("Exiting Application.\n");
 
         glfwMakeContextCurrent(nullptr);
         glfwDestroyWindow(mainWindow);
@@ -228,7 +232,7 @@ namespace Flux {
 
     void Application::initializeAudio() {
 
-        this->audioDevice = SharedPointer<MyAudioDevice>::make();
+        this->audioDevice = Shared<MyAudioDevice>::make();
 
         audioDevice->initialize(44100, 128);
 
@@ -243,19 +247,19 @@ namespace Flux {
     }
 
     void Application::onError(Int errorCode, const char* description) {
-        Console::logRuntime("GLFW Error {}: {}", errorCode, description);
+        Console::error("GLFW Error {}: {}\n", errorCode, description);
     }
 
-    void Application::onApplicationTerminate() { Console::logFatal("Application received termination signal"); }
+    void Application::onApplicationTerminate() { Console::log("Application received termination signal\n"); }
 
     void Application::registerCommands() {
-
+/*
         const auto stopNode = CommandNode::make("Application.Stop");
 
         stopNode->setNodeDescription("Exits the application.");
         stopNode->addExecutable([](auto) { instance->stop(); });
 
-        Console::registerCommand(stopNode);
+        Console::registerCommand(stopNode);*/
 
     }
 
