@@ -174,8 +174,7 @@ namespace Flux {
 
         glfwMakeContextCurrent(mainWindow);
 
-        // Disable VSync
-        glfwSwapInterval(0);
+        glfwSwapInterval(1);
 
         glfwSetKeyCallback(mainWindow, &Application::inputCallback);
         glfwSetMouseButtonCallback(mainWindow, &Application::mouseCallback);
@@ -197,8 +196,8 @@ namespace Flux {
 
         this->cursorManager = Shared<UserInterface::CursorManager>::make();
         cursorManager->setCompound(masterView.pointer());
-        
-        auto frameInfo = masterView->addChild<FrameInfo>();
+
+        const auto frameInfo = masterView->addChild<FrameInfo>();
         frameInfo->setPosition({ f32(windowWidth) - frameInfo->getScale().fX - 10.0f, f32(windowHeight) - frameInfo->getScale().fY - 10.0f});
         
         this->shouldRun = true;

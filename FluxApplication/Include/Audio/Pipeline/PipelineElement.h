@@ -46,7 +46,7 @@ namespace Flux::Audio {
                 
             }
             
-            FORCEINLINE void reset(){
+            FORCEINLINE void reset() const {
                 memset(signals.begin().get(), 0, sizeof(bool) * signals.capacity());
             }
 
@@ -57,7 +57,7 @@ namespace Flux::Audio {
         struct Link {
             
             Link() = default;
-            
+                
             Link(PipelineElement* const pointer, const UInt targetChannel)
                 : pointer(pointer), targetChannel(targetChannel) {}
 

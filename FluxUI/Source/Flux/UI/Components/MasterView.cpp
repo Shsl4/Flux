@@ -44,8 +44,8 @@ namespace Flux::UserInterface {
 
         auto view = Shared<MasterView>::make();
 
-        const auto interface = GrGLMakeNativeInterface();
-        view->context = GrDirectContext::MakeGL(interface).release();
+        const auto itf = GrGLMakeNativeInterface();
+        view->context = GrDirectContext::MakeGL(itf).release();
 
         if(!view->context) throw Exceptions::Exception("Failed to create Skia GL context.");
 

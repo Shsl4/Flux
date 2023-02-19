@@ -24,7 +24,7 @@ namespace Flux {
         try{
             this->audio = Allocator<RtAudio>::construct();
         }
-        catch(std::exception const& e){
+        catch(std::exception const&){
             throw Exceptions::Exception("Failed to initialize audio system.\n");
         }
         
