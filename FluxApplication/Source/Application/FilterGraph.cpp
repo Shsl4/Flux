@@ -2,14 +2,10 @@
 
 namespace Flux{
 
-    void FilterGraph::initialize() {
-
-        Component::initialize();
-        setScale({ 200, 100 });
-        setColor(UserInterface::LinearColor::fromHex(0x303030ff));
-
+    FilterGraph::FilterGraph(Point const& p, Point const& s): Component(p, s) {
+        setColor(LinearColor::fromHex(0x303030ff));
     }
-
+    
     void FilterGraph::draw(SkCanvas *canvas, Float64 deltaTime) {
 
         Component::draw(canvas, deltaTime);
@@ -30,13 +26,13 @@ namespace Flux{
         }
     }
     
-    void FilterGraph::onDrag(UserInterface::MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) {
+    void FilterGraph::onDrag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) {
 
-        const SkVector pos = getAbsolutePosition();
-        const SkVector scale = getScale();
+        const Point pos = globalTransform().position;
+        const Point scale = size();
 
-        const Range xRange = { pos.fX, pos.fX + scale.fX };
-        const Range yRange = { pos.fY, pos.fY + scale.fY };
+        const Range xRange = { pos.x, pos.x + scale.x };
+        const Range yRange = { pos.y, pos.y + scale.y };
         const Range resonanceRange = { 10.0f, 0.25f };
         const Range<Float32> linRange = Range<Float32>::makeLinearRange();
 
@@ -56,9 +52,9 @@ namespace Flux{
 
         path.reset();
 
-        const SkVector pos = getAbsolutePosition();
-        SkVector lastPoint = getAbsolutePosition();
-        lastPoint.fY += getScale().fY;
+        const Point pos = globalTransform().position;
+        Point lastPoint = pos;
+        lastPoint.y += size().y;
 
         constexpr Float64 sr = 44100;
         constexpr Float64 nyquist = sr / 2.0;
@@ -83,20 +79,20 @@ namespace Flux{
 
             if(!isfinite(normalizedResponse)) continue;
 
-            const Float32 drawX = pos.fX + f32(normalizedFrequency) * getScale().fX;
-            const Float32 drawY = pos.fY + getScale().fY - f32(normalizedResponse) * getScale().fY;
+            const Float32 drawX = pos.x + f32(normalizedFrequency) * size().x;
+            const Float32 drawY = pos.y + size().y - f32(normalizedResponse) * size().y;
 
-            SkVector newPoint = { drawX, drawY };
+            Point newPoint = { drawX, drawY };
 
             if(i == 0){
-                path.moveTo(newPoint);
+                path.moveTo(newPoint.x, newPoint.y);
             }
             else{
 
-                path.moveTo(lastPoint);
+                path.moveTo(lastPoint.x, lastPoint.y);
 
                 if(Math::dneq(finalResponse, mindB))
-                    path.lineTo(newPoint);
+                    path.lineTo(newPoint.x, newPoint.y);
             }
 
             lastPoint = newPoint;
@@ -128,14 +124,14 @@ namespace Flux{
 
         SkPaint paint;
         paint.setStrokeWidth(2.5);
-        paint.setColor(UserInterface::LinearColor::fromHex(0x454545ff).toSkColor());
+        paint.setColor(LinearColor::fromHex(0x454545ff).skColor());
 
         const Range<Float32> logRange = { log10(10.0f), log10(44100.0f / 2.0f) };
         const Range<Float32> linRange = Range<Float32>::makeLinearRange();
-        const SkVector position = getAbsolutePosition();
-        const SkVector scale = getScale();
+        const Point position = globalTransform().position;
+        const Point scale = size();
 
-        canvas->drawLine(position.fX, position.fY + scale.fY / 2.0f, position.fX + scale.fX, position.fY + scale.fY / 2.0f, paint);
+        canvas->drawLine(position.x, position.y + scale.y / 2.0f, position.x + scale.x, position.y + scale.y / 2.0f, paint);
         paint.setStrokeWidth(1.0);
 
         for (size_t p = 1; p <= 4; ++p) {
@@ -145,11 +141,11 @@ namespace Flux{
             for (size_t d = 1; d <= 9; ++d) {
                 
                 const Float32 freq = pw * f32(d);
-                const Float32 drawX = Range<Float32>::translateValue(log10(freq), logRange, linRange) * scale.fX + position.fX;
+                const Float32 drawX = Range<Float32>::translateValue(log10(freq), logRange, linRange) * scale.x + position.x;
 
-                if(drawX > position.fX + scale.fX) return;
+                if(drawX > position.x + scale.x) return;
 
-                canvas->drawLine(drawX, position.fY, drawX, position.fY + scale.fY, paint);
+                canvas->drawLine(drawX, position.y, drawX, position.y + scale.y, paint);
 
             }
 

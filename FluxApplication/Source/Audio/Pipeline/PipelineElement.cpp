@@ -3,7 +3,7 @@
 
 namespace Flux::Audio {
 
-    void PipelineElement::createComponent(UserInterface::Compound* parent) {}
+    void PipelineElement::createComponent(Component* parent) {}
 
     void PipelineElement::discard() {
 
@@ -123,8 +123,8 @@ namespace Flux::Audio {
         otherLink.pointer = this;
         otherLink.targetChannel = fromChannel;
         
-        element->onLink(UserInterface::Flow::Input, toChannel);
-        onLink(UserInterface::Flow::Output, fromChannel);
+        element->onLink(Flow::Input, toChannel);
+        onLink(Flow::Output, fromChannel);
 
         return true;
 
@@ -143,8 +143,8 @@ namespace Flux::Audio {
             const Link& currentLink = currentLinks[index];
             
             // Call unlink events
-            currentLink.pointer->onUnlink(UserInterface::Flow::Input, currentLink.targetChannel);
-            onUnlink(UserInterface::Flow::Output, channel);
+            currentLink.pointer->onUnlink(Flow::Input, currentLink.targetChannel);
+            onUnlink(Flow::Output, channel);
 
             Link& otherLink = currentLink.pointer->previous[currentLink.targetChannel];
 
@@ -165,8 +165,8 @@ namespace Flux::Audio {
         if (currentLink.pointer) {
 
             // Call unlink events
-            currentLink.pointer->onUnlink(UserInterface::Flow::Output, currentLink.targetChannel);
-            onUnlink(UserInterface::Flow::Input, channel);
+            currentLink.pointer->onUnlink(Flow::Output, currentLink.targetChannel);
+            onUnlink(Flow::Input, channel);
 
             MutableArray<Link>& otherLinks = currentLink.pointer->next[currentLink.targetChannel];
             
@@ -186,16 +186,16 @@ namespace Flux::Audio {
 
     Pipeline* PipelineElement::getPipeline() const { return this->pipeline; }
 
-    void PipelineElement::onLink(UserInterface::Flow flow, UInt channel) {
+    void PipelineElement::onLink(Flow flow, UInt channel) {
 
-        Console::log("Linked {}. Direction: {}, Channel: {}\n", Type::name(*this), flow == UserInterface::Flow::Input ? "input" : "output", channel);
+        Console::log("Linked {}. Direction: {}, Channel: {}\n", Type::name(*this), flow == Flow::Input ? "input" : "output", channel);
         
     }
 
 
-    void PipelineElement::onUnlink(UserInterface::Flow flow, UInt channel) {
+    void PipelineElement::onUnlink(Flow flow, UInt channel) {
         
-        Console::log("Unlinked {}. Direction: {}, Channel: {}\n", Type::name(*this), flow == UserInterface::Flow::Input ? "input" : "output", channel);
+        Console::log("Unlinked {}. Direction: {}, Channel: {}\n", Type::name(*this), flow == Flow::Input ? "input" : "output", channel);
 
     }
 

@@ -4,21 +4,32 @@
 
 using namespace Nucleus;
 
-namespace Flux::UserInterface {
+namespace Flux::UI {
 
-    enum class MouseButton : UInt {
+    enum class MouseButton : size_t {
 
         Left = 0,
         Right = 1,
         Middle = 2,
-        Other
+        Size
+
         
     };
-
+ 
     class Reactive {
+
+         friend class CursorManager;
         
     public:
-        
+
+        enum class State : size_t {
+
+            Idle,
+            Hovered,
+            Pressed,
+         
+        };
+     
         virtual ~Reactive() = default;
         
         /**
@@ -81,6 +92,18 @@ namespace Flux::UserInterface {
         virtual void onFocus();
 
         virtual void endFocus();
+     
+        NODISCARD FORCEINLINE bool isFocused() const { return this->focused; }
+     
+        NODISCARD FORCEINLINE bool isHovered() const { return this->hovered; }
+     
+        NODISCARD FORCEINLINE bool isPressed(MouseButton button) const { return pressedState[static_cast<size_t>(button)]; }
+
+    private:
+
+        StaticArray<bool, i64(MouseButton::Size)> pressedState = {};
+        bool hovered = false;
+        bool focused = false;
 
     };
     

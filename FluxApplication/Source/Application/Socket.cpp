@@ -9,21 +9,18 @@
 #include <Application/Node.h>
 
 namespace Flux {
-    
-    void Socket::initialize() {
-        setColor(UserInterface::LinearColor::fromHex(0x606060ff));
-        this->node = dynamic_cast<Node*>(getParent());
-    }
-    
-    void Socket::setPosition(SkVector const& value) {
 
-        Component::setPosition(value);
-            
+    Socket::Socket() {
+        setColor(LinearColor::fromHex(0x606060ff));
     }
 
-    void Socket::onButtonDown(UserInterface::MouseButton button, Float64 x, Float64 y) {
+    void Socket::parentLinked() {
+        this->node = dynamic_cast<Node*>(parent());
+    }
+
+    void Socket::onButtonDown(MouseButton button, Float64 x, Float64 y) {
             
-        if (button == UserInterface::MouseButton::Left) {
+        if (button == MouseButton::Left) {
 
             lineEnd = SkVector::Make(f32(x), f32(y));
             dragged = true;
@@ -32,9 +29,9 @@ namespace Flux {
 
     }
 
-    void Socket::onButtonUp(UserInterface::MouseButton button, Float64 x, Float64 y, Reactive* upTarget) {
+    void Socket::onButtonUp(MouseButton button, Float64 x, Float64 y, Reactive* upTarget) {
             
-        if (button == UserInterface::MouseButton::Left) {
+        if (button == MouseButton::Left) {
 
             dragged = false;
             
@@ -47,7 +44,7 @@ namespace Flux {
                     
                 }
 
-                if(flowType == UserInterface::Flow::Input && connections.size() > 0) {
+                if(flowType == Flow::Input && connections.size() > 0) {
                     unlinkAll();
                 }
                 
@@ -57,9 +54,9 @@ namespace Flux {
             
     }
 
-    void Socket::onDrag(UserInterface::MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) {
+    void Socket::onDrag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) {
             
-        if (button == UserInterface::MouseButton::Left) {
+        if (button == MouseButton::Left) {
 
             lineEnd = SkVector::Make(f32(x), f32(y));
                 
@@ -106,29 +103,29 @@ namespace Flux {
         
         SkPaint paint;
 
-        const auto col = hasLink() ? node->getHeaderColor().toSkColor() : getColor().darker(10).toSkColor();
+        const auto col = hasLink() ? node->getHeaderColor().skColor() : color().darker(10).skColor();
+
+        const auto root = globalTransform().centeredPosition();
         
         paint.setColor(col);
         paint.setStyle(SkPaint::kFill_Style);
-        canvas->drawCircle(getAbsoluteCenteredPosition(), 5, paint);
+        canvas->drawCircle(root.x, root.y, 5, paint);
         
         paint.setStyle(SkPaint::kStroke_Style);
         paint.setStrokeWidth(lineWidth);
-        paint.setColor(UserInterface::LinearColor::fromHex(0xffffff55).toSkColor());
+        paint.setColor(LinearColor::fromHex(0xffffff55).skColor());
         SkScalar ps[] = { 10.0f, 10.0f };
         paint.setPathEffect(SkDashPathEffect::Make(ps, 2, f32(linePhase)));
         linePhase -= 20.0 * deltaTime;
         
-        const SkVector root = getAbsoluteCenteredPosition();
-        
         if(dragged) {
 
-            const Float32 factor = lineEnd.x() > root.x() ? 0.5f : -0.5f;
-            canvas->drawPath(makeSpline(root, lineEnd, factor), paint);
+            const Float32 factor = lineEnd.x() > root.x ? 0.5f : -0.5f;
+            canvas->drawPath(makeSpline({ root.x, root.y }, lineEnd, factor), paint);
             
         }        
 /*
-        if(flowType == UserInterface::Flow::Input) { return; }
+        if(flowType == Flow::Input) { return; }
         
         paint.setColor(cableColor.toSkColor());
         
@@ -179,25 +176,25 @@ namespace Flux {
 
         switch (value) {
         case DataType::Audio:
-            setCableColor(UserInterface::LinearColor::fromHex(0x8814f6ff));
+            setCableColor(LinearColor::fromHex(0x8814f6ff));
             break;
         case DataType::Mod:
-            setCableColor(UserInterface::LinearColor::fromHex(0xf61414ff));
+            setCableColor(LinearColor::fromHex(0xf61414ff));
             break;
         case DataType::SideChain:
-            setCableColor(UserInterface::LinearColor::fromHex(0x147ff6ff));
+            setCableColor(LinearColor::fromHex(0x147ff6ff));
             break;
         }
         
     }
 
-    void Socket::setCableColor(UserInterface::LinearColor const& value) {
+    void Socket::setCableColor(LinearColor const& value) {
 
         this->cableColor = value;
         
     }
 
-    void Socket::setFlow(UserInterface::Flow value) {
+    void Socket::setFlow(Flow value) {
 
         if(this->flowType == value) { return; }
 
@@ -213,7 +210,7 @@ namespace Flux {
 
         if(connections.contains(socket)) { return true; }
 
-        if(flowType == UserInterface::Flow::Input) {
+        if(flowType == Flow::Input) {
 
             // Input sockets only accept one input, so unlink everything if trying to link a new socket
             unlinkAll();
@@ -263,22 +260,22 @@ namespace Flux {
         
     }
 
-    SkVector Socket::getSocketRootPosition() const {
+    Point Socket::getSocketRootPosition() const {
 
-        SkVector v = getAbsolutePosition();
+        Point v = globalTransform().centeredPosition();
 
-        if(flowType == UserInterface::Flow::Input) {
-            v.fX += getScale().fX;
+        if(flowType == Flow::Input) {
+            v.x += size().x;
         }
 
-        v.fY += getScale().fY / 2.0f;
+        v.y += size().y / 2.0f;
 
         return v;
         
     }
 
     bool Socket::canLink(const Socket* socket) const {
-        return socket && socket != this && getParent() != socket->getParent() && socket->flowType != flowType && socket->type == type;
+        return socket && socket != this && parent() != socket->parent() && socket->flowType != flowType && socket->type == type;
     }
 
     bool Socket::hasLink() const {

@@ -1,9 +1,16 @@
 ﻿#pragma once
 
-#include <Flux/UI/Components/Component.h>
+#include <Flux/UI/Component.h>
 #include <skia/core/SkPath.h>
 
 namespace Flux {
+
+    using namespace UI;
+    
+    enum class Flow {
+        Input,
+        Output
+    };
     
     enum class DataType {
 
@@ -13,19 +20,17 @@ namespace Flux {
             
     };
     
-    class Socket : public UserInterface::Component {
+    class Socket : public Component {
 
     public:
-        
-        void initialize() override;
 
-        void setPosition(SkVector const& value) override;
+        Socket();
 
-        void onButtonDown(UserInterface::MouseButton button, Float64 x, Float64 y) override;
+        void onButtonDown(MouseButton button, Float64 x, Float64 y) override;
 
-        void onButtonUp(UserInterface::MouseButton button, Float64 x, Float64 y, Reactive* upTarget) override;
+        void onButtonUp(MouseButton button, Float64 x, Float64 y, Reactive* upTarget) override;
 
-        void onDrag(UserInterface::MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) override;
+        void onDrag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) override;
 
         static SkPath makeSpline(SkVector const& a, SkVector const& b, Float32 factor);
 
@@ -35,7 +40,7 @@ namespace Flux {
 
         void setDataType(DataType value, UInt channelIndex);
 
-        void setFlow(UserInterface::Flow value);
+        void setFlow(Flow value);
 
         void onLink();
         
@@ -47,7 +52,7 @@ namespace Flux {
         
         void unlinkAll();
 
-        NODISCARD SkVector getSocketRootPosition() const;
+        NODISCARD Point getSocketRootPosition() const;
 
         NODISCARD bool canLink(const Socket* socket) const;
         
@@ -55,16 +60,20 @@ namespace Flux {
         
         NODISCARD bool isLinked(const Socket* socket) const;
     
+    protected:
+        
+        void parentLinked() override;
+        
     private:
 
-        void setCableColor(UserInterface::LinearColor const& value);
+        void setCableColor(LinearColor const& value);
         
         MutableArray<Socket*> connections = {};
 
-        UserInterface::LinearColor cableColor = UserInterface::LinearColor::fromHex(0x147ff6ff);
+        LinearColor cableColor = LinearColor::fromHex(0x147ff6ff);
         
         DataType type = DataType::Audio;
-        UserInterface::Flow flowType = UserInterface::Flow::Output;
+        Flow flowType = Flow::Output;
         
         bool dragged = false;
 

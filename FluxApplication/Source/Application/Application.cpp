@@ -12,19 +12,22 @@
 #include <Application/LinkResolver.h>
 #include <Application/FilterGraph.h>
 
+#include "Application/DropdownMenu.h"
+
 #define GL_FRAMEBUFFER_BINDING 0x8CA6
+
+using namespace Flux::UI;
 
 namespace Flux {
     
-    class FrameInfo : public UserInterface::Component {
+    class FrameInfo : public Component {
 
     public:
-        
-        void initialize() override {
 
-            setScale({300, 30});
-            setColor(UserInterface::LinearColor::fromHex(0x60606060));
-
+        FrameInfo(Point const& p, Point const& s) : Component(p, s) {
+            
+            setColor(LinearColor::fromHex(0x60606060));
+            
         }
         
         void draw(SkCanvas* canvas, Float64 deltaTime) override {
@@ -42,10 +45,10 @@ namespace Flux {
             
             SkPaint paint;
             
-            paint.setColor(getColor().toSkColor());
+            paint.setColor(color().skColor());
 
-            const SkVector pos = getAbsolutePosition();
-            SkRect rect = SkRect::MakeXYWH(pos.x(), pos.y(), getScale().x(), getScale().y());
+            const Point pos = globalTransform().position;
+            const SkRect rect = SkRect::MakeXYWH(pos.x, pos.y, size().x, size().y);
 
             canvas->drawRoundRect(rect, 10, 10, paint);
             
@@ -55,8 +58,8 @@ namespace Flux {
             SkFont font;
             font.setSize(12.0);
 
-            canvas->drawSimpleText(text.begin().get(), text.size(), SkTextEncoding::kUTF8, pos.fX + 10.0f,
-                                   pos.fY + 20.0f, font, paint);
+            canvas->drawSimpleText(text.begin().get(), text.size(), SkTextEncoding::kUTF8, pos.x + 10.0f,
+                                   pos.y + 20.0f, font, paint);
 
             
         }
@@ -69,11 +72,11 @@ namespace Flux {
         
     };
 
-    class RotaryKnob : public UserInterface::Component {
+    class RotaryKnob : public Component {
 
     public:
         
-        void onDrag(UserInterface::MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) override {
+        void onDrag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) override {
 
             rotation = Math::clamp(rotation + deltaY * 0.35, -120.0, 120.0);
 
@@ -81,47 +84,48 @@ namespace Flux {
             
         }
 
-        void onDoubleClick(UserInterface::MouseButton button, Float64 x, Float64 y) override {
+        void onDoubleClick(MouseButton button, Float64 x, Float64 y) override {
 
-            if(button == UserInterface::MouseButton::Left) {
+            if(button == MouseButton::Left) {
                 rotation = 0.0;
             }
             
         }
 
-        void initialize() override {
-
-            setScale({ 50, 50 });
-            setColor(UserInterface::LinearColor::fromHex(0x3b3b3bff));
+        RotaryKnob() : Component({ {}, {50, 50} }) {
+            
+            setColor(LinearColor::fromHex(0x3b3b3bff));
             
         }
-        
-        static inline auto inner1 = UserInterface::LinearColor::fromHex(0xadaaa7ff);
-        static inline auto inner2 = UserInterface::LinearColor::fromHex(0x797979ff);
+
+        static inline auto inner1 = LinearColor::fromHex(0xadaaa7ff);
+        static inline auto inner2 = LinearColor::fromHex(0x797979ff);
 
         void draw(SkCanvas* canvas, Float64 deltaTime) override {
 
             SkPaint paint;
-            const SkVector pos = getAbsolutePosition();
-            const SkVector size = getScale();
-            const SkVector mid = getAbsoluteCenteredPosition();
-            const Float32 rad = size.x() / 2.0f;
-            paint.setColor(getColor().toSkColor());
+            const Transform t = globalTransform();
+            const Point& pos = t.position;
+            const Point& s = t.size;
+            const Point mid = t.centeredPosition();
+            const Float32 rad = s.x / 2.0f;
+            
+            paint.setColor(color().skColor());
             canvas->save();
-            canvas->rotate(f32(rotation), mid.fX, mid.fY);
-            canvas->drawCircle(mid, rad, paint);
+            canvas->rotate(f32(rotation), mid.x, mid.y);
+            canvas->drawCircle(mid.x, mid.y, rad, paint);
             paint.setColor(SK_ColorWHITE);
-            canvas->drawCircle(mid, rad * 0.9f, paint);
-            paint.setColor(inner1.toSkColor());
-            canvas->drawCircle(mid, rad * 0.85f, paint);
-            paint.setColor(inner2.toSkColor());
-            canvas->drawCircle(mid, rad * 0.8f, paint);
-            paint.setColor(getColor().toSkColor());
-            canvas->drawCircle(mid, rad * 0.75f, paint);
+            canvas->drawCircle(mid.x, mid.y, rad * 0.9f, paint);
+            paint.setColor(inner1.skColor());
+            canvas->drawCircle(mid.x, mid.y, rad * 0.85f, paint);
+            paint.setColor(inner2.skColor());
+            canvas->drawCircle(mid.x, mid.y, rad * 0.8f, paint);
+            paint.setColor(color().skColor());
+            canvas->drawCircle(mid.x, mid.y, rad * 0.75f, paint);
             paint.setStrokeCap(SkPaint::kRound_Cap);
             paint.setStrokeWidth(rad * 0.05f);
             paint.setColor(SK_ColorWHITE);
-            canvas->drawLine(mid.fX, mid.fY, pos.fX + size.fX / 2.0f, pos.fY + size.fY * 0.1f, paint);
+            canvas->drawLine(mid.x, mid.y, pos.x + s.x / 2.0f, pos.y + s.y * 0.1f, paint);
             canvas->restore();
             
         }
@@ -139,19 +143,13 @@ namespace Flux {
         instance = this;
 
         this->console = Unique<Console>::make();
-/*
-        console->init();
-
-        setTerminationCallback(&Application::onApplicationTerminate);
-
-        registerCommands();*/
 
         glfwSetErrorCallback(&Application::onError);
 
         if(!glfwInit()){
             throw Exceptions::Exception( "Failed to initialize GLFW");
         }
-
+        
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
@@ -171,15 +169,20 @@ namespace Flux {
         if(!mainWindow){
             throw Exceptions::Exception("Failed to create window");
         }
-
+         
         glfwMakeContextCurrent(mainWindow);
 
-        glfwSwapInterval(1);
+        glfwSwapInterval(0);
 
         glfwSetKeyCallback(mainWindow, &Application::inputCallback);
         glfwSetMouseButtonCallback(mainWindow, &Application::mouseCallback);
         glfwSetScrollCallback(mainWindow, &Application::scrollCallback);
         glfwSetCursorPosCallback(mainWindow, &Application::cursorCallback);
+
+        Console::log("OpenGL Initialized.\n");
+        Console::log("OpenGL version: {}\n", glGetString(GL_VERSION));
+        Console::log("OpenGL shading language version: {}\n", glGetString(0x8B8C));
+        Console::log("OpenGL rendering device: {}\n", glGetString(GL_RENDERER));
         
         Int framebufferWidth;
         Int framebufferHeight;
@@ -189,21 +192,28 @@ namespace Flux {
         Int32 framebufferId = 0;
         const auto glGetIntegerv = reinterpret_cast<void(*)(UInt32, Int32*)>(glfwGetProcAddress("glGetIntegerv"));
         glGetIntegerv(GL_FRAMEBUFFER_BINDING, &framebufferId);
-        
-        this->masterView = UserInterface::MasterView::makeGL(framebufferWidth, framebufferHeight, {framebufferId, 4, 8, f32(framebufferWidth) / f32(windowWidth), f32(framebufferHeight) / f32(windowHeight)});
 
         initializeAudio();
 
-        this->cursorManager = Shared<UserInterface::CursorManager>::make();
-        cursorManager->setCompound(masterView.pointer());
+        const OpenGLParams params = { framebufferId, 4, 8, f32(framebufferWidth) / f32(windowWidth), f32(framebufferHeight) / f32(windowHeight)};
 
-        const auto frameInfo = masterView->addChild<FrameInfo>();
-        frameInfo->setPosition({ f32(windowWidth) - frameInfo->getScale().fX - 10.0f, f32(windowHeight) - frameInfo->getScale().fY - 10.0f});
+        this->masterView = MasterView::makeGL(framebufferWidth, framebufferHeight, params);
+        
+        this->cursorManager = Shared<CursorManager>::make();
+        
+        cursorManager->setComponent(masterView);
+
+        constexpr Float32 fw = 300.0f;
+        constexpr Float32 fh = 30.0f;
+        
+        Point p = { f32(windowWidth) - fw - 10.0f, f32(windowHeight) - fh - 10.0f};
+        
+        masterView->addChild(Component::Factory::create<FrameInfo>(p, Point(fw, fh)));
+        
+        this->masterView->addChild(Component::Factory::create<DropdownMenu>());
         
         this->shouldRun = true;
-
-        this->masterView->addChild<LinkResolver>()->pipeline = audioDevice->getPipeline();
-
+        
         Console::log("Created new Flux Application.\n");
 
         update();

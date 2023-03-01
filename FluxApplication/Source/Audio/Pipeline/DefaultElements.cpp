@@ -10,11 +10,12 @@ namespace Flux::Audio {
             
     }
 
-    void PipelineInput::createComponent(UserInterface::Compound* parent) {
-        this->component = parent->addChild<InputNode>();
+    void PipelineInput::createComponent(Component* parent) {
+        this->component = Component::Factory::create<InputNode>();
+        parent->addChild(this->component);
     }
 
-    UserInterface::Component* PipelineInput::getComponent() const {
+    Component* PipelineInput::getComponent() const {
         return this->component;
     }
 
@@ -29,11 +30,12 @@ namespace Flux::Audio {
             
     }
 
-    void PipelineOutput::createComponent(UserInterface::Compound* parent) {
-        this->component = parent->addChild<OutputNode>();
+    void PipelineOutput::createComponent(Component* parent) {
+        this->component = Component::Factory::create<OutputNode>();
+        parent->addChild(this->component);
     }
 
-    UserInterface::Component* PipelineOutput::getComponent() const { return this->component; }
+    Component* PipelineOutput::getComponent() const { return this->component; }
 
     void PipelineOutput::prepareOutput(Float64* buffer) {
         this->outputBuffer = buffer;

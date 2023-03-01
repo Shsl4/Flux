@@ -2,19 +2,19 @@
 
 namespace Flux {
 
-    void DragComponent::onButtonDown(UserInterface::MouseButton button, Float64 x, Float64 y) {
+    void DragComponent::onButtonDown(MouseButton button, Float64 x, Float64 y) {
             
-        if (button == UserInterface::MouseButton::Left) {
+        if (button == MouseButton::Left) {
 
-            lastClickPos = SkVector::Make(f32(x), f32(y)) - getPosition();
+            lastClickPos = Point(f32(x), f32(y)) - position();
                 
         }
 
     }
 
-    void DragComponent::onDrag(UserInterface::MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) {
+    void DragComponent::onDrag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) {
             
-        if (button == UserInterface::MouseButton::Left) { setPosition(SkVector::Make(f32(x), f32(y)) - lastClickPos); }
+        if (button == MouseButton::Left) { setPosition(Point(f32(x), f32(y)) - lastClickPos); }
             
     }
     

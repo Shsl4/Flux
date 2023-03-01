@@ -1,11 +1,13 @@
 #include <Application/Application.h>
 
+using namespace Flux;
+
 int main() {
 
-    ExceptionHandler::run([](){
+    ExceptionHandler::run([] {
 
-        Flux::Application().run();
-
+        Application().run();
+        
     });
-
+        
 }

@@ -1,12 +1,14 @@
 #pragma once
 
-#include <Flux/UI/Components/Component.h>
+#include <Flux/UI/Component.h>
 #include <Flux/Audio/Effects/Filters/IIRFilter.h>
 #include <skia/core/SkPath.h>
 
 #include <utility>
 
 namespace Flux{
+
+    using namespace UI;
 
     template<typename NumberType>
     struct Range{
@@ -77,11 +79,11 @@ namespace Flux{
         
     };
 
-    class FilterGraph : public UserInterface::Component {
+    class FilterGraph : public Component {
 
     public:
-
-        void initialize() override;
+        
+        FilterGraph(Point const& p, Point const& s);
 
         static Float64 freqToRad(Float64 f, Float64 ny);
 
@@ -91,7 +93,7 @@ namespace Flux{
 
         void recalculatePath();
 
-        void onDrag(UserInterface::MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) override;
+        void onDrag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) override;
 
         void draw(SkCanvas *canvas, Float64 deltaTime) override;
 
@@ -108,5 +110,5 @@ namespace Flux{
         MutableArray<FilterGraphListener*> listeners;
         
     };
-
+    
 }

@@ -2,19 +2,21 @@
 
 #include <Flux/Audio/AudioObject.h>
 #include <Flux/Audio/Effects/Filters/IIRFilter.h>
-#include <Flux/UI/Components/MasterView.h>
+#include <Flux/UI/MasterView.h>
 
 #include "FilterElement.h"
 
 #include "DefaultElements.h"
 
 namespace Flux::Audio {
-
+    
+    using namespace Flux::UI;
+    
     class Pipeline : public AudioObject {
 
     public:
 
-        Pipeline();
+        Pipeline() = default;
 
         void setupChannels(UInt inCount);
 
@@ -30,8 +32,6 @@ namespace Flux::Audio {
             auto element = Allocator<T>::construct(std::forward<Args>(args)...);
             this->elements += element;
             element->pipeline = this;
-            element->createComponent(pipelineView);
-            dynamic_cast<Node*>(element->getComponent())->setElement(element);
 
             if(getBufferSize() > 0) {
                 element->prepare(getSampleRate(), getBufferSize());
@@ -43,14 +43,14 @@ namespace Flux::Audio {
 
         void removeElement(PipelineElement* element);
 
-        void setPipelineView(UserInterface::MasterView* view);
+        void setPipelineView(MasterView* view);
 
-        // private:
+        NODISCARD SmartArray<PipelineElement> const& getElements() const { return elements; }
+
+        private:
 
         UInt channelCount = 0;
-
-        UserInterface::MasterView* pipelineView;
-
+        
         MutableArray<PipelineInput*> inputChannels;
         MutableArray<PipelineOutput*> outputChannels;
         SmartArray<PipelineElement> elements;
@@ -91,11 +91,12 @@ namespace Flux::Audio {
 
         }
 
-        void createComponent(UserInterface::Compound* parent) override {
-            this->component = parent->addChild<LPFNode>();
+        void createComponent(Component* parent) override {
+            this->component = Component::Factory::create<LPFNode>();
+            parent->addChild(this->component);
         }
 
-        NODISCARD UserInterface::Component* getComponent() const override {
+        NODISCARD Component* getComponent() const override {
             return this->component;
         }
 
@@ -117,11 +118,14 @@ namespace Flux::Audio {
 
         HPFElement();
 
-        void createComponent(UserInterface::Compound* parent) override {
-            this->component = parent->addChild<HPFNode>();
+        void createComponent(Component* parent) override {
+
+            this->component = Component::Factory::create<HPFNode>();
+            parent->addChild(this->component);
+
         }
 
-        NODISCARD UserInterface::Component* getComponent() const override {
+        NODISCARD Component* getComponent() const override {
             return this->component;
         }
         

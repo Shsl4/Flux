@@ -15,22 +15,22 @@ namespace Flux {
         
         if(action) {
             
-            instance->cursorManager->onButtonDown(static_cast<UserInterface::MouseButton>(button));
+            instance->cursorManager->buttonDown(static_cast<UI::MouseButton>(button));
             
         }
         else {
 
-            const auto mouseButton = static_cast<UserInterface::MouseButton>(button);
+            const auto mouseButton = static_cast<UI::MouseButton>(button);
             const Float64 newTime = glfwGetTime();
 
             if(newTime - instance->lastClickTime < 0.250 && mouseButton == instance->lastButtonPressed) {
-                instance->cursorManager->onDoubleClick(mouseButton);
+                instance->cursorManager->doubleClick(mouseButton);
             }
 
             instance->lastClickTime = newTime;
             instance->lastButtonPressed = mouseButton;
             
-            instance->cursorManager->onButtonUp(static_cast<UserInterface::MouseButton>(button));
+            instance->cursorManager->buttonUp(static_cast<UI::MouseButton>(button));
             
         }
         
@@ -38,13 +38,13 @@ namespace Flux {
 
     void Application::scrollCallback(GLFWwindow* window, Float64 xOffset, Float64 yOffset) {
 
-        instance->cursorManager->onScroll(xOffset, yOffset);
+        instance->cursorManager->scroll(xOffset, yOffset);
         
     }
 
     void Application::cursorCallback(GLFWwindow* window, Float64 xPos, Float64 yPos) {
 
-        instance->cursorManager->onCursorMoved(xPos, yPos);
+        instance->cursorManager->cursorMoved(xPos, yPos);
         
     }
 

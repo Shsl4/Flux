@@ -1,20 +1,22 @@
 ﻿#pragma once
 
-#include <Flux/UI/Components/Component.h>
+#include <Flux/UI/Component.h>
 
 namespace Flux {
 
-    class DragComponent : public UserInterface::Component {
+    using namespace UI;
+    
+    class DragComponent : public Component {
 
     public:
 
-        void onButtonDown(UserInterface::MouseButton button, Float64 x, Float64 y) override;
+        void onButtonDown(MouseButton button, Float64 x, Float64 y) override;
 
-        void onDrag(UserInterface::MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) override;
+        void onDrag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) override;
 
     private:
         
-        SkVector lastClickPos = {};
+        Point lastClickPos = {};
         
     };
     

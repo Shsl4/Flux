@@ -2,7 +2,10 @@
 
 #include <Flux/Audio/AudioObject.h>
 #include "AudioBuffer.h"
-#include "Flux/UI/Components/Component.h"
+#include <Flux/UI/Component.h>
+
+#include "Application/Socket.h"
+
 namespace Flux{
     class LinkResolver;
 }
@@ -101,15 +104,15 @@ namespace Flux::Audio {
         
         void unlinkInput(UInt channel);
         
-        virtual void onLink(UserInterface::Flow flow, UInt channel);
+        virtual void onLink(Flow flow, UInt channel);
         
-        virtual void onUnlink(UserInterface::Flow flow, UInt channel);
+        virtual void onUnlink(Flow flow, UInt channel);
 
         virtual void process(AudioBuffer<Float64> const& buffer) = 0;
 
-        virtual void createComponent(UserInterface::Compound* parent) = 0;
+        virtual void createComponent(Component* parent) = 0;
         
-        NODISCARD virtual UserInterface::Component* getComponent() const = 0;
+        NODISCARD virtual Component* getComponent() const = 0;
 
         virtual void discard();
     

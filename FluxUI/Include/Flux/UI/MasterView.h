@@ -1,17 +1,16 @@
 #pragma once
 
-#include <Flux/UI/Components/Compound.h>
-#include <Flux/UI/Reactive.h>
+#include <Flux/UI/Component.h>
 
 class GrDirectContext;
 
-namespace Flux::UserInterface {
+namespace Flux::UI {
     
     struct OpenGLParams {
         
-        OpenGLParams(const Int framebufferId, const Int sampleCount, const Int stencilBits,
-                     const Float32 xDpiScale, const Float32 yDpiScale) :
-        framebufferId(framebufferId), sampleCount(sampleCount), stencilBits(stencilBits), xDpiScale(xDpiScale), yDpiScale(yDpiScale){}
+        OpenGLParams(const Int framebufferId, const Int sampleCount, const Int stencilBits, const Float32 xDpiScale,
+            const Float32 yDpiScale) : framebufferId(framebufferId), sampleCount(sampleCount), stencilBits(stencilBits),
+                xDpiScale(xDpiScale), yDpiScale(yDpiScale){}
 
         Int framebufferId = 0;
         Int sampleCount = 0;
@@ -21,15 +20,15 @@ namespace Flux::UserInterface {
         
     };
     
-    class MasterView : public Compound {
+    class MasterView : public Component {
     
     public:
-        
-        void initialize() override;
+
+        MasterView();
 
         void draw(SkCanvas* canvas, Float64 deltaTime) override;
         
-        static Shared<MasterView> makeGL(Int width, Int height, OpenGLParams const& params);
+        static MasterView* makeGL(Int width, Int height, OpenGLParams const& params);
     
     private:
         

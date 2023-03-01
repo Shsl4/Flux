@@ -18,7 +18,7 @@ namespace Flux {
 
         void stop();
 
-        NODISCARD static Shared<UserInterface::MasterView> getMasterView() { return instance->masterView; }
+        NODISCARD static UI::Component* mainView() { return instance->masterView; }
         
     private:
         
@@ -52,13 +52,13 @@ namespace Flux {
 
         Unique<Console> console = nullptr;
         
-        Shared<UserInterface::MasterView> masterView = nullptr;
+        UI::Component* masterView = nullptr;
         
         Shared<MyAudioDevice> audioDevice = nullptr;
         
-        Shared<UserInterface::CursorManager> cursorManager = nullptr;
+        Shared<UI::CursorManager> cursorManager = nullptr;
         
-        UserInterface::MouseButton lastButtonPressed = UserInterface::MouseButton::Other;
+        UI::MouseButton lastButtonPressed = UI::MouseButton::Size;
         
         static inline Application* instance = nullptr;
         

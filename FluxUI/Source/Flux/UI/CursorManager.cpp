@@ -1,6 +1,6 @@
 ﻿#include <CursorManager.h>
 
-namespace Flux::UserInterface {
+namespace Flux::UI {
 
     CursorManager::CursorManager() {
 
@@ -12,16 +12,18 @@ namespace Flux::UserInterface {
         
     }
 
-    void CursorManager::onButtonDown(MouseButton button) {
+    void CursorManager::buttonDown(const MouseButton button) {
         
-        if (auto* component = master->getComponentAtPosition(getCursorPosition())) {
+        if (auto* component = componentAtPosition(master, cursorPosition())) {
             
             stateMap.add(button, component);
             component->onButtonDown(button, cursorX, cursorY);
 
             if(focused == component) { return; }
             
-            if(focused) { focused->endFocus(); }
+            if(focused) {
+                focused->endFocus();
+            }
             
             focused = component;
             focused->onFocus();
@@ -30,36 +32,36 @@ namespace Flux::UserInterface {
         
     }
 
-    void CursorManager::onDoubleClick(MouseButton button) const {
+    void CursorManager::doubleClick(const MouseButton button) const {
 
-        if (auto* component = master->getComponentAtPosition(getCursorPosition())) {
+        if (auto* component = componentAtPosition(master, cursorPosition())) {
             component->onDoubleClick(button, cursorX, cursorY);
         }
         
     }
 
-    void CursorManager::onButtonUp(MouseButton button) {
+    void CursorManager::buttonUp(const MouseButton button) {
         
         try {
 
             Reactive* target = stateMap[button];
-            target->onButtonUp(button, cursorX, cursorY, master->getComponentAtPosition(getCursorPosition()));
+            target->onButtonUp(button, cursorX, cursorY, componentAtPosition(master, cursorPosition()));
             stateMap.removeByKey(button);
             
         }
-        catch (std::out_of_range const&) { }
+        catch (Exceptions::BadKey const&) { }
         
     }
 
-    void CursorManager::onScroll(Float64 xOffset, Float64 yOffset) const {
+    void CursorManager::scroll(const Float64 xOffset, const Float64 yOffset) const {
         
-        if (auto* component = master->getComponentAtPosition(getCursorPosition())) {
+        if (auto* component = componentAtPosition(master, cursorPosition())) {
             component->onScroll(xOffset, yOffset);
         }
         
     }
 
-    void CursorManager::onCursorMoved(Float64 x, Float64 y) {
+    void CursorManager::cursorMoved(const Float64 x, const Float64 y) {
 
         // Update the cursor position.
         this->lastCursorX = cursorX;
@@ -76,7 +78,7 @@ namespace Flux::UserInterface {
         }
 
         // If a component is under the cursor.
-        if (auto* component = master->getComponentAtPosition(getCursorPosition())) {
+        if (auto* component = componentAtPosition(master, cursorPosition())) {
 
             // If the component under the cursor is already hovered, send a mouse movement message.
             if (hovered == component) {
@@ -99,11 +101,9 @@ namespace Flux::UserInterface {
 
     }
 
-    CursorManager* CursorManager::getCursorManager() {
-        return manager;
-    }
+    CursorManager* CursorManager::cursorManager() { return manager; }
     
-    void CursorManager::setCompound(Compound* value) { this->master = value; }
+    void CursorManager::setComponent(Component* value) { this->master = value; }
 
     void CursorManager::notifyDestruction(const Reactive* reactive) {
 
@@ -120,13 +120,14 @@ namespace Flux::UserInterface {
     void CursorManager::clearHoveredComponent() {
         
         if (hovered) {
+            
             hovered->endHover();
             hovered = nullptr;
         }
         
     }
 
-    bool CursorManager::getButtonFromReactive(const Reactive* value, MouseButton& out) {
+    bool CursorManager::buttonFromReactive(const Reactive* value, MouseButton& out) const {
 
         // Simply search through the map by value
         for (auto it = stateMap.begin(); it != stateMap.end(); ++it) {
@@ -144,7 +145,27 @@ namespace Flux::UserInterface {
 
     }
 
-    SkVector CursorManager::getCursorPosition() const {
+    Component* CursorManager::componentAtPosition(Component* root, Point const& p) {
+        
+        const auto children = root->children();
+        
+        for (size_t i = children.size(); i > 0; --i) {
+
+            auto const& child = children[i - 1];
+
+            if(componentAtPosition(child, p)) { return child; }
+
+            if(child->inBounds(p)) { return child; }
+            
+        }
+
+        if(root->inBounds(p)) { return root; }
+        
+        return nullptr;
+        
+    }
+
+    Point CursorManager::cursorPosition() const {
         
         return { f32(cursorX), f32(cursorY) };
         

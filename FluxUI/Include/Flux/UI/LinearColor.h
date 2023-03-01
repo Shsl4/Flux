@@ -5,7 +5,7 @@
 
 using namespace Nucleus;
 
-namespace Flux::UserInterface {
+namespace Flux::UI {
 
     struct LinearColor {
 
@@ -18,10 +18,6 @@ namespace Flux::UserInterface {
         LinearColor(const Float32 r, const Float32 g, const Float32 b, const Float32 a) : r(r), g(g), b(b), a(a) {
             
         }
-
-        NODISCARD bool isTransparent() const { return Math::feq(0.0f, a); }
-
-        NODISCARD SkColor4f toSkColor() { return *reinterpret_cast<SkColor4f*>(this); }
         
         static Float32 nthBit(const UInt32 number, const UInt32 n) {
 
@@ -30,8 +26,15 @@ namespace Flux::UserInterface {
         }
 
         LinearColor operator*(Float32 scale) const {
-
             return { this->r * scale, this->g * scale, this->b * scale, this->a * scale };
+        }
+        
+        LinearColor operator+(LinearColor const &other) const {
+            return { this->r + other.r, this->g + other.g, this->b + other.b, this->a + other.a };
+        }
+
+        LinearColor operator-(LinearColor const &other) const {
+            return { this->r - other.r, this->g - other.g, this->b - other.b, this->a - other.a };
 
         }
 
@@ -84,19 +87,18 @@ namespace Flux::UserInterface {
             };        
             
         }
-
-                
-        NODISCARD Float32 getRed() const { return r; }
-        NODISCARD Float32 getGreen() const { return g; }
-        NODISCARD Float32 getBlue() const { return b; }
-        NODISCARD Float32 getAlpha() const { return a; }
+        
+        NODISCARD SkColor4f skColor() { return *reinterpret_cast<SkColor4f*>(this); }
+        
+        NODISCARD bool transparent() const { return Math::feq(0.0f, a); }
+        NODISCARD Float32 red() const { return r; }
+        NODISCARD Float32 green() const { return g; }
+        NODISCARD Float32 blue() const { return b; }
+        NODISCARD Float32 alpha() const { return a; }
 
     private:
 
-        Float32 r;
-        Float32 g;
-        Float32 b;
-        Float32 a;
+        Float32 r, g, b, a;
 
     };
     

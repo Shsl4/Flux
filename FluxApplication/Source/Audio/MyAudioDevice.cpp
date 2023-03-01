@@ -23,7 +23,6 @@ namespace Flux {
     MyAudioDevice::MyAudioDevice() {
 
         pipeline = Unique<Audio::Pipeline>::make();
-        pipeline->setPipelineView(Application::getMasterView().pointer());
         
     }
 
@@ -37,10 +36,10 @@ namespace Flux {
         voice.prepare(rate, size);
         
         pipeline->prepare(rate, size);
-
+/*
         pipeline->addElement<Audio::LPFElement>();
         pipeline->addElement<Audio::HPFElement>();
-
+*/
     }
 
     void MyAudioDevice::onMidiMessage(MidiMessage const& message) {

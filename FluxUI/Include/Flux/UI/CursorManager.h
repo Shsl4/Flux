@@ -1,13 +1,8 @@
 ﻿#pragma once
 
-#include <Nucleus/Nucleus.h>
+#include <Flux/UI/Component.h>
 
-#include "Reactive.h"
-#include "Components/Compound.h"
-
-using namespace Nucleus;
-
-namespace Flux::UserInterface {
+namespace Flux::UI {
 
     class CursorManager {
         
@@ -15,29 +10,31 @@ namespace Flux::UserInterface {
 
         CursorManager();
 
-        void onButtonDown(MouseButton button);
+        void buttonDown(MouseButton button);
 
-        void onDoubleClick(MouseButton button) const;
+        void doubleClick(MouseButton button) const;
 
-        void onButtonUp(MouseButton button);
+        void buttonUp(MouseButton button);
 
-        void onScroll(Float64 xOffset, Float64 yOffset) const;
+        void scroll(Float64 xOffset, Float64 yOffset) const;
 
-        void onCursorMoved(Float64 x, Float64 y);
+        void cursorMoved(Float64 x, Float64 y);
         
-        void setCompound(Compound* value);
+        void setComponent(Component* value);
 
         void notifyDestruction(const Reactive* reactive);
 
-        static CursorManager* getCursorManager();
+        static CursorManager* cursorManager();
 
     private:
 
         void clearHoveredComponent();
 
-        bool getButtonFromReactive(const Reactive* value, MouseButton& out);
+        NODISCARD bool buttonFromReactive(const Reactive* value, MouseButton& out) const;
 
-        NODISCARD SkVector getCursorPosition() const;
+        NODISCARD static Component* componentAtPosition(Component* root, Point const& p);
+
+        NODISCARD Point cursorPosition() const;
 
         Map<MouseButton, Reactive*> stateMap;
         
@@ -49,7 +46,7 @@ namespace Flux::UserInterface {
         
         Reactive* focused = nullptr;
         Reactive* hovered = nullptr;
-        Compound* master = nullptr;
+        Component* master = nullptr;
 
         static inline CursorManager* manager = nullptr;
         

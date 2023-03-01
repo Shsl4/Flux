@@ -3,10 +3,7 @@
 #include <skia/effects/SkGradientShader.h>
 
 namespace Flux::Audio {
-
-    Pipeline::Pipeline() {
-    }
-
+    
     void Pipeline::setupChannels(UInt inCount) {
 
         if(channelCount != inCount) {
@@ -119,14 +116,11 @@ namespace Flux::Audio {
         }
         
     }
-
-    void Pipeline::setPipelineView(UserInterface::MasterView* view) {
-        this->pipelineView = view;
-    }
     
-    LPFNode::LPFNode() : FilterNode(2, 2, 25.0, 200.0, 50.0, 5.0, UserInterface::Colors::green) {}
+    
+    LPFNode::LPFNode() : FilterNode(2, 2, 25.0, 200.0, 50.0, 5.0, Colors::green) {}
 
-    HPFNode::HPFNode() : FilterNode(2, 2, 25.0, 200.0, 50.0, 5.0, UserInterface::Colors::red) {}
+    HPFNode::HPFNode() : FilterNode(2, 2, 25.0, 200.0, 50.0, 5.0, Colors::red) {}
 
     LPFElement::LPFElement() : FilterElement(2, 2) {
 

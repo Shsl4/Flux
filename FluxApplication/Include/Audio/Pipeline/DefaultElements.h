@@ -8,7 +8,7 @@ namespace Flux::Audio {
         
     public:
         
-        InputNode() : Node(0, 1, 25.0, 100.0, 0.0, 5.0, UserInterface::Colors::white) {}
+        InputNode() : Node(0, 1, 25.0, 100.0, 0.0, 5.0, Colors::white) {}
         
         
     };
@@ -17,7 +17,7 @@ namespace Flux::Audio {
         
     public:
         
-        OutputNode() : Node(1, 0, 25.0, 100.0, 0.0, 5.0, UserInterface::Colors::white) {}
+        OutputNode() : Node(1, 0, 25.0, 100.0, 0.0, 5.0, Colors::white) {}
         
     };
         
@@ -29,9 +29,9 @@ namespace Flux::Audio {
 
         void process(AudioBuffer<Float64> const& buffer) override;
 
-        void createComponent(UserInterface::Compound* parent) override;
+        void createComponent(Component* parent) override;
 
-        NODISCARD UserInterface::Component* getComponent() const override;
+        NODISCARD Component* getComponent() const override;
 
     private:
 
@@ -47,9 +47,9 @@ namespace Flux::Audio {
 
         void process(AudioBuffer<Float64> const& buffer) override;
 
-        void createComponent(UserInterface::Compound* parent) override;
+        void createComponent(Component* parent) override;
 
-        NODISCARD UserInterface::Component* getComponent() const override;
+        NODISCARD Component* getComponent() const override;
 
     private:
         

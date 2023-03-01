@@ -1,4 +1,4 @@
-#include <Components/MasterView.h>
+#include <Flux/UI/MasterView.h>
 
 #ifndef SK_GL
 #define SK_GL
@@ -15,7 +15,11 @@
 #include <skia/core/SkColorSpace.h>
 #include <skia/gpu/GrBackendSurface.h>
 
-namespace Flux::UserInterface {
+namespace Flux::UI {
+    
+    MasterView::MasterView() {
+        this->setColor(LinearColor::fromHex(0x151515ff));
+    }
 
     void MasterView::draw(SkCanvas*, Float64 deltaTime) {
 
@@ -25,24 +29,15 @@ namespace Flux::UserInterface {
         canvas->scale(xDpiScale, yDpiScale);
         
         Component::draw(canvas, deltaTime);
-        Compound::draw(canvas, deltaTime);
         
         context->flush();
         canvas->restore();
       
     }
     
-    void MasterView::initialize() {
+    MasterView* MasterView::makeGL(Int width, Int height, OpenGLParams const& params) {
         
-        Compound::initialize();
-
-        this->setColor(LinearColor::fromHex(0x151515ff));
-        
-    }
-
-    Shared<MasterView> MasterView::makeGL(Int width, Int height, OpenGLParams const& params) {
-
-        auto view = Shared<MasterView>::make();
+        auto* view = Factory::create<MasterView>();
 
         const auto itf = GrGLMakeNativeInterface();
         view->context = GrDirectContext::MakeGL(itf).release();
@@ -55,10 +50,10 @@ namespace Flux::UserInterface {
         
         // 0x8058 = GL_RGBA8
         framebufferInfo.fFormat = 0x8058;
-        
-        SkColorType colorType = kRGBA_8888_SkColorType;
-        
-        GrBackendRenderTarget backendRenderTarget(width, height, params.sampleCount, params.stencilBits, framebufferInfo);
+
+        constexpr SkColorType colorType = kRGBA_8888_SkColorType;
+
+        const GrBackendRenderTarget backendRenderTarget(width, height, params.sampleCount, params.stencilBits, framebufferInfo);
 
         view->surface = SkSurface::MakeFromBackendRenderTarget(view->context, backendRenderTarget, kBottomLeft_GrSurfaceOrigin, colorType, nullptr, nullptr).release();
 
@@ -74,8 +69,7 @@ namespace Flux::UserInterface {
         view->xDpiScale = params.xDpiScale;
         view->yDpiScale = params.yDpiScale;
 
-        view->setScale({w, h});
-        view->initialize();
+        view->setSize({w, h});
         
         return view;
         
