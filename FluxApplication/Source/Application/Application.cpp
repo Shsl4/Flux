@@ -26,7 +26,7 @@ namespace Flux {
 
         FrameInfo(Point const& p, Point const& s) : Component(p, s) {
             
-            setColor(LinearColor::fromHex(0x60606060));
+            setColor(Color::fromHex(0x60606060));
             
         }
         
@@ -76,7 +76,7 @@ namespace Flux {
 
     public:
         
-        void onDrag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) override {
+        void drag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) override {
 
             rotation = Math::clamp(rotation + deltaY * 0.35, -120.0, 120.0);
 
@@ -84,7 +84,7 @@ namespace Flux {
             
         }
 
-        void onDoubleClick(MouseButton button, Float64 x, Float64 y) override {
+        void doubleClick(MouseButton button, Float64 x, Float64 y) override {
 
             if(button == MouseButton::Left) {
                 rotation = 0.0;
@@ -94,12 +94,12 @@ namespace Flux {
 
         RotaryKnob() : Component({ {}, {50, 50} }) {
             
-            setColor(LinearColor::fromHex(0x3b3b3bff));
+            setColor(Color::fromHex(0x3b3b3bff));
             
         }
 
-        static inline auto inner1 = LinearColor::fromHex(0xadaaa7ff);
-        static inline auto inner2 = LinearColor::fromHex(0x797979ff);
+        static inline auto inner1 = Color::fromHex(0xadaaa7ff);
+        static inline auto inner2 = Color::fromHex(0x797979ff);
 
         void draw(SkCanvas* canvas, Float64 deltaTime) override {
 
@@ -172,7 +172,7 @@ namespace Flux {
          
         glfwMakeContextCurrent(mainWindow);
 
-        glfwSwapInterval(0);
+        glfwSwapInterval(1);
 
         glfwSetKeyCallback(mainWindow, &Application::inputCallback);
         glfwSetMouseButtonCallback(mainWindow, &Application::mouseCallback);

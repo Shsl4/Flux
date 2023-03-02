@@ -18,7 +18,7 @@
 namespace Flux::UI {
     
     MasterView::MasterView() {
-        this->setColor(LinearColor::fromHex(0x151515ff));
+        this->setColor(Color::fromHex(0x151515ff));
     }
 
     void MasterView::draw(SkCanvas*, Float64 deltaTime) {

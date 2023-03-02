@@ -6,8 +6,7 @@ namespace Flux {
     Int audioCallback(void* outBuffer, void* inBuffer, unsigned int bufferSize,
         double streamTime, RtAudioStreamStatus status, void* data) {
 
-        const auto device = static_cast<AudioDevice*>(data);
-        device->process(static_cast<Float64*>(outBuffer));
+        static_cast<AudioDevice*>(data)->process(static_cast<Float64*>(outBuffer));
         return 0;
         
     }
@@ -28,7 +27,8 @@ namespace Flux {
             throw Exceptions::Exception("Failed to initialize audio system.\n");
         }
         
-        this->currentOutputDevice = audio->getDefaultOutputDevice();
+        this->outputDevice = audio->getDefaultOutputDevice();
+
         registerAudioCommands();
         
     }
@@ -55,7 +55,7 @@ namespace Flux {
 
             RtAudio::DeviceInfo info = audio->getDeviceInfo(index);
 
-            if(audio->isStreamOpen() && index == currentOutputDevice) {
+            if(audio->isStreamOpen() && index == outputDevice) {
                 Console::log("[{}] -> {} (In: {}, Out: {}) (Active)\n", index, info.name.c_str(), info.inputChannels, info.outputChannels);
             }
             else {
@@ -71,11 +71,11 @@ namespace Flux {
         assert(rate > 0.0);
         assert(size >= 16);
                 
-        this->sampleRate = rate;
-        this->bufferSize = size;
-        
+        this->sr = rate;
+        this->bufSize = size;
+
         openMidiDevice(0);
-        openAudioOutputDevice(currentOutputDevice);
+        openOutputDevice(outputDevice);
         
     }
 
@@ -83,12 +83,12 @@ namespace Flux {
 
         if(audio->isStreamOpen()) {
             audio->closeStream();
-            onOutputDeviceClosed();
+            outputDeviceClosed();
         }
         
     }
 
-    void AudioDevice::openAudioOutputDevice(UInt deviceId) {
+    void AudioDevice::openOutputDevice(UInt deviceId) {
 
         closeOutputDevice();
 
@@ -115,15 +115,15 @@ namespace Flux {
         parameters.deviceId = deviceId;
         parameters.nChannels = info.outputChannels;
 
-        this->outputChannelCount = info.outputChannels;
+        this->outputChannels = info.outputChannels;
         
         RtAudio::StreamOptions options;
         options.flags = RTAUDIO_NONINTERLEAVED;
         
         try {
             
-            audio->openStream(&parameters, nullptr, RTAUDIO_FLOAT64, static_cast<UInt>(sampleRate),
-                &bufferSize, &audioCallback, this, &options);
+            audio->openStream(&parameters, nullptr, RTAUDIO_FLOAT64, static_cast<UInt>(sr),
+                              &bufSize, &audioCallback, this, &options);
             audio->startStream();
             
         }
@@ -134,9 +134,9 @@ namespace Flux {
             
         }
 
-        onOutputDeviceOpened();
+        outputDeviceOpened();
 
-        prepare(sampleRate, bufferSize);
+        prepare(sr, bufSize);
         
         Console::log("Now using audio output device {} ({})\n", deviceId, info.name.c_str());
         
@@ -145,16 +145,16 @@ namespace Flux {
     void AudioDevice::setSampleRate(Float64 value) {
 
         assert(value > 0.0);
-        this->sampleRate = value;
-        openAudioOutputDevice(currentOutputDevice);
+        this->sr = value;
+        openOutputDevice(outputDevice);
         
     }
     
     void AudioDevice::setBufferSize(UInt value) {
 
         assert(value >= 16);
-        this->bufferSize = value;
-        openAudioOutputDevice(currentOutputDevice);
+        this->bufSize = value;
+        openOutputDevice(outputDevice);
 
     }
 
@@ -165,7 +165,6 @@ namespace Flux {
         const auto listNode = CommandNode::make("Audio.Device.List");
         const auto closeNode = CommandNode::make("Audio.Device.Close");
 
-
         openNode->setNodeDescription("Opens an audio output device.");
         listNode->setNodeDescription("Lists the available audio devices.");
         closeNode->setNodeDescription("Closes the current audio output device.");
@@ -175,7 +174,7 @@ namespace Flux {
 
                     UInt id = static_cast<UInt>(abs(context->getInt64("id")));
 
-                    openAudioOutputDevice(id);
+                    openOutputDevice(id);
                     
                 });
 
@@ -197,17 +196,17 @@ namespace Flux {
         */
     }
     
-    UInt AudioDevice::getOutputChannelCount() const { return this->outputChannelCount; }
+    UInt AudioDevice::numOutputChannels() const { return this->outputChannels; }
     
-    UInt AudioDevice::getInputChannelCount() const { return this->inputChannelCount; }
+    UInt AudioDevice::numInputChannels() const { return this->inputChannels; }
     
-    Float64 AudioDevice::getSampleRate() const { return this->sampleRate; }
+    Float64 AudioDevice::sampleRate() const { return this->sr; }
     
-    UInt AudioDevice::getBufferSize() const { return this->bufferSize; }
+    UInt AudioDevice::bufferSize() const { return this->bufSize; }
     
-    void AudioDevice::onOutputDeviceOpened() { }
+    void AudioDevice::outputDeviceOpened() { }
     
-    void AudioDevice::onOutputDeviceClosed() { }
+    void AudioDevice::outputDeviceClosed() { }
 
 }
 

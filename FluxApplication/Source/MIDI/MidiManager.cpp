@@ -17,21 +17,21 @@ namespace Flux {
         
     }
 
-    UInt MidiMessage::getCC() const {
+    UInt MidiMessage::cc() const {
         return dataByte;
     }
 
-    UInt MidiMessage::getNoteNumber() const {
+    UInt MidiMessage::noteNumber() const {
         return dataByte;
     }
 
-    Float64 MidiMessage::getNoteFrequency() const {
+    Float64 MidiMessage::noteFrequency() const {
 
         return 440.0 * std::pow(2.0, (static_cast<Float64>(dataByte) - 69.0) / 12.0);
         
     }
 
-    Float64 MidiMessage::getLinearValue() const {
+    Float64 MidiMessage::linearValue() const {
         return static_cast<Float64>(valueByte) / 127.0;
     };
 
@@ -86,7 +86,9 @@ namespace Flux {
     void MidiManager::openMidiDevice(UInt deviceIndex) {
 
         closeMidiDevice();
-        
+
+        if(midiIn->getPortCount() <= 0) return;
+
         try {
 
             midiIn->openPort(deviceIndex);
@@ -96,9 +98,7 @@ namespace Flux {
             Console::log("Now using MIDI device on port {} ({}).\n", deviceIndex, deviceName);
             
         }
-        catch(std::exception const&) {
-
-            Console::log("Failed to open MIDI device on port {}.\n", deviceIndex);
+        catch(Exceptions::Exception const&) {
 
         }
         

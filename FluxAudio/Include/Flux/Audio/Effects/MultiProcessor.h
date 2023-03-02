@@ -6,16 +6,12 @@
 
 namespace Flux::Audio {
 
-    template<class ObjectType>
+    template<class ObjectType> requires std::is_base_of_v<AudioObject, ObjectType>
     class MultiProcessor : AudioEffect {
         
     public:
 
-        MultiProcessor(){
-
-            static_assert(std::is_base_of_v<AudioObject, ObjectType>, "ObjectType must be an AudioObject.");
-
-        }
+        MultiProcessor() = default;
 
         void initialize(UInt channelCount) {
 
@@ -77,9 +73,9 @@ namespace Flux::Audio {
             
         }
 
-        void invoke(std::function<void(ObjectType*)> const& function) {
+        void invoke(Function<void(ObjectType*)> const& function) {
 
-            for (auto& object : objects) {
+            for (auto* object : objects) {
 
                 function(object);
 

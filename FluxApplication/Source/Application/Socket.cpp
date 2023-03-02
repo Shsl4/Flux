@@ -11,14 +11,14 @@
 namespace Flux {
 
     Socket::Socket() {
-        setColor(LinearColor::fromHex(0x606060ff));
+        setColor(Color::fromHex(0x606060ff));
     }
 
     void Socket::parentLinked() {
         this->node = dynamic_cast<Node*>(parent());
     }
 
-    void Socket::onButtonDown(MouseButton button, Float64 x, Float64 y) {
+    void Socket::buttonDown(MouseButton button, Float64 x, Float64 y) {
             
         if (button == MouseButton::Left) {
 
@@ -29,7 +29,7 @@ namespace Flux {
 
     }
 
-    void Socket::onButtonUp(MouseButton button, Float64 x, Float64 y, Reactive* upTarget) {
+    void Socket::buttonUp(MouseButton button, Float64 x, Float64 y, Reactive* upTarget) {
             
         if (button == MouseButton::Left) {
 
@@ -54,7 +54,7 @@ namespace Flux {
             
     }
 
-    void Socket::onDrag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) {
+    void Socket::drag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) {
             
         if (button == MouseButton::Left) {
 
@@ -113,7 +113,7 @@ namespace Flux {
         
         paint.setStyle(SkPaint::kStroke_Style);
         paint.setStrokeWidth(lineWidth);
-        paint.setColor(LinearColor::fromHex(0xffffff55).skColor());
+        paint.setColor(Color::fromHex(0xffffff55).skColor());
         SkScalar ps[] = { 10.0f, 10.0f };
         paint.setPathEffect(SkDashPathEffect::Make(ps, 2, f32(linePhase)));
         linePhase -= 20.0 * deltaTime;
@@ -176,19 +176,19 @@ namespace Flux {
 
         switch (value) {
         case DataType::Audio:
-            setCableColor(LinearColor::fromHex(0x8814f6ff));
+            setCableColor(Color::fromHex(0x8814f6ff));
             break;
         case DataType::Mod:
-            setCableColor(LinearColor::fromHex(0xf61414ff));
+            setCableColor(Color::fromHex(0xf61414ff));
             break;
         case DataType::SideChain:
-            setCableColor(LinearColor::fromHex(0x147ff6ff));
+            setCableColor(Color::fromHex(0x147ff6ff));
             break;
         }
         
     }
 
-    void Socket::setCableColor(LinearColor const& value) {
+    void Socket::setCableColor(Color const& value) {
 
         this->cableColor = value;
         

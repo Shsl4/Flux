@@ -3,9 +3,9 @@
 namespace Flux {
 
     DropdownMenu::DropdownMenu() : Component({ {}, { 200, 25 }}), arrowTr(arrowRootY, arrowMaxY),
-                                   defaultColor(LinearColor::fromHex(0x60606060)),
-                                   hoverColor(LinearColor::fromHex(0x50505050)),
-                                   pressedColor(LinearColor::fromHex(0x45454545)) {
+                                   defaultColor(Color::fromHex(0x60606060)),
+                                   hoverColor(Color::fromHex(0x50505050)),
+                                   pressedColor(Color::fromHex(0x45454545)) {
 
         setColor(this->defaultColor);
         animation.setTarget(this);
@@ -23,57 +23,57 @@ namespace Flux {
         
     }
 
-    void DropdownMenu::onFocus() {
+    void DropdownMenu::focused() {
 
-        Reactive::onFocus();
+        Reactive::focused();
         
         Console::log("{} received focus.\n", Type::name(*this));
         
     }
 
-    void DropdownMenu::endFocus() {
+    void DropdownMenu::lostFocus() {
 
-        Reactive::endFocus();
+        Reactive::lostFocus();
 
         Console::log("{} lost focus\n", Type::name(*this));
         
     }
 
-    void DropdownMenu::onHover() {
+    void DropdownMenu::hovered() {
 
-        Reactive::onHover();
+        Reactive::hovered();
         updateColor();
         
     }
     
-    void DropdownMenu::endHover() {
+    void DropdownMenu::unHovered() {
 
-        Reactive::endHover();
+        Reactive::unHovered();
         updateColor();
         
     }
 
-    void DropdownMenu::onButtonDown(MouseButton button, Float64 x, Float64 y) {
+    void DropdownMenu::buttonDown(MouseButton button, Float64 x, Float64 y) {
 
-        Reactive::onButtonDown(button, x, y);
+        Reactive::buttonDown(button, x, y);
         updateColor();
     }
 
-    void DropdownMenu::onButtonUp(MouseButton button, Float64 x, Float64 y, Reactive* upTarget) {
+    void DropdownMenu::buttonUp(MouseButton button, Float64 x, Float64 y, Reactive* upTarget) {
 
-        Reactive::onButtonUp(button, x, y, upTarget);
+        Reactive::buttonUp(button, x, y, upTarget);
         updateColor();
 
         if(button != MouseButton::Left || upTarget != this) return;
         
-        if (arrowTr.getState() == Animation::State::Idle) {
+        if (arrowTr.state() == Animation::State::Idle) {
             arrowTr.play();
         }
         else {
             
             arrowTr.restartFromHere();
         
-            if(arrowTr.getPlayDirection() == Animation::PlayDirection::Normal) {
+            if(arrowTr.playDirection() == Animation::PlayDirection::Normal) {
                 
                 arrowTr.setPlayDirection(Animation::PlayDirection::Reverse);
                 
@@ -91,7 +91,7 @@ namespace Flux {
 
     void DropdownMenu::updateColor() {
 
-        LinearColor color = defaultColor;
+        Color color = defaultColor;
         
         if (isPressed(MouseButton::Left)) {
             color = pressedColor;
@@ -111,21 +111,21 @@ namespace Flux {
         
         animation.update(deltaTime);
         arrowTr.update(deltaTime);
-        
+
         SkPaint paint;
         paint.setColor(SkColors::kWhite);
         paint.setStrokeWidth(2.0f);
         paint.setStrokeCap(SkPaint::kRound_Cap);
-        
+
         const Float32 width = size().x;
         const Float32 height = size().y;
-        
+
         const Float32 arrowHeight = height / 6.0f;
         const Float32 arrowWidth = arrowHeight * 2.0f;
 
         const Float32 offset = width * 0.05f;
         const Float32 drawX = width - arrowWidth - offset;
-        
+
         canvas->drawLine(drawX, arrowRootY, drawX + arrowWidth / 2.0f, arrowMaxY, paint);
         canvas->drawLine(drawX + arrowWidth / 2.0f, arrowMaxY, drawX + arrowWidth, arrowRootY, paint);
         

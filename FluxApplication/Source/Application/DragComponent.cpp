@@ -2,7 +2,7 @@
 
 namespace Flux {
 
-    void DragComponent::onButtonDown(MouseButton button, Float64 x, Float64 y) {
+    void DragComponent::buttonDown(MouseButton button, Float64 x, Float64 y) {
             
         if (button == MouseButton::Left) {
 
@@ -12,7 +12,7 @@ namespace Flux {
 
     }
 
-    void DragComponent::onDrag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) {
+    void DragComponent::drag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) {
             
         if (button == MouseButton::Left) { setPosition(Point(f32(x), f32(y)) - lastClickPos); }
             

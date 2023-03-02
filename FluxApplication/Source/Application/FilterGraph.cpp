@@ -3,7 +3,7 @@
 namespace Flux{
 
     FilterGraph::FilterGraph(Point const& p, Point const& s): Component(p, s) {
-        setColor(LinearColor::fromHex(0x303030ff));
+        setColor(Color::fromHex(0x303030ff));
     }
     
     void FilterGraph::draw(SkCanvas *canvas, Float64 deltaTime) {
@@ -26,7 +26,7 @@ namespace Flux{
         }
     }
     
-    void FilterGraph::onDrag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) {
+    void FilterGraph::drag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) {
 
         const Point pos = globalTransform().position;
         const Point scale = size();
@@ -124,7 +124,7 @@ namespace Flux{
 
         SkPaint paint;
         paint.setStrokeWidth(2.5);
-        paint.setColor(LinearColor::fromHex(0x454545ff).skColor());
+        paint.setColor(Color::fromHex(0x454545ff).skColor());
 
         const Range<Float32> logRange = { log10(10.0f), log10(44100.0f / 2.0f) };
         const Range<Float32> linRange = Range<Float32>::makeLinearRange();

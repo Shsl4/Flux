@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <Flux/UI/Component.h>
-#include <Application/Animation.h>
+#include "Flux/UI/Animation.h"
 
 namespace Flux {
 
@@ -19,27 +19,27 @@ namespace Flux {
             this->currentColor = t->color();
         }
         
-        void setTargetColor(LinearColor const& color) {
+        void setTargetColor(Color const& color) {
             this->targetColor = color;
         } 
         
     protected:
         
-        void onRestart() override {
+        void restarted() override {
             this->baseColor = currentColor;
         }
 
         void process(Float64 deltaTime) override {
-            this->currentColor = Math::lerp(baseColor, targetColor, f32(getProgress()));
+            this->currentColor = Math::lerp(baseColor, targetColor, f32(progress()));
             target->setColor(currentColor);
         }
 
     private:
         
         Component* target = nullptr;
-        LinearColor baseColor = Colors::white;
-        LinearColor currentColor = Colors::white;
-        LinearColor targetColor = Colors::white;
+        Color baseColor = Colors::white;
+        Color currentColor = Colors::white;
+        Color targetColor = Colors::white;
         
     };
 
@@ -60,8 +60,8 @@ namespace Flux {
         
         void process(Float64 deltaTime) override {
 
-            value = Math::easeInOut(from, dest, f32(getProgress()), 3);
-            inverse = Math::easeInOut(dest, from, f32(getProgress()), 3);
+            value = Math::easeInOut(from, dest, f32(progress()), 3);
+            inverse = Math::easeInOut(dest, from, f32(progress()), 3);
             
         }
 
@@ -82,17 +82,17 @@ namespace Flux {
         
         void draw(SkCanvas* canvas, Float64 deltaTime) override;
 
-        void onFocus() override;
+        void focused() override;
 
-        void endFocus() override;
+        void lostFocus() override;
 
-        void onHover() override;
+        void hovered() override;
 
-        void endHover() override;
+        void unHovered() override;
 
-        void onButtonDown(MouseButton button, Float64 x, Float64 y) override;
+        void buttonDown(MouseButton button, Float64 x, Float64 y) override;
 
-        void onButtonUp(MouseButton button, Float64 x, Float64 y, Reactive* upTarget) override;
+        void buttonUp(MouseButton button, Float64 x, Float64 y, Reactive* upTarget) override;
 
     private:
 
@@ -105,9 +105,9 @@ namespace Flux {
         Float32 arrowMaxY;
         
         
-        LinearColor defaultColor;
-        LinearColor hoverColor;
-        LinearColor pressedColor;
+        Color defaultColor;
+        Color hoverColor;
+        Color pressedColor;
         MutableArray<String> choices = {};
         
     };

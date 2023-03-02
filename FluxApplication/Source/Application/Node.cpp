@@ -6,12 +6,12 @@
 namespace Flux {
     
     Node::Node(const UInt inputs, const UInt outputs, const Float32 socketSize, const Float32 baseWidth,
-               const Float32 baseHeight, const Float32 headerSize, const LinearColor& headerColor)
+               const Float32 baseHeight, const Float32 headerSize, const Color& headerColor)
             : Component({ {}, {baseWidth,  baseHeight + headerSize + socketSize * f32(inputs > outputs ? inputs : outputs)} }),
                 inputs(inputs), outputs(outputs), socketSize(socketSize), baseWidth(baseWidth), baseHeight(baseHeight),
                     headerSize(headerSize), headerColor(headerColor) {
         
-        setColor(LinearColor::fromHex(0x606060ff));
+        setColor(Color::fromHex(0x606060ff));
 
         for (UInt i = 0; i < inputs; ++i) {
 
@@ -56,7 +56,7 @@ namespace Flux {
             
     }
 
-    void Node::onButtonDown(MouseButton button, Float64 x, Float64 y) {
+    void Node::buttonDown(MouseButton button, Float64 x, Float64 y) {
             
         if (button == MouseButton::Left) {
 
@@ -66,7 +66,7 @@ namespace Flux {
             
     }
 
-    void Node::onDrag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) {
+    void Node::drag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) {
 
         if (button == MouseButton::Left) { setPosition(Point(f32(x), f32(y)) - lastClickPos); }
             
@@ -108,9 +108,9 @@ namespace Flux {
 
     FilterNode::FilterNode(UInt inputs, UInt outputs, Float32 socketSize,
                            Float32 baseWidth, Float32 baseHeight, Float32 headerSize,
-                           const LinearColor& headerColor) : Node(inputs, outputs, socketSize,
-                                                                  baseWidth, drawerHeight + baseHeight, headerSize,
-                                                                  headerColor) {
+                           const Color& headerColor) : Node(inputs, outputs, socketSize,
+                                                            baseWidth, drawerHeight + baseHeight, headerSize,
+                                                            headerColor) {
         
         this->drawer = Factory::create<FilterGraph>(Point(0, headerSize), Point(baseWidth, drawerHeight));
         addChild(this->drawer);

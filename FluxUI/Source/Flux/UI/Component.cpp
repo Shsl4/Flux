@@ -29,21 +29,14 @@ namespace Flux::UI {
     
     Component* Component::addChild(Component* component) {
 
-        if(!Factory::valid(this)) {
-            throwException("Trying to add child on an invalid component! Use Component::Factory::create() to create components.");
-        }
+        nthrowif(!Factory::valid(this), "Trying to add child on an invalid component! "
+                                        "Use Component::Factory::create() to create components.");
 
-        if(!Factory::valid(component)) {
-            throwException("Trying to add an invalid component! Use Component::Factory::create() to create components.");
-        }
+        nthrowif(!Factory::valid(component), "Trying to add an invalid component! "
+                                             "Use Component::Factory::create() to create components.");
 
-        if (component->parentComponent) {
-            throwException("Trying to add a component that already has a parent!");
-        }
-
-        if (component == this) {
-            throwException("Trying to add a component to itself!");
-        }
+        nthrowif(component->parentComponent, "Trying to add a component that already has a parent!");
+        nthrowif(component == this, "Trying to add a component to itself!");
 
         component->parentComponent = this;
         childrenArray += component;
@@ -61,11 +54,16 @@ namespace Flux::UI {
         for (size_t i = childrenArray.size(); i > 0; --i) {
             childrenArray[i - 1]->dispose();
         }
-        
-        Factory::dispose(this);
+
+        if(parentComponent) {
+            parentComponent->childWillDispose(this);
+            parentComponent->childrenArray -= this;
+        }
 
         parentComponent = nullptr;
-        
+
+        Factory::dispose(this);
+
     }
 
     void Component::setPosition(Point const& p) {
@@ -92,7 +90,7 @@ namespace Flux::UI {
         modified();
     }
 
-    void Component::setColor(LinearColor const& c) {
+    void Component::setColor(Color const& c) {
         this->renderColor = c;
     }
 
@@ -156,11 +154,6 @@ namespace Flux::UI {
     void Component::Factory::dispose(Component* component) {
 
         if(!valid(component)) return;
-
-        if(component->parentComponent) {
-            component->parentComponent->childWillDispose(component);
-            component->parentComponent->childrenArray -= component;
-        }
 
         Console::log("Disposing {}.\n", Type::name(*component));
         

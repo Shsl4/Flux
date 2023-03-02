@@ -1,4 +1,4 @@
-﻿#include "Stack.h"
+﻿#include <Flux/UI/Stack.h>
 
 namespace Flux::UI {
     

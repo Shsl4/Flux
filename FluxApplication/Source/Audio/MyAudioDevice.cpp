@@ -5,15 +5,15 @@
 
 namespace Flux {
 
-    void MyAudioDevice::onOutputDeviceOpened() {
+    void MyAudioDevice::outputDeviceOpened() {
             
-        filter.initialize(getOutputChannelCount());
-        voice.initialize(getOutputChannelCount());
-        pipeline->setupChannels(getOutputChannelCount());
+        filter.initialize(numOutputChannels());
+        voice.initialize(numOutputChannels());
+        pipeline->setupChannels(numOutputChannels());
         
     }
 
-    void MyAudioDevice::onOutputDeviceClosed() {
+    void MyAudioDevice::outputDeviceClosed() {
 
         filter.destroy();
         voice.destroy();
@@ -46,8 +46,8 @@ namespace Flux {
 
         if(message.event == MidiEvent::NoteDown) {
 
-            const Float64 freq = message.getNoteFrequency();
-            const Float64 vel = message.getLinearValue();
+            const Float64 freq = message.noteFrequency();
+            const Float64 vel = message.linearValue();
 
             voice.invoke([freq](auto* obj) {
 
@@ -56,7 +56,7 @@ namespace Flux {
                         
             });
 
-            lastPressed = message.getNoteNumber();
+            lastPressed = message.noteNumber();
             ++pressCount;
                 
         }
@@ -65,7 +65,7 @@ namespace Flux {
 
             --pressCount;
 
-            if(pressCount == 0 || message.getNoteNumber() == lastPressed) {
+            if(pressCount == 0 || message.noteNumber() == lastPressed) {
 
                 voice.invoke([](auto* obj) {
 
@@ -79,9 +79,9 @@ namespace Flux {
 
         if (message.event == MidiEvent::CC) {
 
-            if(message.getCC() == 1) {
+            if(message.cc() == 1) {
                     
-                const Float64 freq = Math::lerp(20.0, 11000.0, static_cast<Float32>(message.getLinearValue()));
+                const Float64 freq = Math::lerp(20.0, 11000.0, static_cast<Float32>(message.linearValue()));
                     
                 filter.invoke([freq](auto* obj) {
                     obj->setCutoffFrequency(freq);
@@ -89,9 +89,9 @@ namespace Flux {
                     
             }
 
-            if(message.getCC() == 14) {
+            if(message.cc() == 14) {
                     
-                const Float64 res = Math::lerp(0.8, 8.0, static_cast<Float32>(message.getLinearValue()));
+                const Float64 res = Math::lerp(0.8, 8.0, static_cast<Float32>(message.linearValue()));
 
                 filter.invoke([res](auto* obj) {
                     obj->setResonance(res);

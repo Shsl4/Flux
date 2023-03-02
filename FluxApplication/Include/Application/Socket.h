@@ -26,11 +26,11 @@ namespace Flux {
 
         Socket();
 
-        void onButtonDown(MouseButton button, Float64 x, Float64 y) override;
+        void buttonDown(MouseButton button, Float64 x, Float64 y) override;
 
-        void onButtonUp(MouseButton button, Float64 x, Float64 y, Reactive* upTarget) override;
+        void buttonUp(MouseButton button, Float64 x, Float64 y, Reactive* upTarget) override;
 
-        void onDrag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) override;
+        void drag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) override;
 
         static SkPath makeSpline(SkVector const& a, SkVector const& b, Float32 factor);
 
@@ -66,11 +66,11 @@ namespace Flux {
         
     private:
 
-        void setCableColor(LinearColor const& value);
+        void setCableColor(Color const& value);
         
         MutableArray<Socket*> connections = {};
 
-        LinearColor cableColor = LinearColor::fromHex(0x147ff6ff);
+        Color cableColor = Color::fromHex(0x147ff6ff);
         
         DataType type = DataType::Audio;
         Flow flowType = Flow::Output;

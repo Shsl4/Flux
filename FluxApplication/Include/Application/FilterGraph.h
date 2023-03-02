@@ -93,7 +93,7 @@ namespace Flux{
 
         void recalculatePath();
 
-        void onDrag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) override;
+        void drag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) override;
 
         void draw(SkCanvas *canvas, Float64 deltaTime) override;
 

@@ -7,15 +7,15 @@ using namespace Nucleus;
 
 namespace Flux::UI {
 
-    struct LinearColor {
+    struct Color {
 
     private:
 
-        LinearColor() = default;
+        Color() = default;
 
     public:
 
-        LinearColor(const Float32 r, const Float32 g, const Float32 b, const Float32 a) : r(r), g(g), b(b), a(a) {
+        Color(const Float32 r, const Float32 g, const Float32 b, const Float32 a) : r(r), g(g), b(b), a(a) {
             
         }
         
@@ -25,22 +25,22 @@ namespace Flux::UI {
         
         }
 
-        LinearColor operator*(Float32 scale) const {
+        Color operator*(Float32 scale) const {
             return { this->r * scale, this->g * scale, this->b * scale, this->a * scale };
         }
         
-        LinearColor operator+(LinearColor const &other) const {
+        Color operator+(Color const &other) const {
             return { this->r + other.r, this->g + other.g, this->b + other.b, this->a + other.a };
         }
 
-        LinearColor operator-(LinearColor const &other) const {
+        Color operator-(Color const &other) const {
             return { this->r - other.r, this->g - other.g, this->b - other.b, this->a - other.a };
 
         }
 
-        NODISCARD LinearColor lighter(const UInt8 value) const {
+        NODISCARD Color lighter(const UInt8 value) const {
 
-            LinearColor c = *this;
+            Color c = *this;
 
             c.r = Math::clamp( c.r + static_cast<Float32>(value) / 255.0f, 0.0f, 1.0f);
             c.g = Math::clamp( c.g + static_cast<Float32>(value) / 255.0f, 0.0f, 1.0f);
@@ -50,9 +50,9 @@ namespace Flux::UI {
             
         }
         
-        NODISCARD LinearColor darker(const UInt8 value) const {
+        NODISCARD Color darker(const UInt8 value) const {
 
-            LinearColor c = *this;
+            Color c = *this;
 
             c.r = Math::clamp( c.r - static_cast<Float32>(value) / 255.0f, 0.0f, 1.0f);
             c.g = Math::clamp( c.g - static_cast<Float32>(value) / 255.0f, 0.0f, 1.0f);
@@ -62,7 +62,7 @@ namespace Flux::UI {
             
         }
         
-        static LinearColor fromHex(UInt32 hex) {
+        static Color fromHex(UInt32 hex) {
 
             return {
                 
@@ -75,7 +75,7 @@ namespace Flux::UI {
 
         }
 
-        static LinearColor randomColor() {
+        static Color randomColor() {
 
             return {
                 
@@ -105,13 +105,13 @@ namespace Flux::UI {
     class Colors {
 
     public:
-    
-        static inline const LinearColor red = LinearColor::fromHex(0xff0000ff);
-        static inline const LinearColor green = LinearColor::fromHex(0x00ff00ff);
-        static inline const LinearColor blue = LinearColor::fromHex(0x0000ffff);
-        static inline const LinearColor white = LinearColor::fromHex(0xffffffff);
-        static inline const LinearColor black = LinearColor::fromHex(0x000000ff);
-        static inline const LinearColor transparent = LinearColor::fromHex(0xffffff00);
+
+        static inline const Color red = Color::fromHex(0xff0000ff);
+        static inline const Color green = Color::fromHex(0x00ff00ff);
+        static inline const Color blue = Color::fromHex(0x0000ffff);
+        static inline const Color white = Color::fromHex(0xffffffff);
+        static inline const Color black = Color::fromHex(0x000000ff);
+        static inline const Color transparent = Color::fromHex(0xffffff00);
     
     };
 

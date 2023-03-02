@@ -17,16 +17,16 @@ namespace Flux::UI {
         if (auto* component = componentAtPosition(master, cursorPosition())) {
             
             stateMap.add(button, component);
-            component->onButtonDown(button, cursorX, cursorY);
+            component->buttonDown(button, cursorX, cursorY);
 
             if(focused == component) { return; }
             
             if(focused) {
-                focused->endFocus();
+                focused->lostFocus();
             }
             
             focused = component;
-            focused->onFocus();
+            focused->focused();
             
         }
         
@@ -35,7 +35,7 @@ namespace Flux::UI {
     void CursorManager::doubleClick(const MouseButton button) const {
 
         if (auto* component = componentAtPosition(master, cursorPosition())) {
-            component->onDoubleClick(button, cursorX, cursorY);
+            component->doubleClick(button, cursorX, cursorY);
         }
         
     }
@@ -45,7 +45,7 @@ namespace Flux::UI {
         try {
 
             Reactive* target = stateMap[button];
-            target->onButtonUp(button, cursorX, cursorY, componentAtPosition(master, cursorPosition()));
+            target->buttonUp(button, cursorX, cursorY, componentAtPosition(master, cursorPosition()));
             stateMap.removeByKey(button);
             
         }
@@ -56,7 +56,7 @@ namespace Flux::UI {
     void CursorManager::scroll(const Float64 xOffset, const Float64 yOffset) const {
         
         if (auto* component = componentAtPosition(master, cursorPosition())) {
-            component->onScroll(xOffset, yOffset);
+            component->scroll(xOffset, yOffset);
         }
         
     }
@@ -74,15 +74,15 @@ namespace Flux::UI {
         const Float64 deltaY = lastCursorY - cursorY;
 
         for (auto const& elem : stateMap) {
-            elem.getValue()->onDrag(elem.getKey(), x, y, deltaX, deltaY);
+            elem.getValue()->drag(elem.getKey(), x, y, deltaX, deltaY);
         }
 
         // If a component is under the cursor.
         if (auto* component = componentAtPosition(master, cursorPosition())) {
 
-            // If the component under the cursor is already hovered, send a mouse movement message.
+            // If the component under the cursor is already bHovered, send a mouse movement message.
             if (hovered == component) {
-                component->onCursorMoved(x, y, deltaX, deltaY);
+                component->cursorMoved(x, y, deltaX, deltaY);
                 return;
             }
 
@@ -90,13 +90,13 @@ namespace Flux::UI {
             clearHoveredComponent();
 
             // Send a hover message to the new component.
-            component->onHover();
+            component->hovered();
             hovered = component;
             return;
             
         }
 
-        // No component is hovered, so stop hovering the old component if any.
+        // No component is bHovered, so stop hovering the old component if any.
         clearHoveredComponent();
 
     }
@@ -120,8 +120,8 @@ namespace Flux::UI {
     void CursorManager::clearHoveredComponent() {
         
         if (hovered) {
-            
-            hovered->endHover();
+
+            hovered->unHovered();
             hovered = nullptr;
         }
         

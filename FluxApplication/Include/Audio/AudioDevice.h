@@ -12,7 +12,7 @@ namespace Flux {
 
         AudioDevice();
         
-        virtual ~AudioDevice();
+        ~AudioDevice() override;
 
         void listAudioDevices() const;
         
@@ -24,7 +24,7 @@ namespace Flux {
 
         void closeOutputDevice();
 
-        void openAudioOutputDevice(UInt deviceId);
+        void openOutputDevice(UInt deviceId);
         
         virtual void prepare(Float64 rate, UInt size) = 0;
         
@@ -32,30 +32,30 @@ namespace Flux {
 
         void registerAudioCommands();
 
-        NODISCARD UInt getOutputChannelCount() const;
+        NODISCARD UInt numOutputChannels() const;
         
-        NODISCARD UInt getInputChannelCount() const;
+        NODISCARD UInt numInputChannels() const;
 
-        NODISCARD Float64 getSampleRate() const;
+        NODISCARD Float64 sampleRate() const;
 
-        NODISCARD UInt getBufferSize() const;
+        NODISCARD UInt bufferSize() const;
 
     protected:
 
-        virtual void onOutputDeviceOpened();
+        virtual void outputDeviceOpened();
         
-        virtual void onOutputDeviceClosed();
+        virtual void outputDeviceClosed();
         
     private:
 
         RtAudio* audio = nullptr;
-        Float64 sampleRate = 0.0;
-        UInt bufferSize = 0;
+        Float64 sr = 0.0;
+        UInt bufSize = 0;
 
-        UInt inputChannelCount = 0;
-        UInt outputChannelCount = 0;
+        UInt inputChannels = 0;
+        UInt outputChannels = 0;
 
-        UInt currentOutputDevice = 0;
+        UInt outputDevice = 0;
         
     };
     

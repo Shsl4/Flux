@@ -85,9 +85,9 @@ namespace Flux {
     
     protected:
         
-        void onOutputDeviceOpened() override;
+        void outputDeviceOpened() override;
 
-        void onOutputDeviceClosed() override;
+        void outputDeviceClosed() override;
 
     public:
 

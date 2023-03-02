@@ -26,13 +26,13 @@ namespace Flux {
               dataByte(dataByte),
               valueByte(valueByte) {}
 
-        NODISCARD UInt getCC() const;
+        NODISCARD UInt cc() const;
         
-        NODISCARD UInt getNoteNumber() const;
+        NODISCARD UInt noteNumber() const;
 
-        NODISCARD Float64 getNoteFrequency() const;
+        NODISCARD Float64 noteFrequency() const;
         
-        NODISCARD Float64 getLinearValue() const;
+        NODISCARD Float64 linearValue() const;
         
         NODISCARD String toString() const;
 

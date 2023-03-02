@@ -16,7 +16,7 @@ namespace Flux{
         SkPaint paint;
         paint.setStyle(SkPaint::kStroke_Style);
         paint.setStrokeWidth(2.0f);
-        paint.setColor(LinearColor::fromHex(0x454545ff).skColor());
+        paint.setColor(Color::fromHex(0x454545ff).skColor());
         paint.setPathEffect(SkDashPathEffect::Make(ps, 2, f32(linePhase)));
 
         for(auto const& element : pipeline->getElements()){

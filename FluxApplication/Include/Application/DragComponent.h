@@ -10,9 +10,9 @@ namespace Flux {
 
     public:
 
-        void onButtonDown(MouseButton button, Float64 x, Float64 y) override;
+        void buttonDown(MouseButton button, Float64 x, Float64 y) override;
 
-        void onDrag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) override;
+        void drag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) override;
 
     private:
         

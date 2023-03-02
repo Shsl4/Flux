@@ -2,7 +2,7 @@
 
 #include <skia/core/SkCanvas.h>
 #include <Flux/UI/Reactive.h>
-#include <Flux/UI/LinearColor.h>
+#include <Flux/UI/Color.h>
 
 namespace Flux::UI {
 
@@ -114,7 +114,7 @@ namespace Flux::UI {
 
         void setTransform(Transform const& t);
 
-        void setColor(LinearColor const& c);
+        void setColor(Color const& c);
         
         Component* addChild(Component* component);
         
@@ -134,7 +134,7 @@ namespace Flux::UI {
         
         NODISCARD FORCEINLINE Component* parent() const { return this->parentComponent; }
         
-        NODISCARD FORCEINLINE LinearColor color() const { return this->renderColor; }
+        NODISCARD FORCEINLINE Color color() const { return this->renderColor; }
 
         NODISCARD FORCEINLINE MutableArray<Component*> const& children() const { return this->childrenArray; }
 
@@ -159,11 +159,10 @@ namespace Flux::UI {
     private:
 
         Transform localTransform = {};
-        LinearColor renderColor = Colors::white;
+        Color renderColor = Colors::white;
         Component* parentComponent = nullptr;
         MutableArray<Component*> childrenArray = {};
     
     };
 
-    
 }
