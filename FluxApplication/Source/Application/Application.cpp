@@ -179,11 +179,6 @@ namespace Flux {
         glfwSetScrollCallback(mainWindow, &Application::scrollCallback);
         glfwSetCursorPosCallback(mainWindow, &Application::cursorCallback);
 
-        Console::log("OpenGL Initialized.\n");
-        Console::log("OpenGL version: {}\n", glGetString(GL_VERSION));
-        Console::log("OpenGL shading language version: {}\n", glGetString(0x8B8C));
-        Console::log("OpenGL rendering device: {}\n", glGetString(GL_RENDERER));
-        
         Int framebufferWidth;
         Int framebufferHeight;
 

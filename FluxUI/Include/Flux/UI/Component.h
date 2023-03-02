@@ -1,6 +1,6 @@
-﻿#pragma once
+#pragma once
 
-#include <core/SkCanvas.h>
+#include <skia/core/SkCanvas.h>
 #include <Flux/UI/Reactive.h>
 #include <Flux/UI/LinearColor.h>
 
