@@ -10,9 +10,9 @@ namespace Flux::Audio {
 
         Resonator() = default;
 
-        NODISCARD Float64 getMagnitude(Float64 omega) const override;
+        NODISCARD Float64 magnitude(Float64 omega) const override;
 
-        NODISCARD Float64 getArgument(Float64 omega) const override;
+        NODISCARD Float64 argument(Float64 omega) const override;
 
     protected:
 

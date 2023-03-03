@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "AudioDevice.h"
+#include "AudioEngine.h"
 #include "../MIDI/MidiManager.h"
 
 #include <Nucleus/Nucleus.h>
@@ -19,14 +19,14 @@ namespace Flux {
         void prepare(Float64 rate, UInt size) override {
 
             AudioObject::prepare(rate, size);
-            phaseIncrement = (Math::pi<Float64> * 2.0 / getSampleRate()) * frequency;
+            phaseIncrement = (Math::pi<Float64> * 2.0 / sampleRate()) * frequency;
             
         }
         
         void setFrequency(Float64 value) {
 
             this->frequency = value;
-            phaseIncrement = (Math::pi<Float64> * 2.0 / getSampleRate()) * frequency;
+            phaseIncrement = (Math::pi<Float64> * 2.0 / sampleRate()) * frequency;
             
         }
 
@@ -38,7 +38,7 @@ namespace Flux {
 
         bool process(Float64* buffer) override {
 
-            for (UInt sample = 0; sample < getBufferSize(); ++sample) {
+            for (UInt sample = 0; sample < bufferSize(); ++sample) {
                 buffer[sample] = processSingle(buffer[sample]);
             }
 
@@ -81,31 +81,26 @@ namespace Flux {
         
     };
     
-    class MyAudioDevice : public AudioDevice {
+    class Engine : public AudioEngine, public MidiManager {
     
     protected:
         
-        void outputDeviceOpened() override;
+        void opened() override;
 
-        void outputDeviceClosed() override;
+        void closed() override;
 
     public:
 
-        MyAudioDevice();
+        Engine();
         
         void prepare(Float64 rate, UInt size) override;
 
-        void onMidiMessage(MidiMessage const& message) override;
+        void receiveMessage(MidiMessage const& message) override;
 
-        void process(Float64* buffer) override;
-
-        NODISCARD Audio::Pipeline* getPipeline() const { return pipeline.pointer(); }
+        void process(Float64 *inputBuffer, Float64 *outputBuffer) override;
 
     private:
 
-        Unique<Audio::Pipeline> pipeline = nullptr;
-        Audio::MultiProcessor<Audio::LowPassFilter> filter;
-        Audio::MultiProcessor<SawVoice> voice;
         Int pressCount = 0;
         UInt lastPressed = 0;
         

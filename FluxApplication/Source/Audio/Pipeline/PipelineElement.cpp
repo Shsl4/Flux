@@ -70,17 +70,17 @@ namespace Flux::Audio {
         signalManager.signal(channel);
 
         if(hasOutputs()) {
-            memcpy(stateBuffers[channel], buffer, sizeof(Float64) * getBufferSize());
+            memcpy(stateBuffers[channel], buffer, sizeof(Float64) * bufferSize());
         }
 
         if (signalManager.ready()) {
 
             // todo: fix this
             if(hasOutputs()) {
-                process({stateBuffers, numOuts, getBufferSize()});
+                process({stateBuffers, numOuts, bufferSize()});
             }
             else {
-                process({(Float64**)const_cast<Float64*>(buffer), 1, getBufferSize()});
+                process({(Float64**)const_cast<Float64*>(buffer), 1, bufferSize()});
             }
 
             UInt ch = 0;

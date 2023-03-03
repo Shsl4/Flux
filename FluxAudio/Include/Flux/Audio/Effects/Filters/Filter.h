@@ -19,18 +19,15 @@ namespace Flux::Audio {
 
         bool process(Float64* buffer) override;
         
-        NODISCARD virtual Float64 getMagnitude(Float64 omega) const;
-        NODISCARD virtual Float64 getArgument(Float64 omega) const;
+        NODISCARD virtual Float64 magnitude(Float64 omega) const;
+        NODISCARD virtual Float64 argument(Float64 omega) const;
         
         virtual void setCutoffFrequency(Float64 cutoff);
         virtual void setResonance(Float64 value);
         
-        NODISCARD FORCEINLINE Float64 getCutoffFrequency() const { return cutoffFrequency; }
-        NODISCARD FORCEINLINE Float64 getResonance() const { return resonance; }
+        NODISCARD FORCEINLINE Float64 cutoff() const { return cutoffFrequency; }
+        NODISCARD FORCEINLINE Float64 resonance() const { return q; }
 
-        NODISCARD FORCEINLINE const Float64* getCoefficients() const { return this->coefficients; }
-        NODISCARD FORCEINLINE const Float64* getStateArray() const { return this->stateArray; }
-    
     protected:
 
         virtual void recalculateCoefficients() = 0;
@@ -43,12 +40,12 @@ namespace Flux::Audio {
         /**
          * \brief The z-1 storage registers
          */
-        Float64 stateArray[stateCount] = {};
+        Float64 state[stateCount] = {};
         
     private:
 
         Float64 cutoffFrequency = 440.0;
-        Float64 resonance = 1.0;
+        Float64 q = 1.0;
         
     };
 

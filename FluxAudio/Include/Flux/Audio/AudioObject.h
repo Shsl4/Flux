@@ -12,16 +12,16 @@ namespace Flux::Audio {
         
         virtual void prepare(Float64 rate, UInt size);
         
-        NODISCARD FORCEINLINE Float64 getSampleRate() const { return sampleRate; }
+        NODISCARD FORCEINLINE Float64 sampleRate() const { return sr; }
 
-        NODISCARD FORCEINLINE UInt getBufferSize() const { return bufferSize; }
+        NODISCARD FORCEINLINE UInt bufferSize() const { return sz; }
         
         virtual ~AudioObject() = default;
 
     private:
         
-        UInt bufferSize = 0;
-        Float64 sampleRate = 0.0;
+        UInt sz = 0;
+        Float64 sr = 0.0;
         
     };
     

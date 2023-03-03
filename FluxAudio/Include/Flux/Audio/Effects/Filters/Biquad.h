@@ -20,7 +20,7 @@ namespace Flux::Audio {
 
         Biquad();
 
-        NODISCARD FORCEINLINE BiquadParameters getParameters() const { return this->params; }
+        NODISCARD FORCEINLINE BiquadParameters parameters() const { return this->params; }
 
         void setParameters(BiquadParameters const& value);
     

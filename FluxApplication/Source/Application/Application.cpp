@@ -236,7 +236,7 @@ namespace Flux {
 
     void Application::initializeAudio() {
 
-        this->audioDevice = Shared<MyAudioDevice>::make();
+        this->audioDevice = Shared<Engine>::make();
 
         audioDevice->initialize(44100, 128);
 

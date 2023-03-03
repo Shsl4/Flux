@@ -25,7 +25,7 @@ namespace Flux::Audio {
     void PipelineOutput::process(AudioBuffer<Float64> const& buffer) {
 
         assert(outputBuffer);
-        memcpy(outputBuffer, (Float64*)buffer.getRawBuffers(), getBufferSize() * sizeof(Float64));
+        memcpy(outputBuffer, (Float64*)buffer.getRawBuffers(), bufferSize() * sizeof(Float64));
         outputBuffer = nullptr;
             
     }

@@ -67,7 +67,7 @@ namespace Flux{
 
         for (UInt i = 0; i < points; ++i) {
 
-            const Float64 mag = filterRef->getMagnitude(values[i]);
+            const Float64 mag = filterRef->magnitude(values[i]);
             const Float64 response = 20.0 * log10(mag);
             const Float64 freq = (values[i] / pi) * nyquist;
             const Float64 finalResponse = Math::clamp(response, mindB, maxdB);

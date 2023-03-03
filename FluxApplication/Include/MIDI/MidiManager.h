@@ -48,15 +48,15 @@ namespace Flux {
         
         MidiManager();
         
-        void openMidiDevice(UInt deviceIndex);
+        void openDevice(UInt deviceIndex);
 
-        void closeMidiDevice() const;
+        void closeDevice() const;
 
-        void listMidiDevices() const;
+        void listDevices() const;
 
-        void simulateMidiMessage(Int key, bool down);
+        void simulateMessage(Int key, bool down);
         
-        virtual void onMidiMessage(MidiMessage const& message) = 0;
+        virtual void receiveMessage(MidiMessage const& message) = 0;
 
         virtual ~MidiManager();
         
@@ -67,7 +67,7 @@ namespace Flux {
         
         void registerCommands();
 
-        static MidiEvent asMIDIEvent(UInt8 value);
+        static MidiEvent asEvent(UInt8 value);
 
         static void eventCallback(Float64 deltaTime, std::vector<UInt8>* message, void* data);
 

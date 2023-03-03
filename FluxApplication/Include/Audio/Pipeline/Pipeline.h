@@ -33,8 +33,8 @@ namespace Flux::Audio {
             this->elements += element;
             element->pipeline = this;
 
-            if(getBufferSize() > 0) {
-                element->prepare(getSampleRate(), getBufferSize());
+            if(bufferSize() > 0) {
+                element->prepare(sampleRate(), bufferSize());
             }
 
             return element;

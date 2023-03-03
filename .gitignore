@@ -30,4 +30,4 @@
 /Build
 /.cmake
 /.idea
-/cmake-build-debug
+/cmake-*

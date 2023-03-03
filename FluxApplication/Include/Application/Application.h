@@ -2,13 +2,13 @@
 
 #include <GLFW/glfw3.h>
 
-#include <Audio/MyAudioDevice.h>
+#include <Audio/Engine.h>
 #include <Flux/UI/CursorManager.h>
 #include <Flux/UI/UserInterface.h>
 
 namespace Flux {
     
-    class AudioDevice;
+    class AudioEngine;
 
     class Application {
 
@@ -54,7 +54,7 @@ namespace Flux {
         
         UI::Component* masterView = nullptr;
         
-        Shared<MyAudioDevice> audioDevice = nullptr;
+        Shared<Engine> audioDevice = nullptr;
         
         Shared<UI::CursorManager> cursorManager = nullptr;
         

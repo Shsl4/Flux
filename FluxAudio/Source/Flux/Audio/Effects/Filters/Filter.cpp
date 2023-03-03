@@ -12,7 +12,7 @@ namespace Flux::Audio {
 
     bool Filter::process(Float64* buffer) {
         
-        for (UInt sample = 0; sample < getBufferSize(); ++sample) {
+        for (UInt sample = 0; sample < bufferSize(); ++sample) {
             buffer[sample] = processSingle(buffer[sample]);
         }
         
@@ -20,11 +20,11 @@ namespace Flux::Audio {
         
     }
 
-    Float64 Filter::getMagnitude(Float64 omega) const {
+    Float64 Filter::magnitude(Float64 omega) const {
         return 0.0;
     }
 
-    Float64 Filter::getArgument(Float64 omega) const {
+    Float64 Filter::argument(Float64 omega) const {
         return 0.0;
     }
 
@@ -39,7 +39,7 @@ namespace Flux::Audio {
     void Filter::setResonance(const Float64 value) {
         
         assert(value >= 0.0);
-        this->resonance = value;
+        this->q = value;
         recalculateCoefficients();
         
     }

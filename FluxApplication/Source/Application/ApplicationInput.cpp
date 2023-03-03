@@ -6,8 +6,8 @@ namespace Flux {
 
         // Ignore key repeat when held
         if(action == GLFW_REPEAT) return;
-        
-        instance->audioDevice->simulateMidiMessage(key, action);
+
+        instance->audioDevice->simulateMessage(key, action);
         
     }
 

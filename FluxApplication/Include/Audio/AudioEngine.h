@@ -6,15 +6,15 @@ class RtAudio;
 
 namespace Flux {
 
-    class AudioDevice : public MidiManager {
+    class AudioEngine {
         
     public:
 
-        AudioDevice();
+        AudioEngine();
         
-        ~AudioDevice() override;
+        virtual ~AudioEngine();
 
-        void listAudioDevices() const;
+        void listDevices() const;
         
         void initialize(Float64 rate, UInt size);
 
@@ -22,15 +22,13 @@ namespace Flux {
         
         void setBufferSize(UInt value);
 
-        void closeOutputDevice();
+        bool open(UInt inputId, UInt outputId);
 
-        void openOutputDevice(UInt deviceId);
-        
+        void close();
+
         virtual void prepare(Float64 rate, UInt size) = 0;
         
-        virtual void process(Float64* buffer) = 0;
-
-        void registerAudioCommands();
+        virtual void process(Float64* inputBuffer, Float64* outputBuffer) = 0;
 
         NODISCARD UInt numOutputChannels() const;
         
@@ -42,21 +40,19 @@ namespace Flux {
 
     protected:
 
-        virtual void outputDeviceOpened();
+        virtual void opened();
         
-        virtual void outputDeviceClosed();
+        virtual void closed();
         
     private:
 
         RtAudio* audio = nullptr;
         Float64 sr = 0.0;
-        UInt bufSize = 0;
 
+        UInt bufSize = 0;
         UInt inputChannels = 0;
         UInt outputChannels = 0;
 
-        UInt outputDevice = 0;
-        
     };
     
 }

@@ -52,7 +52,7 @@ namespace Flux::Audio {
             for(const auto& object : objects) {
 
                 object->process(pointer);
-                pointer += getBufferSize();
+                pointer += bufferSize();
                 
             }
 

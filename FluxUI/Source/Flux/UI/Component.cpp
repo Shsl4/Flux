@@ -1,4 +1,4 @@
-﻿#include "Component.h"
+#include "Component.h"
 
 namespace Flux::UI {
     
@@ -36,6 +36,7 @@ namespace Flux::UI {
                                              "Use Component::Factory::create() to create components.");
 
         nthrowif(component->parentComponent, "Trying to add a component that already has a parent!");
+        
         nthrowif(component == this, "Trying to add a component to itself!");
 
         component->parentComponent = this;
@@ -154,6 +155,9 @@ namespace Flux::UI {
     void Component::Factory::dispose(Component* component) {
 
         if(!valid(component)) return;
+        
+        nthrowif(component->children().size() > 0, "Trying to destroy a component that has active children. "
+                 "Make sure to use Component::dispose() to destroy components.");
 
         Console::log("Disposing {}.\n", Type::name(*component));
         

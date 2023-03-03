@@ -41,8 +41,8 @@ namespace Flux::Audio {
 
         for (size_t i = 0; i < inputChannels.size(); ++i) {
             
-            inputChannels[i]->prepare(getSampleRate(), getBufferSize());
-            outputChannels[i]->prepare(getSampleRate(), getBufferSize());
+            inputChannels[i]->prepare(sampleRate(), bufferSize());
+            outputChannels[i]->prepare(sampleRate(), bufferSize());
             
         }
 
@@ -59,7 +59,7 @@ namespace Flux::Audio {
 
     void Pipeline::render(Float64* outBuffers) {
 
-        const size_t size = sizeof(Float64) * channelCount * getBufferSize();
+        const size_t size = sizeof(Float64) * channelCount * bufferSize();
         memcpy(processBuffers, outBuffers, size);
         memset(outBuffers, 0, size);
         
@@ -67,14 +67,14 @@ namespace Flux::Audio {
         
         for (const auto& channel : outputChannels) {
             channel->prepareOutput(buffer);
-            buffer += getBufferSize();
+            buffer += bufferSize();
         }
         
         buffer = processBuffers;
         
         for (auto* channel : inputChannels) {
             channel->signal(buffer, 0);
-            buffer += getBufferSize();
+            buffer += bufferSize();
         }
 
     }

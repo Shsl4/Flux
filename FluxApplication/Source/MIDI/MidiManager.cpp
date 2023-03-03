@@ -5,7 +5,7 @@ namespace Flux {
     
     void MidiManager::eventCallback(Float64 deltaTime, std::vector<UInt8>* message, void* data) {
         
-        const MidiEvent event = asMIDIEvent(message->at(0));
+        const MidiEvent event = asEvent(message->at(0));
         const UInt noteNumber = message->at(1);
         const UInt noteVelocity = message->at(2);
 
@@ -13,7 +13,7 @@ namespace Flux {
         
         auto* manager = static_cast<MidiManager*>(data);
 
-        manager->onMidiMessage(midiMessage);
+        manager->receiveMessage(midiMessage);
         
     }
 
@@ -33,7 +33,7 @@ namespace Flux {
 
     Float64 MidiMessage::linearValue() const {
         return static_cast<Float64>(valueByte) / 127.0;
-    };
+    }
 
     String MidiMessage::toString() const {
         
@@ -83,9 +83,9 @@ namespace Flux {
         
     }
 
-    void MidiManager::openMidiDevice(UInt deviceIndex) {
+    void MidiManager::openDevice(UInt deviceIndex) {
 
-        closeMidiDevice();
+        closeDevice();
 
         if(midiIn->getPortCount() <= 0) return;
 
@@ -104,13 +104,13 @@ namespace Flux {
         
     }
 
-    void MidiManager::closeMidiDevice() const {
+    void MidiManager::closeDevice() const {
 
         midiIn->closePort();
         
     }
 
-    void MidiManager::listMidiDevices() const {
+    void MidiManager::listDevices() const {
 
         const UInt count = midiIn->getPortCount();
 
@@ -140,7 +140,7 @@ namespace Flux {
         
     }
 
-    void MidiManager::simulateMidiMessage(const Int key, const bool down) {
+    void MidiManager::simulateMessage(Int key, bool down) {
 
         // C = 64, D = 83, E = 68, F = 70, G = 71, A = 72, B = 74
         // Cs = 87, Ds = 69, Fs = 84, Gs = 89, As = 85
@@ -193,7 +193,7 @@ namespace Flux {
 
         const MidiMessage message = { down ? MidiEvent::NoteDown : MidiEvent::NoteUp, realNote, simulationVelocity};
 
-        onMidiMessage(message);
+        receiveMessage(message);
         
     }
 
@@ -208,7 +208,7 @@ namespace Flux {
         
     }
 
-    MidiEvent MidiManager::asMIDIEvent(const UInt8 value) {
+    MidiEvent MidiManager::asEvent(UInt8 value) {
     
         switch (value) {
         

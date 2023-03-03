@@ -6,8 +6,8 @@ namespace Flux::Audio {
         
         assert(rate > 0.0 && size > 0);
         
-        this->sampleRate = rate;
-        this->bufferSize = size;
+        this->sr = rate;
+        this->sz = size;
         
     }
 
