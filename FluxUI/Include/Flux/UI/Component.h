@@ -73,6 +73,7 @@ namespace Flux::UI {
                 Console::log("Creating {}.\n", Type::name<ComponentType>());
                 auto* component = Allocator<ComponentType>::construct(std::forward<Args>(args)...);
                 instance()->components.add(component);
+                component->initialize();
                 return component;
             }
 
@@ -115,6 +116,8 @@ namespace Flux::UI {
         void setTransform(Transform const& t);
 
         void setColor(Color const& c);
+
+        void setVisible(bool state);
         
         Component* addChild(Component* component);
         
@@ -135,11 +138,15 @@ namespace Flux::UI {
         NODISCARD FORCEINLINE Component* parent() const { return this->parentComponent; }
         
         NODISCARD FORCEINLINE Color color() const { return this->renderColor; }
+        
+        NODISCARD FORCEINLINE bool visible() const { return this->bVisible; }
 
         NODISCARD FORCEINLINE MutableArray<Component*> const& children() const { return this->childrenArray; }
 
         virtual void draw(SkCanvas* canvas, Float64 deltaTime);
 
+        virtual void initialize();
+        
         ~Component() override;
 
     protected:
@@ -162,6 +169,7 @@ namespace Flux::UI {
         Color renderColor = Colors::white;
         Component* parentComponent = nullptr;
         MutableArray<Component*> childrenArray = {};
+        bool bVisible = true;
     
     };
 

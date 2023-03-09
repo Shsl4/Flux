@@ -94,6 +94,10 @@ namespace Flux {
 
         void buttonUp(MouseButton button, Float64 x, Float64 y, Reactive* upTarget) override;
 
+        void choiceCallback(Function<void(String const&)> const& f);
+
+        void initialize() override;
+
     private:
 
         void updateColor();
@@ -103,12 +107,14 @@ namespace Flux {
 
         Float32 arrowRootY;
         Float32 arrowMaxY;
-        
-        
+                
         Color defaultColor;
         Color hoverColor;
         Color pressedColor;
+        
         MutableArray<String> choices = {};
+        Function<void(String const&)> callback;
+        bool opened = false;
         
     };
 

@@ -74,7 +74,7 @@ namespace Flux::UI {
         const Float64 deltaY = lastCursorY - cursorY;
 
         for (auto const& elem : stateMap) {
-            elem.getValue()->drag(elem.getKey(), x, y, deltaX, deltaY);
+            elem.value()->drag(elem.key(), x, y, deltaX, deltaY);
         }
 
         // If a component is under the cursor.
@@ -132,9 +132,9 @@ namespace Flux::UI {
         // Simply search through the map by value
         for (auto it = stateMap.begin(); it != stateMap.end(); ++it) {
             
-            if (it->getValue() == value) {
+            if (it->value() == value) {
                 
-                out = it->getKey();
+                out = it->key();
                 return true;
                 
             }
@@ -147,6 +147,8 @@ namespace Flux::UI {
 
     Component* CursorManager::componentAtPosition(Component* root, Point const& p) {
         
+        if (!root->active()) { return nullptr; }
+        
         const auto children = root->children();
         
         for (size_t i = children.size(); i > 0; --i) {
@@ -155,7 +157,7 @@ namespace Flux::UI {
 
             if(componentAtPosition(child, p)) { return child; }
 
-            if(child->inBounds(p)) { return child; }
+            if(child->inBounds(p) && child->active()) { return child; }
             
         }
 

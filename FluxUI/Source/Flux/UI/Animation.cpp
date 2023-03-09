@@ -4,12 +4,24 @@ namespace Flux {
 
     void Animation::play() {
 
-        if(animState == State::Done || animState == State::Playing) return;
-    
+        if(animState == State::Playing) return;
+
+        this->animTime = 0.0;
+        this->direction = PlayDirection::Normal;
         this->animState = State::Playing;
 
         played();
     
+    }
+
+    void Animation::reverse() {
+        
+        if(animState == State::Playing) return;
+
+        this->animTime = animDuration;
+        this->direction = PlayDirection::Reverse;
+        this->animState = State::Playing;
+        
     }
 
     void Animation::pause() {
@@ -119,5 +131,15 @@ namespace Flux {
         animTime = animDuration;
     
     }
-    
+
+    void Animation::switchDirection() {
+
+        if(direction == PlayDirection::Normal) {
+            direction = PlayDirection::Reverse;
+        }
+        else {
+            direction = PlayDirection::Normal;
+        }
+        
+    }
 }

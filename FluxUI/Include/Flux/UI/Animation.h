@@ -30,6 +30,8 @@ namespace Flux {
     
         void play();
 
+        void reverse();
+
         void pause();
 
         void stop();
@@ -41,6 +43,8 @@ namespace Flux {
         void update(Float64 deltaTime);
         
         void end();
+
+        void switchDirection();
     
         FORCEINLINE void setDuration(const Float64 value) { this->animDuration = value; }
 

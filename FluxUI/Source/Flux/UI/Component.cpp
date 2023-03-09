@@ -12,7 +12,7 @@ namespace Flux::UI {
 
     void Component::draw(SkCanvas* canvas, Float64 deltaTime) {
 
-        if(renderColor.transparent()) { return; }
+        if(!visible()) { return; }
         
         SkPaint paint;
         const auto t = globalTransform();
@@ -30,7 +30,7 @@ namespace Flux::UI {
     Component* Component::addChild(Component* component) {
 
         nthrowif(!Factory::valid(this), "Trying to add child on an invalid component! "
-                                        "Use Component::Factory::create() to create components.");
+                                        "Make sure it is initialized, and use Component::Factory::create() to create components.");
 
         nthrowif(!Factory::valid(component), "Trying to add an invalid component! "
                                              "Use Component::Factory::create() to create components.");
@@ -47,7 +47,11 @@ namespace Flux::UI {
         return component;
         
     }
-    
+
+    void Component::initialize() {
+        
+    }
+
     void Component::dispose() {
 
         willDispose();
@@ -95,6 +99,10 @@ namespace Flux::UI {
         this->renderColor = c;
     }
 
+    void Component::setVisible(bool state) {
+        this->bVisible = state;
+    }
+
     Transform Component::globalTransform() const {
 
         Transform t = this->localTransform;
@@ -132,6 +140,7 @@ namespace Flux::UI {
     Component::~Component() = default;
 
     void Component::childModified(Component* component) {
+        
     }
 
     Component::Factory::~Factory() {

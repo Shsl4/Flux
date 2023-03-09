@@ -203,6 +203,8 @@ namespace Flux {
         
         Point p = { f32(windowWidth) - fw - 10.0f, f32(windowHeight) - fh - 10.0f};
         
+        masterView->addChild(Component::Factory::create<FilterGraph>(Point(), masterView->size()));
+
         masterView->addChild(Component::Factory::create<FrameInfo>(p, Point(fw, fh)));
         
         this->masterView->addChild(Component::Factory::create<DropdownMenu>());

@@ -99,11 +99,16 @@ namespace Flux::UI {
      
         NODISCARD FORCEINLINE bool isPressed(MouseButton button) const { return pressedState[static_cast<size_t>(button)]; }
 
+        NODISCARD FORCEINLINE bool active() const { return this->bActive; }
+
+        void setActive(bool state);
+
     private:
 
         StaticArray<bool, i64(MouseButton::Size)> pressedState = {};
         bool bHovered = false;
         bool bFocused = false;
+        bool bActive = true;
 
     };
     
