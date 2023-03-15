@@ -66,22 +66,4 @@ namespace Flux {
         return nullptr;
     }
 
-    void Window::swapBuffers() const {
-        glfwSwapBuffers(this->handle);
-    }
-
-    void Window::draw(const Float64 &deltaTime) {
-
-        glfwMakeContextCurrent(this->handle);
-
-        this->rootComponent->draw(nullptr, deltaTime);
-
-        swapBuffers();
-
-    }
-
-    Window::~Window() {
-        glfwDestroyWindow(handle);
-    }
-
 }

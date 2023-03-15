@@ -13,7 +13,7 @@ class ConsoleColors:
 def gen_skia_args(debug):
 
     args = {'is_official_build': True,
-            'is_debug': False, 
+            'is_debug': False,
             'skia_use_metal': False,
             'skia_use_gl': True,
             'skia_use_vulkan': False,
@@ -38,7 +38,7 @@ def gen_skia_args(debug):
         args['is_debug'] = True
         args['is_official_build'] = False
 
-    return ' '.join([ f'{key}={str(value).lower()}' for key, value in args.items() ] )   
+    return ' '.join([ f'{key}={str(value).lower()}' for key, value in args.items() ] )
     
 
 def build_skia(debug):
@@ -61,11 +61,15 @@ def build_skia(debug):
 
     os.chdir('skia')
         
+    print("Syncing git dependencies for skia...")
+
     proc = subprocess.run(['python', 'tools/git-sync-deps'], capture_output=True, text=True)
 
     if proc.returncode != 0:
         print(proc.stderr)
         print(f'{ConsoleColors.yellow}Failed to sync skia deps!{ConsoleColors.reset}')
+
+    print("Fetching ninja...")
 
     proc = subprocess.run('bin/fetch-ninja', capture_output=True, text=True)
 
@@ -157,8 +161,8 @@ def build(debug):
     shutil.copy('skia/out/build/libSkia.a', '.build')
     shutil.copy('rtmidi/.libs/librtmidi.a', '.build')
     shutil.copy('rtaudio/.libs/librtaudio.a', '.build')
-    shutil.copy('glfw/build/src/libglfw3.a', '.build')
-    shutil.copy('Nucleus/build/libNucleus.a', '.build')
+    shutil.copy('glfw/.build/src/libglfw3.a', '.build')
+    shutil.copy('Nucleus/.build/libNucleus.a', '.build')
 
     print(f'{ConsoleColors.green}Successfully built all dependencies.{ConsoleColors.reset}')
 
@@ -200,7 +204,7 @@ def setup():
 
     if proc.returncode != 0:
         print("\033[91mCMake generation failed!")
-        return
+        return 1
 
     os.chdir("..")
 

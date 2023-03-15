@@ -38,8 +38,6 @@ namespace Flux {
         [[rawWindow contentView] addSubview:view];
         
         this->mtkView = view;
-        
-        
         this->mtlQueue = queue;
         /*
         CAMetalLayer* layer = [CAMetalLayer layer];

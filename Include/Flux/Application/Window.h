@@ -94,7 +94,7 @@ namespace Flux {
 
         };
 
-        virtual void draw(Float64 const& deltaTime);
+        virtual void draw(Float64 const& deltaTime) = 0;
 
         void swapBuffers() const;
 
