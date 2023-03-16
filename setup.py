@@ -54,7 +54,7 @@ def build_skia(debug):
 
         proc = subprocess.run(['git', 'clone', 'https://chromium.googlesource.com/chromium/tools/depot_tools.git', '~/depot_tools'])
 
-        if proc.returnCode != 0:
+        if proc.returncode != 0:
             raise Exception('Failed to clone depot_tools! Are you connected to the internet?')
 
     os.environ['PATH'] += os.pathsep + depot_tools_path
@@ -97,14 +97,14 @@ def build_skia(debug):
 def build_rt(name, debug):
 
     os.chdir(name)
+    
+    print(f'Now building {name}.')
 
     proc = subprocess.run('./autogen.sh', capture_output=True, text=True)
 
     if proc.returncode != 0:
         print(proc.stdout)
         raise Exception(f'{name} autogen failed!')
-
-    print(f'Now building {name}.')
 
     proc = subprocess.run('make')
 
