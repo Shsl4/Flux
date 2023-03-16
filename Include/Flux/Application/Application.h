@@ -1,7 +1,8 @@
 #pragma once
 
 #include <Audio/Engine.h>
-#include <Application/Window.h>
+#include <Application/Window/Window.h>
+#include <Flux/Factory.h>
 
 namespace Flux {
     
@@ -14,6 +15,8 @@ namespace Flux {
         void run();
 
         void stop();
+        
+        NODISCARD FORCEINLINE static Application* instance() { return application; }
 
     private:
 
@@ -38,10 +41,12 @@ namespace Flux {
         Window* mainWindow = nullptr;
 
         Unique<Console> console = nullptr;
+        
+        Unique<Factory> factory = nullptr;
 
         Shared<Engine> audioDevice = nullptr;
 
-        static inline Application* instance = nullptr;
+        static inline Application* application = nullptr;
         
     };
     

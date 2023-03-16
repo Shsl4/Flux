@@ -1,4 +1,5 @@
 #include <UI/Component.h>
+#include <Flux/Factory.h>
 
 namespace Flux::UI {
     
@@ -141,44 +142,6 @@ namespace Flux::UI {
 
     void Component::childModified(Component* component) {
         
-    }
-
-    Component::Factory::~Factory() {
-
-        while (components.size() > 0) {
-            
-            auto* highest = components[0];
-
-            while (highest->parent()) {
-                highest = highest->parent();
-            }
-            
-            highest->dispose();
-            
-        }
-        
-    }
-    
-    bool Component::Factory::valid(Component* component) { return instance()->components.contains(component); }
-    
-    void Component::Factory::dispose(Component* component) {
-
-        if(!valid(component)) return;
-        
-        nthrowif(component->children().size() > 0, "Trying to destroy a component that has active children. "
-                 "Make sure to use Component::dispose() to destroy components.");
-
-        Console::log("Disposing {}.\n", Type::name(*component));
-        
-        instance()->components.remove(component);
-        
-    }
-
-    Component::Factory* Component::Factory::instance() {
-            
-        if (!factory.isValid()) { factory = Unique<Factory>::make(); }
-        return factory.pointer();
-            
     }
     
 }

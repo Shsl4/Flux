@@ -4,22 +4,13 @@
 #include <Flux/UI/CursorManager.h>
 #include <Flux/UI/UserInterface.h>
 #include <skia/include/core/SkFont.h>
+#include <skia/include/gpu/GrDirectContext.h>
 
 #define GL_FRAMEBUFFER_BINDING 0x8CA6
 
 namespace Flux {
 
     using namespace UI;
-
-    enum class RenderBackend{
-
-        OpenGL = 0,
-        Vulkan,
-        Metal,
-        DirectX
-
-    };
-
 
     class FrameInfo : public UI::Component {
 
@@ -77,23 +68,6 @@ namespace Flux {
 
     public:
 
-        class Factory final {
-
-        public:
-
-            static Window* createWindow(RenderBackend backEnd, String const& name, Int width, Int height);
-
-            NODISCARD FORCEINLINE static SmartArray<Window> const& windows() { return activeWindows; };
-
-        private:
-
-            friend class Window;
-            friend class Application;
-
-            static inline SmartArray<Window> activeWindows = {};
-
-        };
-
         virtual void draw(Float64 const& deltaTime) = 0;
 
         void swapBuffers() const;
@@ -122,31 +96,9 @@ namespace Flux {
         
         static void cursorCallback(GLFWwindow* window, Float64 xPos, Float64 yPos);
         
-        static void charCallback(GLFWwindow* window, UInt codepoint);
-
+        static void closeCallback(GLFWwindow* window);
+        
         static Window* windowFromHandle(GLFWwindow* handle);
-
-    };
-
-    class MetalWindow : public Window {
-
-    public:
-
-        MetalWindow(const String &title, Int windowWidth, Int windowHeight);
-
-        void draw(const Float64 &deltaTime) override;
-        
-    private:
-        
-        void* mtkView = nullptr;
-        void* mtlLayer = nullptr;
-        void* mtlQueue = nullptr;
-        const void* mtlDrawable = nullptr;
-        
-        sk_sp<SkSurface> surface = nullptr;
-        SkCanvas* canvas = nullptr;
-        sk_sp<GrDirectContext> context = nullptr;
-        Float32 dpiScale = 1.0f;
 
     };
 

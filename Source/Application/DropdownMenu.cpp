@@ -1,4 +1,5 @@
-﻿#include <Application/DropdownMenu.h>
+#include <Application/DropdownMenu.h>
+#include <Flux/Factory.h>
 
 namespace Flux {
 

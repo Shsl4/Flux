@@ -2,7 +2,7 @@
 
 #include <Flux/Audio/AudioObject.h>
 #include <Flux/Audio/Effects/Filters/IIRFilter.h>
-#include <Flux/UI/MasterView.h>
+#include <Flux/Factory.h>
 
 #include "FilterElement.h"
 
@@ -97,7 +97,7 @@ namespace Flux::Audio {
         }
 
         void createComponent(Component* parent) override {
-            this->component = Component::Factory::create<LPFNode>();
+            this->component = Factory::create<LPFNode>();
             parent->addChild(this->component);
         }
 
@@ -125,7 +125,7 @@ namespace Flux::Audio {
 
         void createComponent(Component* parent) override {
 
-            this->component = Component::Factory::create<HPFNode>();
+            this->component = Factory::create<HPFNode>();
             parent->addChild(this->component);
 
         }

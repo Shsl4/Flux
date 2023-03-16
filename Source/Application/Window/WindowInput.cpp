@@ -1,6 +1,5 @@
 #include <Application/Application.h>
-#include "Application/Window.h"
-
+#include <Application/Window/Window.h>
 
 namespace Flux {
     
@@ -11,10 +10,6 @@ namespace Flux {
 
         // Application::instance->audioDevice->simulateMessage(key, action);
         
-    }
-    
-    void Window::charCallback(GLFWwindow* window, UInt codepoint){
-                
     }
 
     void Window::mouseCallback(GLFWwindow* window, Int button, Int action, Int mods) {
@@ -56,8 +51,15 @@ namespace Flux {
         
     }
 
+    void Window::closeCallback(GLFWwindow* window) {
+
+        Factory::destroyWindow(windowFromHandle(window));
+    
+    }
+
+
     Window *Window::windowFromHandle(GLFWwindow *handle) {
-        for(const auto& w : Window::Factory::activeWindows){
+        for(const auto& w : Factory::windows()){
             if (w->handle == handle){
                 return w;
         

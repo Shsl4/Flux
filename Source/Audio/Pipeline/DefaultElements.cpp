@@ -1,4 +1,5 @@
 #include <Audio/Pipeline/DefaultElements.h>
+#include <Flux/Factory.h>
 
 namespace Flux::Audio {
 
@@ -11,7 +12,7 @@ namespace Flux::Audio {
     }
 
     void PipelineInput::createComponent(Component* parent) {
-        this->component = Component::Factory::create<InputNode>();
+        this->component = Factory::create<InputNode>();
         parent->addChild(this->component);
     }
 
@@ -31,7 +32,7 @@ namespace Flux::Audio {
     }
 
     void PipelineOutput::createComponent(Component* parent) {
-        this->component = Component::Factory::create<OutputNode>();
+        this->component = Factory::create<OutputNode>();
         parent->addChild(this->component);
     }
 

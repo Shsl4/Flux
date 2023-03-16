@@ -79,30 +79,25 @@ namespace Flux {
 
     void Application::run() {
 
-        if(instance) throw Exceptions::Exception( "Tried to run multiple Applications at the same time");
+        if(application) throw Exceptions::Exception( "Tried to run multiple Applications at the same time");
 
-        instance = this;
-
+        application = this;
+        
         this->console = Unique<Console>::make();
+        this->factory = Unique<Factory>::make();
 
         glfwSetErrorCallback(&Application::onError);
 
         if(!glfwInit()){
-            throw Exceptions::Exception( "Failed to initialize GLFW");
+            throw Exceptions::Exception("Failed to initialize GLFW");
         }
 
         constexpr Int windowWidth = 1280;
         constexpr Int windowHeight = 720;
 
-        this->mainWindow = Window::Factory::createWindow(RenderBackend::Metal, "Application", windowWidth, windowHeight);
+        this->mainWindow = Factory::createWindow(RenderBackend::Best, "Application", windowWidth, windowHeight);
         
         initializeAudio();
-
-        for(size_t i = 0; i < 10; ++i){
-            auto e = this->mainWindow->mainView()->addChild(Component::Factory::create<DragComponent>());
-            e->setSize({ 50, 50 });
-            e->setColor(Color::randomColor());
-        }
 
         this->shouldRun = true;
         
@@ -113,8 +108,8 @@ namespace Flux {
         Console::log("Exiting Application.\n");
 
         glfwMakeContextCurrent(nullptr);
-        
-        Window::Factory::activeWindows.clear();
+
+        this->factory = nullptr;
 
         glfwTerminate();
 
@@ -128,7 +123,7 @@ namespace Flux {
         const Float64 deltaTime = currentTime - lastTime;
         lastTime = currentTime;
 
-        for(auto& window : Window::Factory::windows()){
+        for(auto& window : Factory::windows()){
             window->draw(deltaTime);
         }
 
@@ -144,7 +139,7 @@ namespace Flux {
 
     void Application::update() {
 
-        while (shouldRun && !glfwWindowShouldClose(mainWindow->handle)) {
+        while (shouldRun) {
             
             glfwPollEvents();
             draw();
@@ -160,13 +155,6 @@ namespace Flux {
     void Application::onApplicationTerminate() { Console::log("Application received termination signal\n"); }
 
     void Application::registerCommands() {
-/*
-        const auto stopNode = CommandNode::make("Application.Stop");
-
-        stopNode->setNodeDescription("Exits the application.");
-        stopNode->addExecutable([](auto) { instance->stop(); });
-
-        Console::registerCommand(stopNode);*/
 
     }
 

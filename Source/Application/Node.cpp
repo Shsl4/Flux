@@ -1,4 +1,5 @@
 #include <Application/Node.h>
+#include <Flux/Factory.h>
 
 #include "Application/Socket.h"
 #include "Audio/Pipeline/FilterElement.h"

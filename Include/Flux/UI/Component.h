@@ -3,8 +3,10 @@
 #define SK_GL
 #define SK_METAL
 
-#include <skia/include/core/SkPathEffect.h>
+#include <skia/include/core/SkColorSpace.h>
 #include <skia/include/core/SkCanvas.h>
+#include <skia/include/core/SkSurface.h>
+#include <skia/include/core/SkPathEffect.h>
 #include <Flux/UI/Reactive.h>
 #include <Flux/UI/Color.h>
 
@@ -61,39 +63,6 @@ namespace Flux::UI {
     class Component : public Reactive {
         
     public:
-
-        class Factory final {
-
-            friend Allocator<Factory>;
-
-            Factory() = default;
-            
-            static inline Unique<Factory> factory = nullptr;
-            
-        public:
-        
-            template<class ComponentType, typename... Args> requires std::is_base_of_v<Component, ComponentType>
-            static ComponentType* create(Args&&... args) {
-                Console::log("Creating {}.\n", Type::name<ComponentType>());
-                auto* component = Allocator<ComponentType>::construct(std::forward<Args>(args)...);
-                instance()->components.add(component);
-                component->initialize();
-                return component;
-            }
-
-            ~Factory();
-
-            static bool valid(Component* component);
-
-            static void dispose(Component* component);
-
-        private:
-            
-            NODISCARD static Factory* instance();
-
-            SmartArray<Component> components;
-            
-        };
 
         Component() = default;
         

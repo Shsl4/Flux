@@ -63,7 +63,7 @@ def build_skia(debug):
         
     print("Syncing git dependencies for skia...")
 
-    proc = subprocess.run(['python', 'tools/git-sync-deps'], capture_output=True, text=True)
+    proc = subprocess.run(['python3', 'tools/git-sync-deps'], capture_output=True, text=True)
 
     if proc.returncode != 0:
         print(proc.stderr)
