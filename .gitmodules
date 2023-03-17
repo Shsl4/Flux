@@ -1,3 +1,18 @@
-[submodule "nucleus"]
-	path = nucleus
-	url = https://github.com/shsl4/Nucleus
+[submodule "Libraries/rtmidi"]
+	path = Libraries/rtmidi
+	url = https://github.com/thestk/rtmidi.git
+[submodule "Libraries/rtaudio"]
+	path = Libraries/rtaudio
+	url = https://github.com/thestk/rtaudio.git
+[submodule "Libraries/skia"]
+	path = Libraries/skia
+	url = https://skia.googlesource.com/skia.git
+[submodule "Libraries/glfw"]
+	path = Libraries/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "Libraries/Nucleus"]
+	path = Libraries/Nucleus
+	url = https://github.com/shsl4/Nucleus.git
+[submodule "Libraries/Vulkan-Headers"]
+	path = Libraries/Vulkan-Headers
+	url = https://github.com/KhronosGroup/Vulkan-Headers
