@@ -12,7 +12,7 @@ namespace Flux::Audio {
     }
 
     void PipelineInput::createComponent(Component* parent) {
-        this->component = Factory::create<InputNode>();
+        this->component = Factory::createComponent<InputNode>();
         parent->addChild(this->component);
     }
 
@@ -32,7 +32,7 @@ namespace Flux::Audio {
     }
 
     void PipelineOutput::createComponent(Component* parent) {
-        this->component = Factory::create<OutputNode>();
+        this->component = Factory::createComponent<OutputNode>();
         parent->addChild(this->component);
     }
 

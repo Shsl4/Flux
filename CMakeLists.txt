@@ -28,7 +28,8 @@ file(GLOB_RECURSE FLUX_DEPENDENCIES ${CMAKE_CURRENT_LIST_DIR}/Libraries/.build/*
 set(FLUX_DEPENDENCIES_INCLUDES ${CMAKE_CURRENT_LIST_DIR}/Libraries/ 
     ${CMAKE_CURRENT_LIST_DIR}/Libraries/skia/ 
     ${CMAKE_CURRENT_LIST_DIR}/Libraries/Nucleus/Include
-    ${CMAKE_CURRENT_LIST_DIR}/Libraries/glfw/include)
+    ${CMAKE_CURRENT_LIST_DIR}/Libraries/glfw/include
+    ${CMAKE_CURRENT_LIST_DIR}/Libraries/Vulkan-Headers/include)
 
 set(FLUX_ALL ${FLUX_SOURCES} ${FLUX_HEADERS} ${FLUX_INLINE})
 

@@ -20,7 +20,7 @@ namespace Flux {
         
         for (UInt i = 0; i < inputs; ++i) {
 
-            const auto child = Factory::create<Socket>();
+            const auto child = Factory::createComponent<Socket>();
             addChild(child);
             child->setSize({ socketSize, socketSize });
             child->setPosition({ 0.0f, baseHeight + headerSize + socketSize * f32(i) });
@@ -31,7 +31,7 @@ namespace Flux {
 
         for (UInt i = 0; i < outputs; ++i) {
 
-            const auto child = Factory::create<Socket>();
+            const auto child = Factory::createComponent<Socket>();
             addChild(child);
             child->setSize({ socketSize, socketSize });
             child->setPosition({ size().x - socketSize, baseHeight + headerSize + socketSize * f32(i) });
@@ -122,7 +122,7 @@ namespace Flux {
     
     void FilterNode::initialize() {
         
-        this->drawer = Factory::create<FilterGraph>(Point(0, headerSize), Point(baseWidth, drawerHeight));
+        this->drawer = Factory::createComponent<FilterGraph>(Point(0, headerSize), Point(baseWidth, drawerHeight));
         addChild(this->drawer);
         
     }

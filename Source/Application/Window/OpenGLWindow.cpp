@@ -27,7 +27,7 @@ namespace Flux {
         this->handle = glfwCreateWindow(windowWidth, windowHeight, title.begin().get(), nullptr, nullptr);
 
         if (!this->handle) {
-            throw Exceptions::Exception("Failed to create window handle!");
+            throw Exceptions::Exception("Failed to createComponent window handle!");
         }
         
         glfwMakeContextCurrent(this->handle);
@@ -57,7 +57,7 @@ namespace Flux {
         
         this->context = GrDirectContext::MakeGL(itf).release();
 
-        if(!this->context) throw Exceptions::Exception("Failed to create Skia GL context.");
+        if(!this->context) throw Exceptions::Exception("Failed to createComponent Skia GL context.");
 
         GrGLFramebufferInfo framebufferInfo;
 
@@ -72,13 +72,13 @@ namespace Flux {
                 
         this->surface = SkSurface::MakeFromBackendRenderTarget(this->context, backendRenderTarget, kBottomLeft_GrSurfaceOrigin, colorType, nullptr, nullptr);
 
-        if(!this->surface) throw Exceptions::Exception("Failed to create Skia Surface.");
+        if(!this->surface) throw Exceptions::Exception("Failed to createComponent Skia Surface.");
 
         this->canvas = this->surface->getCanvas();
 
         if(!this->surface) throw Exceptions::Exception("Failed to get Skia Canvas.");
         
-        this->rootComponent = Flux::Factory::create<Component>(Point(0, 0), Point(windowWidth, windowHeight));
+        this->rootComponent = Flux::Factory::createComponent<Component>(Point(0, 0), Point(windowWidth, windowHeight));
         this->cursorManager = Shared<CursorManager>::make();
         
         this->cursorManager->setComponent(this->rootComponent);
@@ -88,7 +88,7 @@ namespace Flux {
 
         Point p = { f32(windowWidth) - fw - 10.0f, f32(windowHeight) - fh - 10.0f };
 
-        this->rootComponent->addChild(Flux::Factory::create<FrameInfo>(p, Point(fw, fh)));
+        this->rootComponent->addChild(Flux::Factory::createComponent<FrameInfo>(p, Point(fw, fh)));
         
     }
 

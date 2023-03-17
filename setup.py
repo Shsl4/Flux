@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 
-import os, sys, shutil, subprocess, glob, win32api
+import glob
+import os
+import shutil
+import subprocess
+import sys
+
 
 class ConsoleColors:
     blue = '\033[94m'
@@ -10,8 +15,8 @@ class ConsoleColors:
     red = '\033[91m'
     reset = '\033[0m'
 
-def gen_skia_args(debug):
 
+def gen_skia_args(debug):
     args = {'is_official_build': True,
             'is_debug': False,
             'skia_use_metal': False,
@@ -24,7 +29,7 @@ def gen_skia_args(debug):
             'skia_use_system_libpng': False,
             'skia_use_system_libwebp': False,
             'skia_use_system_expat': False,
-            'skia_use_system_icu': False }
+            'skia_use_system_icu': False}
 
     if sys.platform == 'darwin':
         args['skia_use_metal'] = True
@@ -38,11 +43,10 @@ def gen_skia_args(debug):
         args['is_debug'] = True
         args['is_official_build'] = False
 
-    return ' '.join([ f'{key}={str(value).lower()}' for key, value in args.items() ] )
-    
+    return ' '.join([f'{key}={str(value).lower()}' for key, value in args.items()])
+
 
 def build_skia(debug):
-
     depot_tools_path = os.path.join(os.path.expanduser('~'), 'depot_tools')
 
     if not os.path.exists(depot_tools_path):
@@ -52,13 +56,14 @@ def build_skia(debug):
         if git_path is None:
             raise Exception('Git could not be found. Make sure it is installed.')
 
-        proc = subprocess.run(['git', 'clone', 'https://chromium.googlesource.com/chromium/tools/depot_tools.git', depot_tools_path])
+        proc = subprocess.run(
+            ['git', 'clone', 'https://chromium.googlesource.com/chromium/tools/depot_tools.git', depot_tools_path])
 
         if proc.returncode != 0:
             raise Exception('Failed to clone depot_tools! Are you connected to the internet?')
 
     os.chdir('skia')
-        
+
     print("Syncing git dependencies for skia. This might take a while.")
 
     proc = subprocess.run(['python3', 'tools/git-sync-deps'], capture_output=True, text=True)
@@ -66,15 +71,16 @@ def build_skia(debug):
     if proc.returncode != 0:
         print(proc.stderr)
         print(f'{ConsoleColors.yellow}Failed to sync skia deps!{ConsoleColors.reset}')
-    
+
     print('Now building skia. This might take a while.')
 
-    proc = subprocess.run(['./bin/gn', 'gen', 'out/build', f'--args={gen_skia_args(debug)}'], capture_output=True, text=True)
+    proc = subprocess.run(['./bin/gn', 'gen', 'out/build', f'--args={gen_skia_args(debug)}'], capture_output=True,
+                          text=True)
 
     if proc.returncode != 0:
         print(proc.stdout)
         raise Exception('Failed to generate project!')
-    
+
     if shutil.which('ninja') is None:
         raise Exception('Could not find ninja! Please check the README for instructions on how to install.')
 
@@ -87,13 +93,16 @@ def build_skia(debug):
 
     os.chdir('..')
 
-def cmake_build(name, debug):
+
+def cmake_build(name, debug, params=None):
+    if params is None:
+        params = []
 
     os.chdir(name)
 
-    type = 'Debug' if debug else 'Release'
+    build_type = 'Debug' if debug else 'Release'
 
-    proc = subprocess.run(['cmake', '-S', '.', '.build'], capture_output=True, text=True)
+    proc = subprocess.run(['cmake', '-S', '.', '.build'] + params, capture_output=True, text=True)
 
     if proc.returncode != 0:
         print(proc.stdout)
@@ -103,7 +112,7 @@ def cmake_build(name, debug):
 
     print(f'Now building {name}.')
 
-    proc = subprocess.run(['cmake', '--build', '.', '--config', type])
+    proc = subprocess.run(['cmake', '--build', '.', '--config', build_type])
 
     if proc.returncode != 0:
         raise Exception(f'Failed to build {name}!')
@@ -114,17 +123,15 @@ def cmake_build(name, debug):
 
 
 def build(debug):
-
     os.chdir('Libraries')
 
     try:
         build_skia(debug)
-        cmake_build('rtmidi', debug)
-        cmake_build('rtaudio', debug)
+        cmake_build('rtmidi', debug, ['-DRTMIDI_BUILD_STATIC_LIBS=1'])
+        cmake_build('rtaudio', debug, ['-DRTAUDIO_BUILD_STATIC_LIBS=1'])
         cmake_build('glfw', debug)
         cmake_build('Nucleus', debug)
     except Exception as message:
-        raise message
         print(f'{ConsoleColors.red}{message}{ConsoleColors.reset}')
         sys.stdout.flush()
         return 1
@@ -158,11 +165,11 @@ def build(debug):
 
     return 0
 
-def setup():
 
+def setup():
     cmake_path = shutil.which("cmake")
 
-    if(cmake_path is None):
+    if cmake_path is None:
         print("Could not find CMake. Make sure it is installed")
         return
 
@@ -194,9 +201,15 @@ def setup():
     os.chdir("..")
 
     if sys.platform == "darwin":
-        os.symlink(f'.cmake/Flux.xcodeproj', f'Flux.xcodeproj')
+        try:
+            os.symlink(f'.cmake/Flux.xcodeproj', f'Flux.xcodeproj')
+        except FileExistsError:
+            pass
+
     elif sys.platform == "win32":
-        os.system('pwsh -command "$Location = Get-Location; $WScriptObj = New-Object -ComObject (""WScript.Shell""); $Shortcut = $WscriptObj.CreateShortcut("""$Location\Flux.lnk"""); $Shortcut.TargetPath="""$Location\.cmake\Flux.sln"""; $Shortcut.Save()"')
+        os.system('pwsh -command "$Location = Get-Location; $WScriptObj = New-Object -ComObject (""WScript.Shell""); '
+                  '$Shortcut = $WscriptObj.CreateShortcut("""$Location\Flux.lnk"""); '
+                  '$Shortcut.TargetPath="""$Location\.cmake\Flux.sln"""; $Shortcut.Save()"')
 
 
 def purge(path):
@@ -206,8 +219,8 @@ def purge(path):
         except FileNotFoundError:
             pass
 
-def clean():
 
+def clean():
     purge(".cmake")
     purge("./Build")
     purge("./cmake-*")
@@ -216,6 +229,7 @@ def clean():
         os.unlink(file)
 
     print("Cleaned cmake and Build directories.")
+
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:

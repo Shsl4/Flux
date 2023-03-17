@@ -97,7 +97,7 @@ namespace Flux::Audio {
         }
 
         void createComponent(Component* parent) override {
-            this->component = Factory::create<LPFNode>();
+            this->component = Factory::createComponent<LPFNode>();
             parent->addChild(this->component);
         }
 
@@ -125,7 +125,7 @@ namespace Flux::Audio {
 
         void createComponent(Component* parent) override {
 
-            this->component = Factory::create<HPFNode>();
+            this->component = Factory::createComponent<HPFNode>();
             parent->addChild(this->component);
 
         }

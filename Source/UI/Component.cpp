@@ -31,10 +31,10 @@ namespace Flux::UI {
     Component* Component::addChild(Component* component) {
 
         nthrowif(!Factory::valid(this), "Trying to add child on an invalid component! "
-                                        "Make sure it is initialized, and use Component::Factory::create() to create components.");
+                                        "Make sure it is initialized, and use Component::Factory::create() to createComponent components.");
 
         nthrowif(!Factory::valid(component), "Trying to add an invalid component! "
-                                             "Use Component::Factory::create() to create components.");
+                                             "Use Component::Factory::create() to createComponent components.");
 
         nthrowif(component->parentComponent, "Trying to add a component that already has a parent!");
         

@@ -27,7 +27,7 @@ namespace Flux {
 
     void DropdownMenu::initialize() {
         
-        Component* child = addChild(Factory::create<Component>(Point(0, size().y), Point(size().x, 500)));
+        Component* child = addChild(Factory::createComponent<Component>(Point(0, size().y), Point(size().x, 500)));
         child->setColor(Color::fromHex(0xffffffff));
         child->setActive(false);
 

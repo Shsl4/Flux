@@ -23,7 +23,7 @@ namespace Flux {
         this->handle = glfwCreateWindow(windowWidth, windowHeight, title.begin().get(), nullptr, nullptr);
 
         if (!this->handle) {
-            throw Exceptions::Exception("Failed to create window handle!");
+            throw Exceptions::Exception("Failed to createComponent window handle!");
         }
 
         glfwSetKeyCallback(this->handle, &Window::inputCallback);
@@ -44,11 +44,12 @@ namespace Flux {
         
         this->dpiScale = [rawWindow backingScaleFactor];
                 
-        this->rootComponent = Factory::create<Component>(Point(0, 0), Point(windowWidth * dpiScale, windowHeight * dpiScale));
+        this->rootComponent = Factory::createComponent<Component>(Point(0, 0), Point(windowWidth * dpiScale,
+                                                                                     windowHeight * dpiScale));
         
         this->context = GrDirectContext::MakeMetal(device, queue);
 
-        if(!this->context) throw Exceptions::Exception("Failed to create Skia metal context.");
+        if(!this->context) throw Exceptions::Exception("Failed to createComponent Skia metal context.");
 
         constexpr SkColorType colorType = kBGRA_8888_SkColorType;
         Float32 sampleCount = [view sampleCount];
@@ -62,7 +63,7 @@ namespace Flux {
         Point p = { f32(windowWidth) - fw - 10.0f, f32(windowHeight) - fh - 10.0f};
         Point s = {fw, fh };
 
-        this->rootComponent->addChild(Flux::Factory::create<FrameInfo>(p, s));
+        this->rootComponent->addChild(Flux::Factory::createComponent<FrameInfo>(p, s));
 
     }
 

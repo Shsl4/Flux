@@ -13,3 +13,6 @@
 [submodule "Libraries/Nucleus"]
 	path = Libraries/Nucleus
 	url = https://github.com/shsl4/Nucleus.git
+[submodule "Libraries/Vulkan-Headers"]
+	path = Libraries/Vulkan-Headers
+	url = https://github.com/KhronosGroup/Vulkan-Headers

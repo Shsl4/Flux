@@ -3,11 +3,9 @@
 #include <Application/DragComponent.h>
 #include <Application/Node.h>
 #include <Application/Socket.h>
-
 #include <Application/LinkResolver.h>
 #include <Application/FilterGraph.h>
-
-#include "Application/DropdownMenu.h"
+#include <Application/DropdownMenu.h>
 
 using namespace Flux::UI;
 
@@ -96,7 +94,7 @@ namespace Flux {
         constexpr Int windowHeight = 720;
 
         this->mainWindow = Factory::createWindow(RenderBackend::Best, "Application", windowWidth, windowHeight);
-        
+
         initializeAudio();
 
         this->shouldRun = true;

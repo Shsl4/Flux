@@ -24,7 +24,7 @@ namespace Flux {
         ~Factory();
         
         template<class ComponentType, typename... Args> requires std::is_base_of_v<Component, ComponentType>
-        static ComponentType* create(Args&&... args) {
+        static ComponentType* createComponent(Args&&... args) {
             auto* component = Allocator<ComponentType>::construct(std::forward<Args>(args)...);
             factory->components.add(component);
             component->initialize();
