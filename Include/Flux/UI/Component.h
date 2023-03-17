@@ -1,7 +1,15 @@
 #pragma once
 
 #define SK_GL
+
+#ifdef __APPLE__
 #define SK_METAL
+#elif defined(_WIN64)
+#define SK_DIRECT3D
+// #define SK_VULKAN
+#else
+// #define SK_VULKAN
+#endif
 
 #include <skia/include/core/SkColorSpace.h>
 #include <skia/include/core/SkCanvas.h>

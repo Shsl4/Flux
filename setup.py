@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os, sys, shutil, subprocess, glob, pathlib
+import os, sys, shutil, subprocess, glob, win32api
 
 class ConsoleColors:
     blue = '\033[94m'
@@ -52,38 +52,31 @@ def build_skia(debug):
         if git_path is None:
             raise Exception('Git could not be found. Make sure it is installed.')
 
-        proc = subprocess.run(['git', 'clone', 'https://chromium.googlesource.com/chromium/tools/depot_tools.git', '~/depot_tools'])
+        proc = subprocess.run(['git', 'clone', 'https://chromium.googlesource.com/chromium/tools/depot_tools.git', depot_tools_path])
 
         if proc.returncode != 0:
             raise Exception('Failed to clone depot_tools! Are you connected to the internet?')
 
-    os.environ['PATH'] += os.pathsep + depot_tools_path
-
     os.chdir('skia')
         
-    print("Syncing git dependencies for skia...")
+    print("Syncing git dependencies for skia. This might take a while.")
 
     proc = subprocess.run(['python3', 'tools/git-sync-deps'], capture_output=True, text=True)
 
     if proc.returncode != 0:
         print(proc.stderr)
         print(f'{ConsoleColors.yellow}Failed to sync skia deps!{ConsoleColors.reset}')
+    
+    print('Now building skia. This might take a while.')
 
-    print("Fetching ninja...")
-
-    proc = subprocess.run('bin/fetch-ninja', capture_output=True, text=True)
-
-    if proc.returncode != 0:
-        print(proc.stdout)
-        raise Exception('Failed to fetch ninja!')
-
-    proc = subprocess.run(['bin/gn', 'gen', 'out/build', f'--args={gen_skia_args(debug)}'], capture_output=True, text=True)
+    proc = subprocess.run(['./bin/gn', 'gen', 'out/build', f'--args={gen_skia_args(debug)}'], capture_output=True, text=True)
 
     if proc.returncode != 0:
         print(proc.stdout)
         raise Exception('Failed to generate project!')
-
-    print('Now building skia. This might take a while.')
+    
+    if shutil.which('ninja') is None:
+        raise Exception('Could not find ninja! Please check the README for instructions on how to install.')
 
     proc = subprocess.run(['ninja', '-C', 'out/build'])
 
@@ -94,30 +87,11 @@ def build_skia(debug):
 
     os.chdir('..')
 
-def build_rt(name, debug):
-
-    os.chdir(name)
-    
-    print(f'Now building {name}.')
-
-    proc = subprocess.run('./autogen.sh', capture_output=True, text=True)
-
-    if proc.returncode != 0:
-        print(proc.stdout)
-        raise Exception(f'{name} autogen failed!')
-
-    proc = subprocess.run('make')
-
-    if proc.returncode != 0:
-        raise Exception(f'Failed to build {name}!')
-
-    print(f'{ConsoleColors.green}Successfully built {name}.{ConsoleColors.reset}')
-
-    os.chdir('..')
-
 def cmake_build(name, debug):
 
     os.chdir(name)
+
+    type = 'Debug' if debug else 'Release'
 
     proc = subprocess.run(['cmake', '-S', '.', '.build'], capture_output=True, text=True)
 
@@ -129,7 +103,7 @@ def cmake_build(name, debug):
 
     print(f'Now building {name}.')
 
-    proc = subprocess.run('make')
+    proc = subprocess.run(['cmake', '--build', '.', '--config', type])
 
     if proc.returncode != 0:
         raise Exception(f'Failed to build {name}!')
@@ -145,12 +119,14 @@ def build(debug):
 
     try:
         build_skia(debug)
-        build_rt('rtmidi', debug)
-        build_rt('rtaudio', debug)
+        cmake_build('rtmidi', debug)
+        cmake_build('rtaudio', debug)
         cmake_build('glfw', debug)
         cmake_build('Nucleus', debug)
     except Exception as message:
+        raise message
         print(f'{ConsoleColors.red}{message}{ConsoleColors.reset}')
+        sys.stdout.flush()
         return 1
 
     try:
@@ -158,11 +134,23 @@ def build(debug):
     except FileExistsError:
         pass
 
-    shutil.copy('skia/out/build/libSkia.a', '.build')
-    shutil.copy('rtmidi/.libs/librtmidi.a', '.build')
-    shutil.copy('rtaudio/.libs/librtaudio.a', '.build')
-    shutil.copy('glfw/.build/src/libglfw3.a', '.build')
-    shutil.copy('Nucleus/.build/libNucleus.a', '.build')
+    if sys.platform == "win32":
+
+        path = "Debug" if debug else "Release"
+        nucleus_name = "Nucleusd" if debug else "Nucleus"
+
+        shutil.copy('skia/out/build/skia.lib', '.build')
+        shutil.copy(f'rtmidi/.build/{path}/rtmidi.lib', '.build')
+        shutil.copy(f'rtaudio/.build/{path}/rtaudio.lib', '.build')
+        shutil.copy(f'glfw/.build/src/{path}/glfw3.lib', '.build')
+        shutil.copy(f'Nucleus/.build/{path}/{nucleus_name}.lib', '.build')
+
+    else:
+        shutil.copy('skia/out/build/libSkia.a', '.build')
+        shutil.copy('rtmidi/.build/librtmidi.a', '.build')
+        shutil.copy('rtaudio/.build/librtaudio.a', '.build')
+        shutil.copy('glfw/.build/src/libglfw3.a', '.build')
+        shutil.copy('Nucleus/.build/libNucleus.a', '.build')
 
     print(f'{ConsoleColors.green}Successfully built all dependencies.{ConsoleColors.reset}')
 
@@ -180,7 +168,7 @@ def setup():
 
     if not os.path.exists('Libraries/.build'):
         print('Dependencies binary folder not found. Now building dependencies...')
-        if build(True) != 0:
+        if build(False) != 0:
             return 1
 
     try:
@@ -191,14 +179,11 @@ def setup():
     os.chdir(".cmake")
 
     generator = "Unix Makefiles"
-    ext = ""
 
     if sys.platform == "darwin":
         generator = "Xcode"
-        ext = ".xcodeproj"
     elif sys.platform == "win32":
         generator = "Visual Studio 17 2022"
-        ext = ".sln"
 
     proc = subprocess.run([cmake_path, "..", "-G", generator])
 
@@ -208,11 +193,10 @@ def setup():
 
     os.chdir("..")
 
-    if ext != "":
-        try:
-            os.symlink(f'.cmake/Flux{ext}', f'Flux{ext}')
-        except FileExistsError:
-            pass
+    if sys.platform == "darwin":
+        os.symlink(f'.cmake/Flux.xcodeproj', f'Flux.xcodeproj')
+    elif sys.platform == "win32":
+        os.system('pwsh -command "$Location = Get-Location; $WScriptObj = New-Object -ComObject (""WScript.Shell""); $Shortcut = $WscriptObj.CreateShortcut("""$Location\Flux.lnk"""); $Shortcut.TargetPath="""$Location\.cmake\Flux.sln"""; $Shortcut.Save()"')
 
 
 def purge(path):
