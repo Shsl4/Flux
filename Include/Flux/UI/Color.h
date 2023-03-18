@@ -5,7 +5,7 @@
 
 using namespace Nucleus;
 
-namespace Flux::UI {
+namespace Flux {
 
     struct Color {
 
@@ -88,7 +88,7 @@ namespace Flux::UI {
             
         }
         
-        NODISCARD SkColor4f skColor() { return *reinterpret_cast<SkColor4f*>(this); }
+        NODISCARD SkColor4f skColor() const { return *reinterpret_cast<const SkColor4f*>(this); }
         
         NODISCARD bool transparent() const { return Math::feq(0.0f, a); }
         NODISCARD Float32 red() const { return r; }

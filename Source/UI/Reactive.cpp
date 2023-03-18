@@ -1,6 +1,6 @@
 #include <Flux/UI/Reactive.h>
 
-namespace Flux::UI {
+namespace Flux {
 
     void Reactive::buttonDown(MouseButton button, Float64 x, Float64 y) {
         pressedState[static_cast<size_t>(button)] = true;

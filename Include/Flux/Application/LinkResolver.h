@@ -5,7 +5,7 @@
 
 namespace Flux {
 
-    using namespace UI;
+
     
     class LinkResolver : public Component {
 

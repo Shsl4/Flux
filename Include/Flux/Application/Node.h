@@ -7,7 +7,7 @@
 
 namespace Flux {
 
-    using namespace UI;
+
 
     class Node : public Component {
 

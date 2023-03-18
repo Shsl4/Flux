@@ -4,8 +4,6 @@
 
 namespace Flux {
 
-    using namespace UI;
-    
     class DragComponent : public Component {
 
     public:

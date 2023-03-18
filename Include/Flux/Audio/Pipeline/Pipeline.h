@@ -10,7 +10,7 @@
 
 namespace Flux::Audio {
     
-    using namespace Flux::UI;
+    using namespace Flux;
     
     class Pipeline : public AudioObject {
 

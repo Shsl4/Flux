@@ -23,7 +23,7 @@ namespace Flux {
         this->handle = glfwCreateWindow(windowWidth, windowHeight, title.begin().get(), nullptr, nullptr);
 
         if (!this->handle) {
-            throw Exceptions::Exception("Failed to createComponent window handle!");
+            throw Exceptions::Exception("Failed to create window handle!");
         }
 
         glfwSetKeyCallback(this->handle, &Window::inputCallback);
@@ -42,28 +42,16 @@ namespace Flux {
         this->mtkView = view;
         this->mtlQueue = queue;
         
-        this->dpiScale = [rawWindow backingScaleFactor];
+        this->dpiScale = f32([rawWindow backingScaleFactor]);
                 
-        this->rootComponent = Factory::createComponent<Component>(Point(0, 0), Point(windowWidth * dpiScale,
-                                                                                     windowHeight * dpiScale));
+        this->rootComponent = Factory::createComponent<Component>(Point(0, 0), Point(windowWidth,windowHeight));
         
         this->context = GrDirectContext::MakeMetal(device, queue);
 
-        if(!this->context) throw Exceptions::Exception("Failed to createComponent Skia metal context.");
-
-        constexpr SkColorType colorType = kBGRA_8888_SkColorType;
-        Float32 sampleCount = [view sampleCount];
+        if(!this->context) throw Exceptions::Exception("Failed to create Skia metal context.");
 
         this->cursorManager = Shared<CursorManager>::make();
         this->cursorManager->setComponent(this->rootComponent);
-
-        constexpr Float32 fw = 300.0f;
-        constexpr Float32 fh = 30.0f;
-
-        Point p = { f32(windowWidth) - fw - 10.0f, f32(windowHeight) - fh - 10.0f};
-        Point s = {fw, fh };
-
-        this->rootComponent->addChild(Flux::Factory::createComponent<FrameInfo>(p, s));
 
     }
 
@@ -71,10 +59,10 @@ namespace Flux {
         
         @autoreleasepool {
                     
-            MTKView* view = (__bridge MTKView*)this->mtkView;
-            id<MTLCommandQueue> queue = (__bridge id<MTLCommandQueue>)this->mtlQueue;
+            auto view = (__bridge MTKView*)this->mtkView;
+            auto queue = (__bridge id<MTLCommandQueue>)this->mtlQueue;
             id<MTLCommandBuffer> buffer = [queue commandBuffer];
-            
+
             auto surface = SkSurface::MakeFromMTKView(this->context.get(), view, kTopLeft_GrSurfaceOrigin, f32([view sampleCount]), kBGRA_8888_SkColorType, nullptr, nullptr);
             
             auto* canvas = surface->getCanvas();
@@ -84,10 +72,9 @@ namespace Flux {
             this->rootComponent->draw(canvas, deltaTime);
                         
             context->flushAndSubmit();
-            
-            id<MTLCommandBuffer> commandBuffer = [queue commandBuffer];
-            [commandBuffer presentDrawable:[view currentDrawable]];
-            [commandBuffer commit];
+
+            [buffer presentDrawable:[view currentDrawable]];
+            [buffer commit];
             
         }
         

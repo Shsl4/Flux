@@ -2,7 +2,7 @@
 
 #include <Flux/UI/Component.h>
 
-namespace Flux::UI {
+namespace Flux {
 
     class CursorManager {
         

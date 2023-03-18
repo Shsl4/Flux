@@ -1,6 +1,6 @@
 #include <UI/CursorManager.h>
 
-namespace Flux::UI {
+namespace Flux {
 
     void CursorManager::buttonDown(const MouseButton button) {
         

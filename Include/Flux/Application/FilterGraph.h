@@ -8,7 +8,7 @@
 
 namespace Flux{
 
-    using namespace UI;
+
 
     template<typename NumberType>
     struct Range{

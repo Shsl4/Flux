@@ -5,7 +5,7 @@
 
 namespace Flux {
 
-    using namespace UI;
+
 
     class ColorAnimation : public Animation {
 

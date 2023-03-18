@@ -18,12 +18,12 @@ namespace Flux {
 
         if(action) {
 
-            appWindow->cursorManager->buttonDown(static_cast<UI::MouseButton>(button));
+            appWindow->cursorManager->buttonDown(static_cast<MouseButton>(button));
             
         }
         else {
 
-            const auto mouseButton = static_cast<UI::MouseButton>(button);
+            const auto mouseButton = static_cast<MouseButton>(button);
             const Float64 newTime = glfwGetTime();
 
             if(newTime - appWindow->lastClickTime < 0.250 && mouseButton == appWindow->lastButtonPressed) {
@@ -33,7 +33,7 @@ namespace Flux {
             appWindow->lastClickTime = newTime;
             appWindow->lastButtonPressed = mouseButton;
 
-            appWindow->cursorManager->buttonUp(static_cast<UI::MouseButton>(button));
+            appWindow->cursorManager->buttonUp(static_cast<MouseButton>(button));
             
         }
         

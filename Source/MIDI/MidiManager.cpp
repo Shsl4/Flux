@@ -73,7 +73,7 @@ namespace Flux {
             this->midiIn = Allocator<RtMidiIn>::construct();
         }
         catch(std::exception const&){
-            throw Exceptions::Exception("Failed to createComponent MIDI Manager.");
+            throw Exceptions::Exception("Failed to create MIDI Manager.");
         }
         
         midiIn->setCallback(&MidiManager::eventCallback, this);

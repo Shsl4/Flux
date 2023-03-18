@@ -17,8 +17,9 @@
 #include <skia/include/core/SkPathEffect.h>
 #include <Flux/UI/Reactive.h>
 #include <Flux/UI/Color.h>
+#include <Flux/UI/EdgeInsets.h>
 
-namespace Flux::UI {
+namespace Flux {
 
     struct Point {
 
@@ -29,7 +30,7 @@ namespace Flux::UI {
         Point operator+(Point const& other) const {
             return { this->x + other.x, this->y + other.y };
         }
-        
+
         Point operator-(Point const& other) const {
             return { this->x - other.x, this->y - other.y };
         }
@@ -38,11 +39,27 @@ namespace Flux::UI {
             return { this->x * other.x, this->y * other.y };
         }
 
+        Point& operator+=(Point const& other) {
+            this->x += other.x;
+            this->y += other.y;
+            return *this;
+        }
+
+        Point& operator-=(Point const& other) {
+            this->x -= other.x;
+            this->y -= other.y;
+            return *this;
+        }
+
         Float32 x = 0.0f;
         Float32 y = 0.0f;
-        
+
+    public:
+
+        const static Point zero;
+
     };
-    
+
     struct Transform {
 
         Transform() = default;
@@ -108,17 +125,21 @@ namespace Flux::UI {
 
         NODISCARD Transform globalTransform() const;
         
-        NODISCARD FORCEINLINE Transform transform() const { return this->localTransform; }
-        
-        NODISCARD FORCEINLINE Point position() const { return this->localTransform.position; }
-        
-        NODISCARD FORCEINLINE Point size() const { return this->localTransform.size; }
-        
+        NODISCARD FORCEINLINE Transform const& transform() const { return this->localTransform; }
+
         NODISCARD FORCEINLINE Float32 rotation() const { return this->localTransform.rotation; }
+
+        NODISCARD FORCEINLINE Point const& position() const { return this->localTransform.position; }
         
+        NODISCARD FORCEINLINE Point const& size() const { return this->localTransform.size; }
+
         NODISCARD FORCEINLINE Component* parent() const { return this->parentComponent; }
-        
-        NODISCARD FORCEINLINE Color color() const { return this->renderColor; }
+
+        NODISCARD FORCEINLINE Color const& color() const { return this->renderColor; }
+
+        NODISCARD FORCEINLINE EdgeInsets& insets() { return this->edgeInsets; }
+
+        NODISCARD FORCEINLINE EdgeInsets const& insets() const { return this->edgeInsets; }
         
         NODISCARD FORCEINLINE bool visible() const { return this->bVisible; }
 
@@ -138,11 +159,15 @@ namespace Flux::UI {
 
         virtual void parentLinked() {}
 
+        virtual void colorChanged() {}
+
         virtual void childAdded(Component* component) {}
         
         virtual void childWillDispose(Component* component) {}
         
         virtual void childModified(Component* component);
+
+        NODISCARD virtual bool supportsChildren() const;
 
     private:
 
@@ -150,6 +175,7 @@ namespace Flux::UI {
         Color renderColor = Colors::white;
         Component* parentComponent = nullptr;
         MutableArray<Component*> childrenArray = {};
+        EdgeInsets edgeInsets = {};
         bool bVisible = true;
     
     };

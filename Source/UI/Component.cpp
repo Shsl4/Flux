@@ -1,8 +1,10 @@
 #include <UI/Component.h>
 #include <Flux/Factory.h>
 
-namespace Flux::UI {
-    
+namespace Flux {
+
+    const Point Point::zero = {};
+
     Component::Component(Transform const& t): localTransform(t) {
             
     }
@@ -14,13 +16,20 @@ namespace Flux::UI {
     void Component::draw(SkCanvas* canvas, Float64 deltaTime) {
 
         if(!visible()) { return; }
-        
-        SkPaint paint;
-        const auto t = globalTransform();
-        const SkRect rect = SkRect::MakeXYWH(t.position.x, t.position.y, t.size.x, t.size.y);
-        
-        paint.setColor(renderColor.skColor());
-        canvas->drawRect(rect, paint);
+
+        if(!color().transparent()){
+
+            SkPaint paint;
+            const auto t = globalTransform();
+            const SkRect rect = SkRect::MakeXYWH(t.position.x + edgeInsets.left,
+                                                 t.position.y + edgeInsets.top,
+                                                 t.size.x - edgeInsets.left - edgeInsets.right,
+                                                 t.size.y - edgeInsets.top - edgeInsets.bottom);
+
+            paint.setColor(renderColor.skColor());
+            canvas->drawRect(rect, paint);
+
+        }
 
         for(const auto& child : childrenArray) {
             child->draw(canvas, deltaTime);
@@ -37,13 +46,15 @@ namespace Flux::UI {
                                              "Use Component::Factory::create() to createComponent components.");
 
         nthrowif(component->parentComponent, "Trying to add a component that already has a parent!");
-        
+
         nthrowif(component == this, "Trying to add a component to itself!");
+
+        nthrowif(!supportsChildren(), "Trying to add a child to a component that does not support children!");
 
         component->parentComponent = this;
         childrenArray += component;
-        childAdded(component);
         component->parentLinked();
+        childAdded(component);
 
         return component;
         
@@ -98,6 +109,7 @@ namespace Flux::UI {
 
     void Component::setColor(Color const& c) {
         this->renderColor = c;
+        colorChanged();
     }
 
     void Component::setVisible(bool state) {
@@ -143,6 +155,10 @@ namespace Flux::UI {
     void Component::childModified(Component* component) {
         
     }
-    
+
+    bool Component::supportsChildren() const {
+        return true;
+    }
+
 }
 

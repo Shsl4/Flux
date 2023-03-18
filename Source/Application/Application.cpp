@@ -6,8 +6,11 @@
 #include <Application/LinkResolver.h>
 #include <Application/FilterGraph.h>
 #include <Application/DropdownMenu.h>
+#include <UI/Text.h>
+#include <UI/Stack.h>
+#include <UI/FrameInfo.h>
 
-using namespace Flux::UI;
+using namespace Flux;
 
 namespace Flux {
 
@@ -94,6 +97,43 @@ namespace Flux {
         constexpr Int windowHeight = 720;
 
         this->mainWindow = Factory::createWindow(RenderBackend::Best, "Application", windowWidth, windowHeight);
+
+        auto* stack = Factory::createComponent<VStack>(VAlignment::center, HAlignment::center);
+        auto* stack2 = Factory::createComponent<HStack>(VAlignment::center, HAlignment::center);
+        auto* stack3 = Factory::createComponent<HStack>(VAlignment::center, HAlignment::center);
+        auto* stack4 = Factory::createComponent<HStack>(VAlignment::center, HAlignment::center);
+        auto* stack5 = Factory::createComponent<HStack>(VAlignment::center, HAlignment::center);
+
+        stack->setSpacing(50);
+        stack2->setColor(Color::randomColor());
+        stack3->setColor(Color::randomColor());
+        stack4->setColor(Color::randomColor());
+        stack5->setColor(Color::randomColor());
+
+        auto* text = Factory::createComponent<TextRenderer>("Hello, world!", 50);
+        auto* text2 = Factory::createComponent<TextRenderer>("c[0] = -7", 50);
+        auto* text3 = Factory::createComponent<TextRenderer>("Text!", 50);
+        auto* text4 = Factory::createComponent<TextRenderer>("[{}] + - _ = & * !", 50);
+
+        this->mainWindow->mainView()->addChild(stack);
+
+        stack->addChild(stack2);
+        stack->addChild(stack3);
+        stack->addChild(stack4);
+        stack->addChild(stack5);
+
+        stack2->addChild(text);
+        stack3->addChild(text2);
+        stack4->addChild(text3);
+        stack5->addChild(text4);
+
+        constexpr Float32 fw = 300.0f;
+        constexpr Float32 fh = 30.0f;
+
+        Point p = { f32(windowWidth) - fw - 10.0f, f32(windowHeight) - fh - 10.0f};
+        Point s = {fw, fh };
+
+        mainWindow->mainView()->addChild(Flux::Factory::createComponent<FrameInfo>(p, s));
 
         initializeAudio();
 

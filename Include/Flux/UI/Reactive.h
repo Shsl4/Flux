@@ -4,7 +4,7 @@
 
 using namespace Nucleus;
 
-namespace Flux::UI {
+namespace Flux {
 
     enum class MouseButton : size_t {
 

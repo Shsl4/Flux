@@ -175,7 +175,7 @@ def setup():
 
     if not os.path.exists('Libraries/.build'):
         print('Dependencies binary folder not found. Now building dependencies...')
-        if build(False) != 0:
+        if build(True) != 0:
             return 1
 
     try:
