@@ -1,4 +1,5 @@
 #include <UI/CursorManager.h>
+#include <Flux/Factory.h>
 
 namespace Flux {
 
@@ -7,12 +8,20 @@ namespace Flux {
         if (auto* component = componentAtPosition(master, cursorPosition())) {
             
             stateMap.add(button, component);
+            component->pressedState[static_cast<size_t>(button)] = true;
             component->buttonDown(button, cursorX, cursorY);
 
             if(focused == component) { return; }
             
             if(focused) {
                 focused->lostFocus();
+            }
+
+            if(!Factory::valid(component)) {
+                stateMap.removeByKey(button);
+                hovered = nullptr;
+                focused = nullptr;
+                return;
             }
             
             focused = component;
@@ -35,6 +44,7 @@ namespace Flux {
         try {
 
             Reactive* target = stateMap[button];
+            target->pressedState[static_cast<size_t>(button)] = false;
             target->buttonUp(button, cursorX, cursorY, componentAtPosition(master, cursorPosition()));
             stateMap.removeByKey(button);
             
@@ -111,6 +121,7 @@ namespace Flux {
 
             hovered->unHovered();
             hovered = nullptr;
+
         }
         
     }
@@ -143,9 +154,14 @@ namespace Flux {
 
             auto const& child = children[i - 1];
 
-            if(componentAtPosition(child, p)) { return child; }
+            if(!Factory::valid(child)) continue;
 
-            if(child->inBounds(p) && child->active()) { return child; }
+            if(Component* sub = componentAtPosition(child, p)) {
+                return sub;
+            }
+
+            if(child->inBounds(p) && child->active()) {
+                return child; }
             
         }
 

@@ -103,7 +103,7 @@ namespace Flux {
         
         SkPaint paint;
 
-        const auto col = hasLink() ? node->getHeaderColor().skColor() : color().darker(10).skColor();
+        const auto col = hasLink() ? node->getHeaderColor().skColor() : color().skColor();
 
         const auto root = globalTransform().centeredPosition();
         

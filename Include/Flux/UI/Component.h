@@ -105,6 +105,8 @@ namespace Flux {
         
         void dispose();
 
+        void disposeAllChildren();
+
         void setPosition(Point const& p);
 
         void setSize(Point const& s);
@@ -161,6 +163,8 @@ namespace Flux {
 
         virtual void colorChanged() {}
 
+        virtual void parentModified() {}
+
         virtual void childAdded(Component* component) {}
         
         virtual void childWillDispose(Component* component) {}
@@ -177,7 +181,7 @@ namespace Flux {
         MutableArray<Component*> childrenArray = {};
         EdgeInsets edgeInsets = {};
         bool bVisible = true;
-    
+
     };
 
 }

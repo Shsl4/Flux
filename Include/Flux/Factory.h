@@ -38,14 +38,15 @@ namespace Flux {
         static bool valid(Component* component);
 
         static void dispose(Component* component);
-        
+
         NODISCARD FORCEINLINE static SmartArray<Window> const& windows() { return factory->activeWindows; }
-        
+
     private:
         
         static inline Factory* factory = nullptr;
         
         SmartArray<Component> components = {};
+
         SmartArray<Window> activeWindows = {};
 
     };

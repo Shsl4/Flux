@@ -11,13 +11,11 @@ namespace Flux {
 
         FrameInfo(Point const& p, Point const& s) : Component(p, s) {
 
-            setColor(Color::fromHex(0x606060ff));
-
         }
 
         void initialize() override {
 
-            this->text = Flux::Factory::createComponent<Text>(Point(10, 0), size(), nullptr, 12);
+            this->text = Flux::Factory::createComponent<Text>(Point::zero, size(), nullptr, 14.0f, VAlignment::top, HAlignment::left);
             this->addChild(text);
 
         }
@@ -37,14 +35,8 @@ namespace Flux {
 
             SkPaint paint;
 
-            paint.setColor(color().skColor());
-
-            const Point pos = globalTransform().position;
-            const SkRect rect = SkRect::MakeXYWH(pos.x, pos.y, size().x, size().y);
-
-            canvas->drawRoundRect(rect, 10, 10, paint);
-
-            String value = String::format("Draw: {} FPS ({}ms)", 1000.0 * (1.0 / lastFrameTime), lastFrameTime);
+            const auto fps = i64(1000.0 * (1.0 / lastFrameTime));
+            String value = String::format("{} FPS", fps > 100000 ? 0 : fps);
             text->setText(value);
             text->draw(canvas, deltaTime);
 

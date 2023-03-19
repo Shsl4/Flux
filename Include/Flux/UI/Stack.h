@@ -16,26 +16,32 @@ namespace Flux {
 
     public:
 
-        Stack(VAlignment vAlign, HAlignment hAlign);
+        Stack(Point const& p, Point const& s, VAlignment vAlign, HAlignment hAlign, bool stretch = false);
 
         NODISCARD FORCEINLINE Float32 spacing() const { return childSpacing; }
 
-        void setSpacing(Float32 value) { this->childSpacing = value; }
+        void setSpacing(Float32 value) {
+            this->childSpacing = value;
+            realign();
+        }
 
         virtual void realign() = 0;
 
     protected:
 
-        void childAdded(Component* child) override;
+        void childWillDispose(Component *component) override;
 
-        void parentLinked() override;
+        void parentModified() override;
 
         void modified() override;
+
+        void childAdded(Component *component) override;
 
         HAlignment hAlign = HAlignment::center;
         VAlignment vAlign = VAlignment::center;
 
         Float32 childSpacing = 0.0f;
+        bool bStretchChildren = false;
 
     };
 
@@ -43,7 +49,7 @@ namespace Flux {
 
     public:
 
-        HStack(VAlignment vAlign, HAlignment hAlign);
+        HStack(Point const& p, Point const& s, VAlignment vAlign, HAlignment hAlign, bool stretch = false);
 
         void realign() override;
 
@@ -59,7 +65,7 @@ namespace Flux {
 
     public:
 
-        VStack(VAlignment vAlign, HAlignment hAlign);
+        VStack(Point const& p, Point const& s, VAlignment vAlign, HAlignment hAlign, bool stretch = false);
 
         void realign() override;
 

@@ -54,7 +54,7 @@ namespace Flux {
     void Window::closeCallback(GLFWwindow* window) {
 
         Factory::destroyWindow(windowFromHandle(window));
-    
+
     }
 
 
@@ -66,6 +66,12 @@ namespace Flux {
             }
         }
         return nullptr;
+    }
+
+    void Window::resizeCallback(GLFWwindow *window, Int width, Int height) {
+
+        windowFromHandle(window)->resized(width, height);
+
     }
 
 }

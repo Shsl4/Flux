@@ -7,6 +7,8 @@ namespace Flux {
 
     void TextRenderer::draw(SkCanvas *canvas, Float64 deltaTime) {
 
+        if(textValue.isEmpty()) return;
+
         const Point pos = globalTransform().position;
 
         canvas->drawSimpleText(&textValue[0], textValue.size(), SkTextEncoding::kUTF8,
@@ -51,7 +53,6 @@ namespace Flux {
         Float32 height = 0.0f;
         Float32 offset = 0.0f;
 
-        int i = 0;
         for(auto & glyph : glyphs){
             width += glyph->advanceX();
             auto off = f32(glyph->top() + glyph->height());
@@ -87,6 +88,8 @@ namespace Flux {
 
     TextRenderer::TextRenderer(String const& text, Float32 textSize) {
 
+        auto typeface = SkTypeface::MakeFromFile("../Resources/Fonts/VarelaRound-Regular.ttf");
+        this->font = SkFont(typeface);
         setColor(Colors::white);
         setText(text);
         setTextSize(textSize);
@@ -102,6 +105,7 @@ namespace Flux {
 
     void Text::initialize() {
         addChild(renderer);
+        realign();
     }
 
     bool Text::supportsChildren() const {
@@ -135,22 +139,40 @@ namespace Flux {
 
     Float32 Text::textX() const {
 
-        if (hAlign == HAlignment::left) return 0.0f;
+        Float32 offset = renderer->textSize() / 4.0f;
 
-        return hAlign == HAlignment::right ? size().x - renderer->size().x : size().x / 2.0f - renderer->size().x / 2.0f;
+        if (hAlign == HAlignment::left) return offset;
+
+        return hAlign == HAlignment::right ? size().x - renderer->size().x - offset : size().x / 2.0f - renderer->size().x / 2.0f;
 
     }
 
     Float32 Text::textY() const {
 
-        if(vAlign == VAlignment::top) return 0.0f;
+        Float32 offset = renderer->textSize() / 4.0f;
 
-        return vAlign == VAlignment::bottom ? size().y - renderer->size().y : size().y / 2.0f - renderer->size().y / 2.0f;
+        if(vAlign == VAlignment::top) return offset;
+
+        return vAlign == VAlignment::bottom ? size().y - renderer->size().y - offset : size().y / 2.0f - renderer->size().y / 2.0f;
 
     }
 
     void Text::draw(SkCanvas *canvas, Float64 deltaTime) {
+
+        Point pos = globalTransform().position;
+        canvas->save();
+        SkRect rect { pos.x, pos.y, pos.x + size().x, pos.y + size().y };
+        canvas->clipRect(rect);
         renderer->draw(canvas, deltaTime);
+        canvas->restore();
+    }
+
+    void Text::setAlignment(VAlignment v, HAlignment h) {
+
+        this->vAlign = v;
+        this->hAlign = h;
+        realign();
+
     }
 
 }

@@ -13,15 +13,15 @@ namespace Flux {
     Factory::~Factory() {
 
         while (components.size() > 0) {
-        
-            auto* highest = components[0];
+
+            auto *highest = components[0];
 
             while (highest->parent()) {
                 highest = highest->parent();
             }
-        
+
             highest->dispose();
-        
+
         }
     
     }
@@ -42,11 +42,11 @@ namespace Flux {
     }
 
     void Factory::destroyWindow(Window* window){
-    
+        
         if (factory->activeWindows[0] == window) {
             Application::instance()->stop();
         }
-        
+
         factory->activeWindows.remove(window);
         
     }
@@ -84,7 +84,7 @@ namespace Flux {
                 throw Exceptions::Exception("Unsupported backend.");
         }
 
-        window->mainView()->setColor(Color::fromHex(0x151515ff));
+        window->mainView()->setColor(ColorScheme::onyx.base);
     
         factory->activeWindows += window;
 

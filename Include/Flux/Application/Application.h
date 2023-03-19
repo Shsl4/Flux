@@ -15,7 +15,7 @@ namespace Flux {
         void run();
 
         void stop();
-        
+
         NODISCARD FORCEINLINE static Application* instance() { return application; }
 
     private:
@@ -33,6 +33,8 @@ namespace Flux {
         static void onApplicationTerminate();
         
         static void registerCommands();
+
+        static void renderThread(Application* app);
 
         bool shouldRun = true;
 

@@ -3,14 +3,15 @@
 namespace Flux {
 
     void Reactive::buttonDown(MouseButton button, Float64 x, Float64 y) {
-        pressedState[static_cast<size_t>(button)] = true;
+
     }
 
     void Reactive::doubleClick(MouseButton button, Float64 x, Float64 y) {
+
     }
 
     void Reactive::buttonUp(MouseButton button, Float64 x, Float64 y, Reactive* upTarget) {
-        pressedState[static_cast<size_t>(button)] = false;
+
     }
     
     void Reactive::scroll(Float64 xOffset, Float64 yOffset) {
@@ -35,10 +36,12 @@ namespace Flux {
     }
 
     void Reactive::focused() {
+        Console::log("{} earned focus.\n", Type::name(*this));
         this->bFocused = true;
     }
     
     void Reactive::lostFocus() {
+        Console::log("{} lost focus.\n", Type::name(*this));
         this->bFocused = false;
     }
 

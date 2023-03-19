@@ -55,6 +55,8 @@ namespace Flux {
 
         void draw(SkCanvas *canvas, Float64 deltaTime) override;
 
+        void setAlignment(VAlignment vAlign, HAlignment hAlign);
+
         NODISCARD FORCEINLINE String text() const { return this->renderer->text(); }
 
         NODISCARD FORCEINLINE Float32 textSize() const { return this->renderer->textSize(); }

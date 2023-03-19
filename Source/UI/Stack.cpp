@@ -2,23 +2,27 @@
 
 namespace Flux {
 
-    Stack::Stack(VAlignment vAlign, HAlignment hAlign) : vAlign(vAlign), hAlign(hAlign) {
-        setColor(Color::fromHex(0));
+    Stack::Stack(Point const& p, Point const& s, VAlignment vAlign, HAlignment hAlign, bool stretch) : Component(p, s), vAlign(vAlign), hAlign(hAlign), bStretchChildren(stretch) {
+        setColor(Colors::transparent);
     }
 
     void Stack::modified() {
         realign();
     }
 
-    void Stack::childAdded(Component* child) {
+    void Stack::parentModified() {
         realign();
     }
 
-    void Stack::parentLinked() {
-        this->setSize(parent()->size());
+    void Stack::childWillDispose(Component *component) {
+        realign();
     }
 
-    HStack::HStack(VAlignment vAlign, HAlignment hAlign) : Stack(vAlign, hAlign) {
+    void Stack::childAdded(Component *component) {
+        realign();
+    }
+
+    HStack::HStack(Point const& p, Point const& s, VAlignment vAlign, HAlignment hAlign, bool stretch) : Stack(p, s, vAlign, hAlign, stretch) {
 
     }
 
@@ -26,22 +30,13 @@ namespace Flux {
 
         const auto& ch = children();
 
-        const Float32 totalWidth = childrenWidth();
-
-        if(totalWidth > size().x){
-
-            const Float32 spaceLeft = size().x - childSpacing * (f32(ch.size()) - 1);
-            const Float32 newW = spaceLeft / f32(ch.size());
-
-            for(auto& child : children()){
-                child->setSize({ newW, child->size().y });
-            }
-
-        }
-
         Float32 newX = initialDrawX();
 
         for(auto* child : ch){
+
+            if(bStretchChildren){
+                child->setSize({ child->size().x, size().y });
+            }
 
             const Float32 newY = childDrawY(child);
 
@@ -89,7 +84,8 @@ namespace Flux {
 
     }
 
-    VStack::VStack(VAlignment vAlign, HAlignment hAlign) : Stack(vAlign, hAlign) {
+
+    VStack::VStack(Point const& p, Point const& s, VAlignment vAlign, HAlignment hAlign, bool stretch) : Stack(p, s, vAlign, hAlign, stretch) {
 
     }
 
@@ -99,20 +95,13 @@ namespace Flux {
 
         const Float32 totalHeight = childrenHeight();
 
-        if(totalHeight > size().y){
-
-            const Float32 spaceLeft = size().y - childSpacing * (f32(ch.size()) - 1);
-            const Float32 newH = spaceLeft / f32(ch.size());
-
-            for(auto& child : children()){
-                child->setSize({ child->size().x, newH });
-            }
-
-        }
-
         Float32 newY = initialDrawY();
 
         for(auto* child : ch){
+
+            if(bStretchChildren){
+                child->setSize({ size().x, child->size().y });
+            }
 
             const Float32 newX = childDrawX(child);
 

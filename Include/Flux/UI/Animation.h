@@ -53,6 +53,8 @@ namespace Flux {
         FORCEINLINE void setAutoReverse(const bool value) { this->autoReverse = value; }
         
         FORCEINLINE void setPlayDirection(const PlayDirection value) { this->direction = value; }
+
+        FORCEINLINE void setProgress(const Float32 value) { this->animTime = animDuration * Math::clamp(value, 0.0f, 1.0f); }
         
         NODISCARD FORCEINLINE bool looping() const { return loop; }
     

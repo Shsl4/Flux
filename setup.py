@@ -105,7 +105,7 @@ def cmake_build(name, debug, params=None):
     proc = subprocess.run(['cmake', '-S', '.', '.build'] + params, capture_output=True, text=True)
 
     if proc.returncode != 0:
-        print(proc.stdout)
+        print(proc.stderr)
         raise Exception(f'{name} cmake generation failed!')
 
     os.chdir('.build')
@@ -132,6 +132,7 @@ def build(debug):
         cmake_build('glfw', debug)
         cmake_build('Nucleus', debug)
     except Exception as message:
+        raise message
         print(f'{ConsoleColors.red}{message}{ConsoleColors.reset}')
         sys.stdout.flush()
         return 1

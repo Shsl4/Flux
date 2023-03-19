@@ -17,7 +17,7 @@ namespace Flux {
     MetalWindow::MetalWindow(const String &title, Int windowWidth, Int windowHeight) {
 
         glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
         glfwWindowHint(GLFW_FOCUS_ON_SHOW, GLFW_TRUE);
 
         this->handle = glfwCreateWindow(windowWidth, windowHeight, title.begin().get(), nullptr, nullptr);
@@ -30,6 +30,7 @@ namespace Flux {
         glfwSetMouseButtonCallback(this->handle, &Window::mouseCallback);
         glfwSetScrollCallback(this->handle, &Window::scrollCallback);
         glfwSetCursorPosCallback(this->handle, &Window::cursorCallback);
+        glfwSetWindowSizeCallback(this->handle, &Window::resizeCallback);
         glfwSetWindowCloseCallback(this->handle, &Window::closeCallback);
         
         NSWindow* rawWindow = glfwGetCocoaWindow(this->handle);
@@ -43,16 +44,29 @@ namespace Flux {
         this->mtlQueue = queue;
         
         this->dpiScale = f32([rawWindow backingScaleFactor]);
-                
-        this->rootComponent = Factory::createComponent<Component>(Point(0, 0), Point(windowWidth,windowHeight));
-        
+
         this->context = GrDirectContext::MakeMetal(device, queue);
 
         if(!this->context) throw Exceptions::Exception("Failed to create Skia metal context.");
 
+        this->rootComponent = Factory::createComponent<Component>(Point(0, 0), Point(windowWidth,windowHeight));
+
         this->cursorManager = Shared<CursorManager>::make();
         this->cursorManager->setComponent(this->rootComponent);
 
+    }
+
+    void MetalWindow::resized(Int width, Int height) {
+
+        auto view = (__bridge MTKView*)this->mtkView;
+
+        CGRect frame = view.frame;
+        frame.size.height = height;
+        frame.size.width = width;
+        view.frame = frame;
+
+        rootComponent->setSize({f32(width), f32(height)});
+        
     }
 
     void MetalWindow::draw(const Float64 &deltaTime) {

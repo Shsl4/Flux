@@ -15,7 +15,7 @@ namespace Flux {
 
     void Component::draw(SkCanvas* canvas, Float64 deltaTime) {
 
-        if(!visible()) { return; }
+        if(!visible() || !active()) { return; }
 
         if(!color().transparent()){
 
@@ -73,8 +73,8 @@ namespace Flux {
         }
 
         if(parentComponent) {
-            parentComponent->childWillDispose(this);
             parentComponent->childrenArray -= this;
+            parentComponent->childWillDispose(this);
         }
 
         parentComponent = nullptr;
@@ -86,24 +86,28 @@ namespace Flux {
     void Component::setPosition(Point const& p) {
         this->localTransform.position = p;
         if (parentComponent) { parentComponent->childModified(this); }
+        for (auto& child : childrenArray) { child->parentModified(); }
         modified();
     }
 
     void Component::setSize(Point const& s) {
         this->localTransform.size = s;
         if (parentComponent) { parentComponent->childModified(this); }
+        for (auto& child : childrenArray) { child->parentModified(); }
         modified();
     }
     
     void Component::setRotation(const Float32 r) {
         this->localTransform.rotation = r;
         if (parentComponent) { parentComponent->childModified(this); }
+        for (auto& child : childrenArray) { child->parentModified(); }
         modified();
     }
     
     void Component::setTransform(Transform const& t) {
         this->localTransform = t;
         if (parentComponent) { parentComponent->childModified(this); }
+        for (auto& child : childrenArray) { child->parentModified(); }
         modified();
     }
 
@@ -158,6 +162,14 @@ namespace Flux {
 
     bool Component::supportsChildren() const {
         return true;
+    }
+
+    void Component::disposeAllChildren() {
+
+        while (childrenArray.size() > 0){
+            childrenArray[0]->dispose();
+        }
+
     }
 
 }

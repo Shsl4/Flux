@@ -10,17 +10,17 @@
 
 namespace Flux {
 
-
-
     class Window {
 
     public:
 
         virtual void draw(Float64 const& deltaTime) = 0;
 
+        virtual void resized(Int width, Int height) = 0;
+
         virtual ~Window();
 
-        NODISCARD Component* mainView() const { return this->rootComponent; }
+        NODISCARD FORCEINLINE Component* mainView() const { return this->rootComponent; }
 
     protected:
 
@@ -43,7 +43,9 @@ namespace Flux {
         static void cursorCallback(GLFWwindow* window, Float64 xPos, Float64 yPos);
         
         static void closeCallback(GLFWwindow* window);
-        
+
+        static void resizeCallback(GLFWwindow* window, Int width, Int height);
+
         static Window* windowFromHandle(GLFWwindow* handle);
 
     };
