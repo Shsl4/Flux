@@ -40,12 +40,13 @@ namespace Flux {
 
         this->mainWindow = Factory::createWindow(RenderBackend::Best, "Application", windowWidth, windowHeight);
 
-        auto stack = Factory::createComponent<ColorsExample>(Point::zero, Point(windowWidth, windowHeight));
+        auto stack = Factory::createComponent<StacksExample>(Point::zero, Point(windowWidth, windowHeight));
 
         this->mainWindow->rootComponent->addChild(stack);
 
-        /*
-        auto stack = Factory::createComponent<VStack>(Point::zero, Point(windowWidth, windowHeight), VAlignment::top, HAlignment::center);
+/*
+        
+        auto stack = Factory::createComponent<VStack>(Point::zero, Point(windowWidth, windowHeight), VAlignment::top, HAlignment::center, true);
 
         this->mainWindow->rootComponent->addChild(stack);
 
@@ -59,7 +60,8 @@ namespace Flux {
             data += String::format("Choice {}", i + 1);
         }
 
-        component->setChoices(data);*/
+        component->setChoices(data);
+*/
 
         constexpr Float32 fw = 100.0f;
         constexpr Float32 fh = 100.0f;

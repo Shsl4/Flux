@@ -172,5 +172,19 @@ namespace Flux {
 
     }
 
+    Component* Component::componentAtPosition(const Point &p) const {
+
+        for(size_t i = childrenArray.size(); i > 0; --i){
+
+            auto& child = childrenArray[i - 1];
+
+            if(auto* component = child->componentAtPosition(p)) return component;
+
+        }
+
+        return const_cast<Component *>(inBounds(p) && active() ? this : nullptr);
+
+    }
+
 }
 

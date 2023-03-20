@@ -16,7 +16,7 @@ namespace Flux {
 
     MetalWindow::MetalWindow(const String &title, Int windowWidth, Int windowHeight) {
 
-        glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
         glfwWindowHint(GLFW_FOCUS_ON_SHOW, GLFW_TRUE);
 
@@ -32,7 +32,7 @@ namespace Flux {
         glfwSetCursorPosCallback(this->handle, &Window::cursorCallback);
         glfwSetWindowSizeCallback(this->handle, &Window::resizeCallback);
         glfwSetWindowCloseCallback(this->handle, &Window::closeCallback);
-        
+                        
         NSWindow* rawWindow = glfwGetCocoaWindow(this->handle);
         id<MTLDevice> device = MTLCreateSystemDefaultDevice();
         id<MTLCommandQueue> queue = [device newCommandQueue];

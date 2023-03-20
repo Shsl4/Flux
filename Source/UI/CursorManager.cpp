@@ -5,7 +5,7 @@ namespace Flux {
 
     void CursorManager::buttonDown(const MouseButton button) {
         
-        if (auto* component = componentAtPosition(master, cursorPosition())) {
+        if (auto* component = master->componentAtPosition(cursorPosition())) {
             
             stateMap.add(button, component);
             component->pressedState[static_cast<size_t>(button)] = true;
@@ -33,7 +33,7 @@ namespace Flux {
 
     void CursorManager::doubleClick(const MouseButton button) const {
 
-        if (auto* component = componentAtPosition(master, cursorPosition())) {
+        if (auto* component = master->componentAtPosition(cursorPosition())) {
             component->doubleClick(button, cursorX, cursorY);
         }
         
@@ -45,7 +45,7 @@ namespace Flux {
 
             Reactive* target = stateMap[button];
             target->pressedState[static_cast<size_t>(button)] = false;
-            target->buttonUp(button, cursorX, cursorY, componentAtPosition(master, cursorPosition()));
+            target->buttonUp(button, cursorX, cursorY, master->componentAtPosition(cursorPosition()));
             stateMap.removeByKey(button);
             
         }
@@ -55,7 +55,7 @@ namespace Flux {
 
     void CursorManager::scroll(const Float64 xOffset, const Float64 yOffset) const {
         
-        if (auto* component = componentAtPosition(master, cursorPosition())) {
+        if (auto* component = master->componentAtPosition(cursorPosition())) {
             component->scroll(xOffset, yOffset);
         }
         
@@ -78,7 +78,7 @@ namespace Flux {
         }
 
         // If a component is under the cursor.
-        if (auto* component = componentAtPosition(master, cursorPosition())) {
+        if (auto* component = master->componentAtPosition(cursorPosition())) {
 
             // If the component under the cursor is already bHovered, send a mouse movement message.
             if (hovered == component) {
@@ -142,33 +142,6 @@ namespace Flux {
 
         return false;
 
-    }
-
-    Component* CursorManager::componentAtPosition(Component* root, Point const& p) {
-        
-        if (!root->active()) { return nullptr; }
-        
-        const auto children = root->children();
-        
-        for (size_t i = children.size(); i > 0; --i) {
-
-            auto const& child = children[i - 1];
-
-            if(!Factory::valid(child)) continue;
-
-            if(Component* sub = componentAtPosition(child, p)) {
-                return sub;
-            }
-
-            if(child->inBounds(p) && child->active()) {
-                return child; }
-            
-        }
-
-        if(root->inBounds(p)) { return root; }
-        
-        return nullptr;
-        
     }
 
     Point CursorManager::cursorPosition() const {

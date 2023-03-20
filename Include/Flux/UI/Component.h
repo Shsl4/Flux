@@ -118,7 +118,7 @@ namespace Flux {
         void setColor(Color const& c);
 
         void setVisible(bool state);
-        
+
         Component* addChild(Component* component);
         
         NODISCARD UInt depth() const;
@@ -147,10 +147,12 @@ namespace Flux {
 
         NODISCARD FORCEINLINE MutableArray<Component*> const& children() const { return this->childrenArray; }
 
+        NODISCARD virtual Component* componentAtPosition(Point const& p) const;
+
         virtual void draw(SkCanvas* canvas, Float64 deltaTime);
 
         virtual void initialize();
-        
+
         ~Component() override;
 
     protected:

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <Flux/UI/Component.h>
 #include "Flux/UI/Animation.h"
@@ -69,7 +69,7 @@ namespace Flux {
         Float32 arrowRootY;
         Float32 arrowMaxY;
                 
-        ColorScheme scheme = ColorScheme::intenseIndigo;
+        ColorScheme scheme = ColorScheme::deepPurple;
 
         size_t currentSelection = 0;
         MutableArray<String> choices = {};

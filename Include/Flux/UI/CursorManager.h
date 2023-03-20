@@ -30,8 +30,6 @@ namespace Flux {
 
         NODISCARD bool buttonFromReactive(const Reactive* value, MouseButton& out) const;
 
-        NODISCARD static Component* componentAtPosition(Component* root, Point const& p);
-
         NODISCARD Point cursorPosition() const;
 
         Map<MouseButton, Reactive*> stateMap;
