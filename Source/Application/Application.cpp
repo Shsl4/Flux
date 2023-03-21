@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <Application/Application.h>
 
 #include <Application/DragComponent.h>
@@ -39,14 +40,13 @@ namespace Flux {
         constexpr Int windowHeight = 720;
 
         this->mainWindow = Factory::createWindow(RenderBackend::Best, "Application", windowWidth, windowHeight);
-
-        auto stack = Factory::createComponent<StacksExample>(Point::zero, Point(windowWidth, windowHeight));
+/*
+        auto stack = Factory::createComponent<ColorsExample>(Point::zero, Point(windowWidth, windowHeight));
 
         this->mainWindow->rootComponent->addChild(stack);
 
-/*
-        
-        auto stack = Factory::createComponent<VStack>(Point::zero, Point(windowWidth, windowHeight), VAlignment::top, HAlignment::center, true);
+*/
+        auto stack = Factory::createComponent<VStack>(Point::zero, Point(windowWidth, windowHeight), VAlignment::top, HAlignment::center);
 
         this->mainWindow->rootComponent->addChild(stack);
 
@@ -61,7 +61,7 @@ namespace Flux {
         }
 
         component->setChoices(data);
-*/
+
 
         constexpr Float32 fw = 100.0f;
         constexpr Float32 fh = 100.0f;
@@ -70,7 +70,7 @@ namespace Flux {
 
         mainWindow->mainView()->addChild(Flux::Factory::createComponent<FrameInfo>(Point::zero, s));
 
-        initializeAudio();
+        //initializeAudio();
 
         this->shouldRun = true;
 

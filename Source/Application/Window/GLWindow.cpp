@@ -1,4 +1,4 @@
-#include <Application/Window/OpenGLWindow.h>
+#include <Application/Window/GLWindow.h>
 #include <Flux/Factory.h>
 
 #include <skia/include/core/SkSurface.h>
@@ -9,7 +9,7 @@
 
 namespace Flux {
     
-    OpenGLWindow::OpenGLWindow(const String &title, Int windowWidth, Int windowHeight) {
+    GLWindow::GLWindow(const String &title, Int windowWidth, Int windowHeight) {
         
         glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
         
@@ -41,7 +41,7 @@ namespace Flux {
         glfwSetWindowCloseCallback(this->handle, &Window::closeCallback);
         glfwSetWindowSizeCallback(this->handle, &Window::resizeCallback);
 
-        this->rootComponent = Flux::Factory::createComponent<Component>(Point(0, 0), Point(windowWidth, windowHeight));
+        this->rootComponent = Factory::createComponent<Component>(Point(0, 0), Point(f32(windowWidth), f32(windowHeight)));
         this->cursorManager = Shared<CursorManager>::make();
         
         this->cursorManager->setComponent(this->rootComponent);
@@ -54,10 +54,9 @@ namespace Flux {
 
         setupCanvas(windowWidth, windowHeight);
 
-
     }
 
-    void OpenGLWindow::draw(const Float64 &deltaTime) {
+    void GLWindow::draw(const Float64 &deltaTime) {
 
         glfwMakeContextCurrent(this->handle);
 
@@ -73,11 +72,11 @@ namespace Flux {
 
     }
 
-    void OpenGLWindow::resized(Int width, Int height) {
+    void GLWindow::resized(Int width, Int height) {
 
     }
 
-    void OpenGLWindow::setupCanvas(Int width, Int height) {
+    void GLWindow::setupCanvas(Int width, Int height) {
 
         Int framebufferWidth;
         Int framebufferHeight;
@@ -94,7 +93,7 @@ namespace Flux {
 
         GrGLFramebufferInfo framebufferInfo;
 
-        framebufferInfo.fFBOID = 0;
+        framebufferInfo.fFBOID = framebufferId;
 
         // 0x8058 = GL_RGBA8
         framebufferInfo.fFormat = 0x8058;
@@ -114,6 +113,5 @@ namespace Flux {
         rootComponent->setSize({ f32(width), f32(height) });
 
     }
-
 
 }

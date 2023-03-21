@@ -99,9 +99,9 @@ namespace Flux {
      
         NODISCARD FORCEINLINE bool isPressed(MouseButton button) const { return pressedState[static_cast<size_t>(button)]; }
 
-        NODISCARD FORCEINLINE bool active() const { return this->bActive; }
+        NODISCARD FORCEINLINE bool reactive() const { return this->bActive; }
 
-        void setActive(bool state);
+        void setReactive(bool state);
 
     private:
 

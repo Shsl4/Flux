@@ -22,3 +22,20 @@ Open the generated Xcode project:
 ```sh
 open Flux.xcodeproj
 ```
+### Windows
+Install the required build tools:
+```sh
+winget install Kitware.CMake 
+winget install Ninja-build.Ninja 
+winget install python3
+```
+Clone the project and launch the setup script:
+```sh
+git clone https://github.com/Shsl4/Flux.git --recursive
+cd Flux
+python3 setup.py
+```
+Open the generated Visual Studio project:
+```sh
+open Flux.lnk
+```

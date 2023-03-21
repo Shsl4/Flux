@@ -1,6 +1,9 @@
 #include <Flux/Factory.h>
 #include <Flux/Application/Application.h>
-#include <Flux/Application/Window/OpenGLWindow.h>
+#include <Flux/Application/Window/GLWindow.h>
+#ifdef _WIN32
+#include <Flux/Application/Window/DXWindow.h>
+#endif
 #include <Flux/Application/Window/MetalWindow.h>
 
 namespace Flux {
@@ -69,7 +72,7 @@ namespace Flux {
         switch (backEnd) {
 
             case RenderBackend::OpenGL:
-                window = Allocator<OpenGLWindow>::construct(name, width, height);
+                window = Allocator<GLWindow>::construct(name, width, height);
                 break;
             case RenderBackend::Metal:
             #ifdef __APPLE__
@@ -78,8 +81,12 @@ namespace Flux {
                 throw Exceptions::Exception("Unsupported backend.");
             #endif
                 break;
-            case RenderBackend::Vulkan:
             case RenderBackend::DirectX:
+            #ifdef _WIN32
+                window = Allocator<DXWindow>::construct(name, width, height);
+                break;
+            #endif
+            case RenderBackend::Vulkan:
             default:
                 throw Exceptions::Exception("Unsupported backend.");
         }

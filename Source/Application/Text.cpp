@@ -56,11 +56,11 @@ namespace Flux {
         for(auto & glyph : glyphs){
             width += glyph->advanceX();
             auto off = f32(glyph->top() + glyph->height());
-            height = Math::max(height, f32(glyph->height() + off));
+            height = Math::max(height, f32(glyph->height()) + off);
             offset = Math::max(offset, off);
         }
 
-        if (strikeToSourceScale != 1) {
+        if (Math::fneq(strikeToSourceScale, 1.0f)) {
             width *= strikeToSourceScale;
             height *= strikeToSourceScale;
         }
@@ -93,6 +93,7 @@ namespace Flux {
         setColor(Colors::white);
         setText(text);
         setTextSize(textSize);
+        setReactive(false);
 
     }
 
@@ -158,10 +159,9 @@ namespace Flux {
     }
 
     void Text::draw(SkCanvas *canvas, Float64 deltaTime) {
-
-        Point pos = globalTransform().position;
+        const Point pos = globalTransform().position;
         canvas->save();
-        SkRect rect { pos.x, pos.y, pos.x + size().x, pos.y + size().y };
+        const SkRect rect { pos.x, pos.y, pos.x + size().x, pos.y + size().y };
         canvas->clipRect(rect);
         renderer->draw(canvas, deltaTime);
         canvas->restore();

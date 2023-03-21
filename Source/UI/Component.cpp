@@ -15,7 +15,7 @@ namespace Flux {
 
     void Component::draw(SkCanvas* canvas, Float64 deltaTime) {
 
-        if(!visible() || !active()) { return; }
+        if(!visible() || !reactive()) { return; }
 
         if(!color().transparent()){
 
@@ -182,7 +182,7 @@ namespace Flux {
 
         }
 
-        return const_cast<Component *>(inBounds(p) && active() ? this : nullptr);
+        return const_cast<Component *>(inBounds(p) && reactive() ? this : nullptr);
 
     }
 

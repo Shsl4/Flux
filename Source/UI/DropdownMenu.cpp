@@ -36,12 +36,12 @@ namespace Flux {
 
             arrowTr.switchDirection();
             arrowTr.restartFromHere();
-            stack->setActive(!stack->active());
+            stack->setReactive(!stack->reactive());
 
         });
 
         stack->setColor(Colors::transparent);
-        stack->setActive(false);
+        stack->setReactive(false);
         stack->setPosition({ 0, size().y });
 
     }
@@ -97,7 +97,7 @@ namespace Flux {
 
         arrowTr.switchDirection();
         arrowTr.restartFromHere();
-        stack->setActive(!stack->active());
+        stack->setReactive(!stack->reactive());
 
         if(i == currentSelection) return;
 
@@ -129,7 +129,7 @@ namespace Flux {
             btn->setColorScheme(ColorScheme::fromColor(scheme.lighter));
             btn->label()->setTextSize(size().y / 2.0f);
             btn->label()->setAlignment(VAlignment::center, HAlignment::left);
-            btn->setAction([=]{
+            btn->setAction([=, this]{
                 choiceSelected(i);
             });
 

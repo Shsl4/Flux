@@ -5,11 +5,11 @@
 namespace Flux {
     
     
-    class OpenGLWindow : public Window {
+    class GLWindow : public Window {
 
     public:
 
-        OpenGLWindow(const String &title, Int windowWidth, Int windowHeight);
+        GLWindow(const String &title, Int windowWidth, Int windowHeight);
         
         void draw(Float64 const& deltaTime) override;
 

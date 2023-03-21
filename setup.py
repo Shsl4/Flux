@@ -43,7 +43,16 @@ def gen_skia_args(debug):
         args['is_debug'] = True
         args['is_official_build'] = False
 
-    return ' '.join([f'{key}={str(value).lower()}' for key, value in args.items()])
+    st = ' '.join([f'{key}={str(value).lower()}' for key, value in args.items()])
+    
+    if sys.platform == "win32":
+        if debug:
+            return st + ' extra_cflags=["/MDd"]'
+        else:
+            return st + ' extra_cflags=["/MD"]'
+        
+    return st
+
 
 
 def build_skia(debug):
@@ -74,8 +83,9 @@ def build_skia(debug):
 
     print('Now building skia. This might take a while.')
 
-    proc = subprocess.run(['./bin/gn', 'gen', 'out/build', f'--args={gen_skia_args(debug)}'], capture_output=True,
-                          text=True)
+    build_type = 'Debug' if debug else 'Release'
+
+    proc = subprocess.run(['./bin/gn', 'gen', f'.build/{build_type}', f'--args={gen_skia_args(debug)}'], capture_output=True, text=True)
 
     if proc.returncode != 0:
         print(proc.stdout)
@@ -84,7 +94,7 @@ def build_skia(debug):
     if shutil.which('ninja') is None:
         raise Exception('Could not find ninja! Please check the README for instructions on how to install.')
 
-    proc = subprocess.run(['ninja', '-C', 'out/build'])
+    proc = subprocess.run(['ninja', '-C', f'.build/{build_type}', 'skia'])
 
     if proc.returncode != 0:
         raise Exception('Failed to build skia!')
@@ -123,12 +133,13 @@ def cmake_build(name, debug, params=None):
 
 
 def build(debug):
+
     os.chdir('Libraries')
 
     try:
         build_skia(debug)
         cmake_build('rtmidi', debug, ['-DRTMIDI_BUILD_STATIC_LIBS=1'])
-        cmake_build('rtaudio', debug, ['-DRTAUDIO_BUILD_STATIC_LIBS=1'])
+        cmake_build('rtaudio', debug, ['-DRTAUDIO_BUILD_SHARED_LIBS=1'])
         cmake_build('glfw', debug)
         cmake_build('Nucleus', debug)
     except Exception as message:
@@ -137,28 +148,29 @@ def build(debug):
         sys.stdout.flush()
         return 1
 
+    path = "Debug" if debug else "Release"
+
     try:
-        os.mkdir(".build")
+        os.makedirs(f'.build/{path}')
     except FileExistsError:
         pass
 
     if sys.platform == "win32":
 
-        path = "Debug" if debug else "Release"
-        nucleus_name = "Nucleusd" if debug else "Nucleus"
+        postfix = "d" if debug else ""
 
-        shutil.copy('skia/out/build/skia.lib', '.build')
-        shutil.copy(f'rtmidi/.build/{path}/rtmidi.lib', '.build')
-        shutil.copy(f'rtaudio/.build/{path}/rtaudio.lib', '.build')
-        shutil.copy(f'glfw/.build/src/{path}/glfw3.lib', '.build')
-        shutil.copy(f'Nucleus/.build/{path}/{nucleus_name}.lib', '.build')
+        shutil.copy(f'skia/.build/{path}/skia.lib', f'.build/{path}')
+        shutil.copy(f'rtmidi/.build/{path}/rtmidi.lib', f'.build/{path}')
+        shutil.copy(f'rtaudio/.build/{path}/rtaudio{postfix}.lib', f'.build/{path}')
+        shutil.copy(f'glfw/.build/src/{path}/glfw3.lib', f'.build/{path}')
+        shutil.copy(f'Nucleus/.build/{path}/Nucleus{postfix}.lib', f'.build/{path}')
 
     else:
-        shutil.copy('skia/out/build/libSkia.a', '.build')
-        shutil.copy('rtmidi/.build/librtmidi.a', '.build')
-        shutil.copy('rtaudio/.build/librtaudio.a', '.build')
-        shutil.copy('glfw/.build/src/libglfw3.a', '.build')
-        shutil.copy('Nucleus/.build/libNucleus.a', '.build')
+        shutil.copy(f'skia/.build/{path}/libSkia.a', f'.build/{path}')
+        shutil.copy('rtmidi/.build/librtmidi.a', f'.build/{path}')
+        shutil.copy('rtaudio/.build/librtaudio.a', f'.build/{path}')
+        shutil.copy('glfw/.build/src/libglfw3.a', f'.build/{path}')
+        shutil.copy('Nucleus/.build/libNucleus.a', f'.build/{path}')
 
     print(f'{ConsoleColors.green}Successfully built all dependencies.{ConsoleColors.reset}')
 
@@ -196,7 +208,7 @@ def setup():
     proc = subprocess.run([cmake_path, "..", "-G", generator])
 
     if proc.returncode != 0:
-        print("\033[91mCMake generation failed!")
+        print(f"{ConsoleColors.red}CMake generation failed!{ConsoleColors.reset}")
         return 1
 
     os.chdir("..")
@@ -238,4 +250,14 @@ if __name__ == "__main__":
     elif sys.argv[1] == "clean":
         clean()
     elif sys.argv[1] == "build":
-        build(True)
+        if len(sys.argv) >= 3:
+            if sys.argv[2].lower() == 'debug':
+                build(True)
+            elif sys.argv[2].lower() == 'release':
+                build(False)
+            else:
+                print('Invalid argument. Expected debug or release')
+        else:
+            print('Not enough arguments. Expected debug or release')
+    else:
+        print(f'Unrecognized argument: {sys.argv[1]}')

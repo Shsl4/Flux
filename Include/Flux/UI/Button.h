@@ -27,7 +27,7 @@ namespace Flux{
     protected:
 
         void process(Float64 deltaTime) override {
-            target->setColor(Math::lerp(fromColor, toColor, progress()));
+            target->setColor(Math::lerp(fromColor, toColor, f32(progress())));
         }
 
     private:
@@ -45,7 +45,7 @@ namespace Flux{
         Button(Point const& pos, Point const& size, String const& label) : Component(pos, size), fader(this) {
 
             this->buttonLabel = Factory::createComponent<Text>(Point::zero, size, label, 18.0f, VAlignment::center, HAlignment::center);
-            this->buttonLabel->setActive(false);
+            this->buttonLabel->setReactive(false);
             setColor(defaultColor);
 
         }

@@ -12,7 +12,7 @@ namespace Flux{
 
         explicit ColorShift(Component* component) : target(component){
             setLooping(true);
-            setDuration(3.0f);
+            setDuration(5.0f);
         }
 
         Float32 s = 0.0f;

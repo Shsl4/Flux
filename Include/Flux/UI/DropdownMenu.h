@@ -69,7 +69,7 @@ namespace Flux {
         Float32 arrowRootY;
         Float32 arrowMaxY;
                 
-        ColorScheme scheme = ColorScheme::deepPurple;
+        ColorScheme scheme = ColorScheme::vividPink;
 
         size_t currentSelection = 0;
         MutableArray<String> choices = {};

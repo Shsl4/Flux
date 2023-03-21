@@ -49,7 +49,7 @@ namespace Flux{
     };
 
     void CoolAnimation::process(Float64 deltaTime) {
-        st->setSpacing(Math::easeInOut(0.0f, 100.0f, progress(), 2));
+        st->setSpacing(Math::easeInOut(0.0f, 100.0f, f32(progress()), 2));
     }
 
     class StacksExample : public CoolStack<VStack> {
@@ -74,9 +74,9 @@ namespace Flux{
             stack4->setColor(Color::randomColor());
             stack5->setColor(Color::randomColor());
 
-            auto* text = Factory::createComponent<Text>(Point::zero, Point(500, 200), "Hello, world!", 50, VAlignment::center, HAlignment::center);
-            auto* text2 = Factory::createComponent<Text>(Point::zero, Point(500, 200), "c[0] = -7", 50, VAlignment::center, HAlignment::center);
-            auto* text3 = Factory::createComponent<Text>(Point::zero, Point(500, 200), "Text!", 50, VAlignment::center, HAlignment::center);
+            auto* text = Factory::createComponent<Text>(Point::zero, Point(500, 200), "Hello, world!", 50.0f, VAlignment::center, HAlignment::center);
+            auto* text2 = Factory::createComponent<Text>(Point::zero, Point(500, 200), "c[0] = -7", 50.0f, VAlignment::center, HAlignment::center);
+            auto* text3 = Factory::createComponent<Text>(Point::zero, Point(500, 200), "Text!", 50.0f, VAlignment::center, HAlignment::center);
 
             addChild(stack2);
             addChild(stack3);

@@ -24,7 +24,10 @@ endif()
 
 file(GLOB_RECURSE FLUX_HEADERS ${CMAKE_CURRENT_LIST_DIR}/Include/*.h*)
 file(GLOB_RECURSE FLUX_INLINE ${CMAKE_CURRENT_LIST_DIR}/Include/*.inl)
-file(GLOB_RECURSE FLUX_DEPENDENCIES ${CMAKE_CURRENT_LIST_DIR}/Libraries/.build/*)
+
+file(GLOB_RECURSE FLUX_DEBUG_DEPENDENCIES ${CMAKE_CURRENT_LIST_DIR}/Libraries/.build/Debug/*)
+file(GLOB_RECURSE FLUX_RELEASE_DEPENDENCIES ${CMAKE_CURRENT_LIST_DIR}/Libraries/.build/Release/*)
+
 set(FLUX_DEPENDENCIES_INCLUDES ${CMAKE_CURRENT_LIST_DIR}/Libraries/ 
     ${CMAKE_CURRENT_LIST_DIR}/Libraries/skia/ 
     ${CMAKE_CURRENT_LIST_DIR}/Libraries/Nucleus/Include
@@ -41,7 +44,9 @@ filterSources("${FLUX_ALL}")
 
 if(WIN32)
 
-target_link_libraries(Flux ${FLUX_DEPENDENCIES} winmm.lib dbghelp.lib)
+target_link_libraries(Flux debug ${FLUX_DEBUG_DEPENDENCIES} winmm.lib dbghelp.lib d3d12.lib dxgi.lib d3dcompiler.lib)
+
+target_link_libraries(Flux optimized ${FLUX_RELEASE_DEPENDENCIES} winmm.lib dbghelp.lib d3d12.lib dxgi.lib d3dcompiler.lib)
 
 elseif(APPLE)
 
@@ -55,7 +60,9 @@ find_library(METAL Metal)
 find_library(METALKIT MetalKit)
 find_library(OPENGL OpenGL)
 
-target_link_libraries(Flux PUBLIC ${FOUNDATION} ${COCOA} ${IOKIT} ${QUARTZCORE} ${METAL} ${METALKIT} ${COREMIDI} ${COREAUDIO} ${OPENGL} ${FLUX_DEPENDENCIES})
+target_link_libraries(Flux PUBLIC debug ${FOUNDATION} ${COCOA} ${IOKIT} ${QUARTZCORE} ${METAL} ${METALKIT} ${COREMIDI} ${COREAUDIO} ${OPENGL} ${FLUX_DEBUG_DEPENDENCIES})
+
+target_link_libraries(Flux PUBLIC optimized ${FOUNDATION} ${COCOA} ${IOKIT} ${QUARTZCORE} ${METAL} ${METALKIT} ${COREMIDI} ${COREAUDIO} ${OPENGL} ${FLUX_RELEASE_DEPENDENCIES})
 
 else()
 
@@ -66,7 +73,9 @@ find_package(X11 REQUIRED)
 find_package(Threads REQUIRED)
 
 target_include_directories(Flux PUBLIC ${X11_INCLUDE_DIR})
-target_link_libraries(Flux PUBLIC ${X11_LIBRARIES} ${X11_Xrandr_LIB} Threads::Threads ${CMAKE_DL_LIBS} ${FLUX_DEPENDENCIES})
+
+target_link_libraries(Flux PUBLIC debug ${X11_LIBRARIES} ${X11_Xrandr_LIB} Threads::Threads ${CMAKE_DL_LIBS} ${FLUX_DEBUG_DEPENDENCIES})
+target_link_libraries(Flux PUBLIC optimized ${X11_LIBRARIES} ${X11_Xrandr_LIB} Threads::Threads ${CMAKE_DL_LIBS} ${FLUX_RELEASE_DEPENDENCIES})
 
 endif()
 

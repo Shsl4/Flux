@@ -45,7 +45,7 @@ namespace Flux {
         this->bFocused = false;
     }
 
-    void Reactive::setActive(bool state) {
+    void Reactive::setReactive(bool state) {
         this->bActive = state;
     }
 }

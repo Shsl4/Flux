@@ -11,7 +11,7 @@ namespace Flux {
 
     struct HSV{
 
-        constexpr HSV(Float32 h, Float32 s, Float32 v) : h(Math::clampAround(h, 0.0f, 360.0f)),
+         HSV(Float32 h, Float32 s, Float32 v) : h(Math::clampAround(h, 0.0f, 360.0f)),
             s(Math::clamp(s, 0.0f, 1.0f)), v(Math::clamp(v, 0.0f, 1.0f)) {
 
         }
@@ -22,7 +22,7 @@ namespace Flux {
 
         HSV withHue(Float32 value) const { HSV hsv = *this; hsv.h = Math::clamp(value, 0.0f, 360.0f); return hsv;}
 
-        NODISCARD inline constexpr Color rgb(Float32 alpha = 1.0f) const;
+        NODISCARD inline  Color rgb(Float32 alpha = 1.0f) const;
 
         Float32 h, s, v;
 
@@ -36,11 +36,11 @@ namespace Flux {
 
     public:
 
-        constexpr Color(const Float32 r, const Float32 g, const Float32 b, const Float32 a) : r(r), g(g), b(b), a(a) {
+         Color(const Float32 r, const Float32 g, const Float32 b, const Float32 a) : r(r), g(g), b(b), a(a) {
 
         }
         
-        static constexpr Float32 nthBit(UInt32 number, UInt32 n) {
+        static  Float32 nthBit(UInt32 number, UInt32 n) {
             return static_cast<Float32>((number >> (8*n)) & 0xff);
         }
 
@@ -57,7 +57,7 @@ namespace Flux {
 
         }
 
-        NODISCARD constexpr HSV hsv() const{
+        NODISCARD HSV hsv() const{
 
             const Float32 max = Math::max(r, g, b);
             const Float32 min = Math::min(r, g, b);
@@ -75,7 +75,7 @@ namespace Flux {
 
         }
 
-        constexpr static Color fromHex(UInt32 hex){
+         static Color fromHex(UInt32 hex){
 
             return {
 
@@ -117,7 +117,7 @@ namespace Flux {
 
     };
 
-    constexpr Color Flux::HSV::rgb(Float32 alpha) const {
+     Color Flux::HSV::rgb(Float32 alpha) const {
 
         Float32 c = v * s;
         Float32 x = c * (1.0f - std::abs(std::fmod(h / 60.0f, 2.0f) - 1.0f));
