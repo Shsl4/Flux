@@ -15,6 +15,8 @@
 #include <Examples/HelloWorld.h>
 #include <Examples/StacksExample.h>
 
+#include "UI/SceneComponent.h"
+
 using namespace Flux;
 
 namespace Flux {
@@ -39,39 +41,22 @@ namespace Flux {
         constexpr Int windowWidth = 1280;
         constexpr Int windowHeight = 720;
 
-        this->mainWindow = Factory::createWindow(RenderBackend::Best, "Application", windowWidth, windowHeight);
-/*
-        auto stack = Factory::createComponent<ColorsExample>(Point::zero, Point(windowWidth, windowHeight));
+        auto* scene = Factory::createComponent<SceneComponent>(Point::zero, Point(windowWidth, windowHeight));
+        this->mainWindow = Factory::createWindow(scene, RenderBackend::Best, "Application", windowWidth, windowHeight);
+        
+        auto example = Factory::createComponent<ColorsExample>(Point::zero, Point(windowWidth, windowHeight));
 
-        this->mainWindow->rootComponent->addChild(stack);
-
-*/
-        auto stack = Factory::createComponent<VStack>(Point::zero, Point(windowWidth, windowHeight), VAlignment::top, HAlignment::center);
-
-        this->mainWindow->rootComponent->addChild(stack);
-
-        auto* component = Factory::createComponent<DropdownMenu>(Point::zero, Point(200, 25));
-
-        stack->addChild(component);
-
-        MutableArray<String> data;
-
-        for (size_t i = 0; i < 10; ++i) {
-            data += String::format("Choice {}", i + 1);
-        }
-
-        component->setChoices(data);
-
+        scene->addChild(example);
 
         constexpr Float32 fw = 100.0f;
         constexpr Float32 fh = 100.0f;
 
         Point s = {fw, fh };
 
-        mainWindow->mainView()->addChild(Flux::Factory::createComponent<FrameInfo>(Point::zero, s));
+        mainWindow->mainComponent()->addChild(Factory::createComponent<FrameInfo>(Point::zero, s));
 
-        //initializeAudio();
-
+        initializeAudio();
+        
         this->shouldRun = true;
 
         Console::log("Created new Flux Application.\n");

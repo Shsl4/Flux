@@ -33,9 +33,7 @@ namespace Flux {
         static void onApplicationTerminate();
         
         static void registerCommands();
-
-        static void renderThread(Application* app);
-
+        
         bool shouldRun = true;
 
         Float64 lastTime = 0.0;

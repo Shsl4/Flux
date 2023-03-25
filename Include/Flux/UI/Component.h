@@ -34,9 +34,17 @@ namespace Flux {
         Point operator-(Point const& other) const {
             return { this->x - other.x, this->y - other.y };
         }
+
+        Point operator-() const {
+            return { -this->x, -this->y };
+        }
         
         Point operator*(Point const& other) const {
             return { this->x * other.x, this->y * other.y };
+        }
+        
+        Point operator/(Point const& other) const {
+            return { this->x / other.x, this->y / other.y };
         }
 
         Point& operator+=(Point const& other) {
@@ -49,6 +57,14 @@ namespace Flux {
             this->x -= other.x;
             this->y -= other.y;
             return *this;
+        }
+
+        Point operator/(Float32 s) const {
+            return { x / s, y / s };
+        }
+
+        Point operator*(Float32 s) const {
+            return { x * s, y * s };
         }
 
         Float32 x = 0.0f;
@@ -147,7 +163,7 @@ namespace Flux {
 
         NODISCARD FORCEINLINE MutableArray<Component*> const& children() const { return this->childrenArray; }
 
-        NODISCARD virtual Component* componentAtPosition(Point const& p) const;
+        NODISCARD virtual Component* componentAtPosition(Point const& p);
 
         virtual void draw(SkCanvas* canvas, Float64 deltaTime);
 

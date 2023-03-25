@@ -15,6 +15,20 @@ namespace Flux {
 
         
     };
+
+    struct Key {
+     
+         Key(Int key, Int mods);
+     
+         Int key;
+         bool bShift;
+         bool bCaps;
+         bool bCtrl;
+         bool bSuper;
+         bool bAlt;
+         bool bNumLock;
+  
+    };
  
     class Reactive {
 
@@ -55,10 +69,10 @@ namespace Flux {
 
         /**
          * \brief Function called when the mouse wheel is scrolled
-         * \param xOffset The x scroll offset
-         * \param yOffset The y scroll offset
+         * \param deltaX The x scroll offset
+         * \param deltaY The y scroll offset
          */
-        virtual void scroll(Float64 xOffset, Float64 yOffset);
+        virtual void scroll(Float64 deltaX, Float64 deltaY);
         
         /**
          * \brief Function called when the mouse drags the component
@@ -78,6 +92,10 @@ namespace Flux {
          * \param deltaY The cursor y delta position
          */
         virtual void cursorMoved(Float64 x, Float64 y, Float64 deltaX, Float64 deltaY);
+
+        virtual void keyDown(Key const& key);
+
+        virtual void keyUp(Key const& key);
 
         /**
          * \brief Function called when the cursor begins hovering the component

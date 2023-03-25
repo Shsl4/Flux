@@ -9,7 +9,7 @@
 
 namespace Flux {
     
-    GLWindow::GLWindow(const String &title, Int windowWidth, Int windowHeight) {
+    GLWindow::GLWindow(const String &title, Int windowWidth, Int windowHeight, Component* rootComponent) {
         
         glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
         
@@ -23,7 +23,7 @@ namespace Flux {
         glfwWindowHint(GLFW_SAMPLES, 4);
         glfwWindowHint(GLFW_DEPTH_BITS, 0);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-
+        
         this->handle = glfwCreateWindow(windowWidth, windowHeight, title.begin().get(), nullptr, nullptr);
 
         if (!this->handle) {
@@ -40,11 +40,22 @@ namespace Flux {
         glfwSetCursorPosCallback(this->handle, &Window::cursorCallback);
         glfwSetWindowCloseCallback(this->handle, &Window::closeCallback);
         glfwSetWindowSizeCallback(this->handle, &Window::resizeCallback);
-
-        this->rootComponent = Factory::createComponent<Component>(Point(0, 0), Point(f32(windowWidth), f32(windowHeight)));
-        this->cursorManager = Shared<CursorManager>::make();
         
-        this->cursorManager->setComponent(this->rootComponent);
+        this->component = Factory::createComponent<Component>(Point(0, 0), Point(f32(windowWidth), f32(windowHeight)));
+        this->component->addChild(rootComponent);
+        
+        if(auto* cast = dynamic_cast<CursorManager*>(rootComponent)) {
+            
+            this->manager = cast;
+            this->manager->setComponent(rootComponent);
+            
+        }
+        else {
+            
+            this->manager = Factory::createCursorManager();
+            this->manager->setComponent(this->component);
+            
+        }
 
         const auto itf = GrGLMakeNativeInterface();
 
@@ -63,7 +74,7 @@ namespace Flux {
         canvas->save();
         canvas->scale(dpiScale, dpiScale);
         
-        this->rootComponent->draw(this->canvas, deltaTime);
+        this->component->draw(this->canvas, deltaTime);
 
         context->flush();
         canvas->restore();
@@ -102,16 +113,15 @@ namespace Flux {
 
         const GrBackendRenderTarget backendRenderTarget(framebufferWidth, framebufferHeight, 4, 8, framebufferInfo);
 
-        this->surface = SkSurface::MakeFromBackendRenderTarget(this->context, backendRenderTarget, kBottomLeft_GrSurfaceOrigin, colorType, nullptr, nullptr);
+        this->surface = SkSurface::MakeFromBackendRenderTarget(this->context, backendRenderTarget,
+            kBottomLeft_GrSurfaceOrigin, colorType, nullptr, nullptr);
 
         if(!this->surface) throw Exceptions::Exception("Failed to create Skia Surface.");
 
         this->canvas = this->surface->getCanvas();
 
         if(!this->canvas) throw Exceptions::Exception("Failed to get Skia Canvas.");
-
-        rootComponent->setSize({ f32(width), f32(height) });
-
+        
     }
 
 }

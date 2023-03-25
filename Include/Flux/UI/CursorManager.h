@@ -10,23 +10,31 @@ namespace Flux {
 
         CursorManager() = default;
 
-        void buttonDown(MouseButton button);
+        virtual ~CursorManager() = default;
 
-        void doubleClick(MouseButton button) const;
+        virtual void handleButtonDown(MouseButton button);
 
-        void buttonUp(MouseButton button);
+        virtual void handleDoubleClick(MouseButton button);
 
-        void scroll(Float64 xOffset, Float64 yOffset) const;
+        virtual void handleButtonUp(MouseButton button);
 
-        void cursorMoved(Float64 x, Float64 y);
+        virtual void handleScroll(Float64 deltaX, Float64 deltaY);
+
+        virtual void handleCursorMoved(Float64 x, Float64 y);
+
+        virtual void handleKeyDown(Key const& key);
+        
+        virtual void handleKeyUp(Key const& key);
         
         void setComponent(Component* value);
 
         void notifyDestruction(const Reactive* reactive);
-
-    private:
+    
+    protected:
 
         void clearHoveredComponent();
+
+        static void setButtonState(Reactive* reactive, MouseButton button, bool value);
 
         NODISCARD bool buttonFromReactive(const Reactive* value, MouseButton& out) const;
 

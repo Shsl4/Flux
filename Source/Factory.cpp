@@ -1,10 +1,8 @@
 #include <Flux/Factory.h>
 #include <Flux/Application/Application.h>
 #include <Flux/Application/Window/GLWindow.h>
-#ifdef _WIN32
-#include <Flux/Application/Window/DXWindow.h>
-#endif
 #include <Flux/Application/Window/MetalWindow.h>
+#include <Flux/Application/Window/VKWindow.h>
 
 namespace Flux {
 
@@ -54,16 +52,15 @@ namespace Flux {
         
     }
 
-    Window* Factory::createWindow(RenderBackend backEnd, const String &name, Int width, Int height) {
+    Window* Factory::createWindow(Component* component, RenderBackend backEnd, const String &name, Int width, Int height) {
 
         if(backEnd == RenderBackend::Best){
             
 #ifdef __APPLE__
             backEnd = RenderBackend::Metal;
-#elif defined(WIN32)
-            backEnd = RenderBackend::DirectX;
 #else
-            backEnd = glfwVulkanSupported() ? RenderBackend::Vulkan : RenderBackend::OpenGL;
+            // TODO Switch to DirectX for windows and Vulkan for Linux when backends are implemented
+            backEnd = RenderBackend::OpenGL;
 #endif
         }
 
@@ -72,26 +69,24 @@ namespace Flux {
         switch (backEnd) {
 
             case RenderBackend::OpenGL:
-                window = Allocator<GLWindow>::construct(name, width, height);
+                window = Allocator<GLWindow>::construct(name, width, height, component);
                 break;
             case RenderBackend::Metal:
             #ifdef __APPLE__
-                window = Allocator<MetalWindow>::construct(name, width, height);
+                window = Allocator<MetalWindow>::construct(name, width, height, component);
+                break;
             #else
                 throw Exceptions::Exception("Unsupported backend.");
             #endif
+            case RenderBackend::Vulkan:
+                window = Allocator<VKWindow>::construct(name, width, height, component);
                 break;
             case RenderBackend::DirectX:
-            #ifdef _WIN32
-                window = Allocator<DXWindow>::construct(name, width, height);
-                break;
-            #endif
-            case RenderBackend::Vulkan:
             default:
                 throw Exceptions::Exception("Unsupported backend.");
         }
 
-        window->mainView()->setColor(ColorScheme::onyx.base);
+        window->mainComponent()->setColor(ColorScheme::onyx.base);
     
         factory->activeWindows += window;
 
@@ -99,4 +94,16 @@ namespace Flux {
 
     }
 
+    Window* Factory::createWindow(const RenderBackend backEnd, String const& name, const Int width, const Int height) {
+        return createWindow(nullptr, backEnd, name, width, height);
+    }
+
+    CursorManager* Factory::createCursorManager() {
+
+        CursorManager* manager = Allocator<CursorManager>::construct();
+        factory->managers += manager;
+        return manager;
+        
+    }
+    
 }

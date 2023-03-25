@@ -1,6 +1,18 @@
 #include <Flux/UI/Reactive.h>
+#include <GLFW/glfw3.h>
 
 namespace Flux {
+
+    Key::Key(Int key, Int mods) : key(key) {
+
+        this->bShift = mods & GLFW_MOD_SHIFT;
+        this->bCtrl = mods & GLFW_MOD_CONTROL;
+        this->bAlt = mods & GLFW_MOD_ALT;
+        this->bCaps = mods & GLFW_MOD_CAPS_LOCK;
+        this->bSuper = mods & GLFW_MOD_SUPER;
+        this->bNumLock = mods & GLFW_MOD_NUM_LOCK;
+        
+    }
 
     void Reactive::buttonDown(MouseButton button, Float64 x, Float64 y) {
 
@@ -14,7 +26,7 @@ namespace Flux {
 
     }
     
-    void Reactive::scroll(Float64 xOffset, Float64 yOffset) {
+    void Reactive::scroll(Float64 deltaX, Float64 deltaY) {
         
     }
     
@@ -26,7 +38,15 @@ namespace Flux {
 
             
     }
-    
+
+    void Reactive::keyDown(Key const& key) {
+        Console::log("{} received {}.\n", Type::name(*this), &(key.key));
+    }
+
+    void Reactive::keyUp(Key const& key) {
+        
+    }
+
     void Reactive::hovered() {
         this->bHovered = true;
     }
@@ -48,4 +68,5 @@ namespace Flux {
     void Reactive::setReactive(bool state) {
         this->bActive = state;
     }
+    
 }

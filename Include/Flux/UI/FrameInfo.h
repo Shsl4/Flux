@@ -15,7 +15,7 @@ namespace Flux {
 
         void initialize() override {
 
-            this->text = Flux::Factory::createComponent<Text>(Point::zero, size(), nullptr, 14.0f, VAlignment::top, HAlignment::left);
+            this->text = Factory::createComponent<Text>(Point::zero, size(), nullptr, 14.0f, VAlignment::top, HAlignment::left);
             this->addChild(text);
 
         }
@@ -30,14 +30,11 @@ namespace Flux {
                 lastFrameTime = (1000.0 / static_cast<Float64>(frameCount));
                 frameCount = 0;
                 lastTime += 1.0;
+                
+                text->setText(String::format("{} FPS", i64(1000.0 * (1.0 / lastFrameTime))));
 
             }
-
-            SkPaint paint;
-
-            const auto fps = i64(1000.0 * (1.0 / lastFrameTime));
-            String value = String::format("{} FPS", fps > 100000 ? 0 : fps);
-            text->setText(value);
+            
             text->draw(canvas, deltaTime);
 
         }

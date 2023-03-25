@@ -3,12 +3,12 @@
 
 namespace Flux {
 
-    void CursorManager::buttonDown(const MouseButton button) {
+    void CursorManager::handleButtonDown(const MouseButton button) {
         
         if (auto* component = master->componentAtPosition(cursorPosition())) {
             
             stateMap.add(button, component);
-            component->pressedState[static_cast<size_t>(button)] = true;
+            setButtonState(component, button, true);
             component->buttonDown(button, cursorX, cursorY);
 
             if(focused == component) { return; }
@@ -31,7 +31,7 @@ namespace Flux {
         
     }
 
-    void CursorManager::doubleClick(const MouseButton button) const {
+    void CursorManager::handleDoubleClick(const MouseButton button) {
 
         if (auto* component = master->componentAtPosition(cursorPosition())) {
             component->doubleClick(button, cursorX, cursorY);
@@ -39,12 +39,12 @@ namespace Flux {
         
     }
 
-    void CursorManager::buttonUp(const MouseButton button) {
+    void CursorManager::handleButtonUp(const MouseButton button) {
         
         try {
 
             Reactive* target = stateMap[button];
-            target->pressedState[static_cast<size_t>(button)] = false;
+            setButtonState(target, button, false);
             target->buttonUp(button, cursorX, cursorY, master->componentAtPosition(cursorPosition()));
             stateMap.removeByKey(button);
             
@@ -53,15 +53,15 @@ namespace Flux {
         
     }
 
-    void CursorManager::scroll(const Float64 xOffset, const Float64 yOffset) const {
+    void CursorManager::handleScroll(const Float64 deltaX, const Float64 deltaY) {
         
         if (auto* component = master->componentAtPosition(cursorPosition())) {
-            component->scroll(xOffset, yOffset);
+            component->scroll(deltaX, deltaY);
         }
         
     }
 
-    void CursorManager::cursorMoved(const Float64 x, const Float64 y) {
+    void CursorManager::handleCursorMoved(const Float64 x, const Float64 y) {
 
         // Update the cursor position.
         this->lastCursorX = cursorX;
@@ -101,6 +101,22 @@ namespace Flux {
 
     }
 
+    void CursorManager::handleKeyDown(Key const& key) {
+
+        if(focused) {
+            focused->keyDown(key);
+        }
+        
+    }
+    
+    void CursorManager::handleKeyUp(Key const& key) {
+
+        if(focused) {
+            focused->keyUp(key);
+        }
+        
+    }
+
     void CursorManager::setComponent(Component* value) { this->master = value; }
 
     void CursorManager::notifyDestruction(const Reactive* reactive) {
@@ -124,6 +140,10 @@ namespace Flux {
 
         }
         
+    }
+
+    void CursorManager::setButtonState(Reactive* reactive, MouseButton button, const bool value) {
+        reactive->pressedState[static_cast<size_t>(button)] = value;
     }
 
     bool CursorManager::buttonFromReactive(const Reactive* value, MouseButton& out) const {

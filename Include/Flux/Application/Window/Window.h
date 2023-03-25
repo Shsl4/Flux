@@ -18,18 +18,18 @@ namespace Flux {
 
         virtual void resized(Int width, Int height) = 0;
 
+        NODISCARD virtual CursorManager* cursorManager() const = 0;
+
+        NODISCARD virtual Component* mainComponent() const = 0;
+        
         virtual ~Window();
-
-        NODISCARD FORCEINLINE Component* mainView() const { return this->rootComponent; }
-
+    
     protected:
 
         friend class Application;
 
         Window() = default;
-
-        Shared<CursorManager> cursorManager = nullptr;
-        Component* rootComponent = nullptr;
+        
         MouseButton lastButtonPressed = MouseButton::Size;
         GLFWwindow* handle = nullptr;
         Float64 lastClickTime = 0.0;

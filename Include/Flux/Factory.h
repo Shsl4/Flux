@@ -31,7 +31,11 @@ namespace Flux {
             return component;
         }
         
+        static Window* createWindow(Component* component, RenderBackend backEnd, String const& name, Int width, Int height);
+        
         static Window* createWindow(RenderBackend backEnd, String const& name, Int width, Int height);
+        
+        static CursorManager* createCursorManager();
         
         static void destroyWindow(Window* window);
                 
@@ -46,7 +50,7 @@ namespace Flux {
         static inline Factory* factory = nullptr;
         
         SmartArray<Component> components = {};
-
+        SmartArray<CursorManager> managers = {};
         SmartArray<Window> activeWindows = {};
 
     };

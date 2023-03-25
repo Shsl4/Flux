@@ -37,11 +37,13 @@ namespace Flux {
             arrowTr.switchDirection();
             arrowTr.restartFromHere();
             stack->setReactive(!stack->reactive());
+            stack->setVisible(!stack->visible());
 
         });
 
         stack->setColor(Colors::transparent);
         stack->setReactive(false);
+        stack->setVisible(false);
         stack->setPosition({ 0, size().y });
 
     }
@@ -98,7 +100,8 @@ namespace Flux {
         arrowTr.switchDirection();
         arrowTr.restartFromHere();
         stack->setReactive(!stack->reactive());
-
+        stack->setVisible(!stack->visible());
+        
         if(i == currentSelection) return;
 
         this->currentSelection = i;

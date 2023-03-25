@@ -81,7 +81,6 @@ endif()
 
 set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Flux)
 
-target_include_directories(Flux PUBLIC ${NUCLEUS_INCLUDE})
 target_include_directories(Flux PRIVATE "${CMAKE_CURRENT_LIST_DIR}/Include/" "${CMAKE_CURRENT_LIST_DIR}/Include/Flux" ${FLUX_DEPENDENCIES_INCLUDES})
 
 set_target_properties(Flux PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Build/)

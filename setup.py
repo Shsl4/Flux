@@ -139,7 +139,7 @@ def build(debug):
     try:
         build_skia(debug)
         cmake_build('rtmidi', debug, ['-DRTMIDI_BUILD_STATIC_LIBS=1'])
-        cmake_build('rtaudio', debug, ['-DRTAUDIO_BUILD_SHARED_LIBS=1'])
+        cmake_build('rtaudio', debug, ['-DRTAUDIO_BUILD_STATIC_LIBS=1', '-DRTAUDIO_STATIC_MSVCRT=0'])
         cmake_build('glfw', debug)
         cmake_build('Nucleus', debug)
     except Exception as message:

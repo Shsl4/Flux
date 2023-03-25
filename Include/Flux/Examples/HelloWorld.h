@@ -13,6 +13,9 @@ namespace Flux {
 
             this->text = Factory::createComponent<Text>(Point::zero, s, "Hello, world!",
                                                         50.0f, VAlignment::center, HAlignment::center);
+
+            setReactive(false);
+            this->text->setReactive(false);
             setColor(Colors::transparent);
         }
 

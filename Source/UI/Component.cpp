@@ -13,9 +13,9 @@ namespace Flux {
         
     }
 
-    void Component::draw(SkCanvas* canvas, Float64 deltaTime) {
+    void Component::draw(SkCanvas* canvas, const Float64 deltaTime) {
 
-        if(!visible() || !reactive()) { return; }
+        if(!visible()) { return; }
 
         if(!color().transparent()){
 
@@ -53,6 +53,7 @@ namespace Flux {
 
         component->parentComponent = this;
         childrenArray += component;
+        
         component->parentLinked();
         childAdded(component);
 
@@ -116,7 +117,7 @@ namespace Flux {
         colorChanged();
     }
 
-    void Component::setVisible(bool state) {
+    void Component::setVisible(const bool state) {
         this->bVisible = state;
     }
 
@@ -169,20 +170,22 @@ namespace Flux {
         while (childrenArray.size() > 0){
             childrenArray[0]->dispose();
         }
-
+        
     }
 
-    Component* Component::componentAtPosition(const Point &p) const {
+    Component* Component::componentAtPosition(const Point &p) {
 
+        if(!reactive()) return nullptr;
+        
         for(size_t i = childrenArray.size(); i > 0; --i){
-
-            auto& child = childrenArray[i - 1];
+            
+            const auto& child = childrenArray[i - 1];
 
             if(auto* component = child->componentAtPosition(p)) return component;
 
         }
 
-        return const_cast<Component *>(inBounds(p) && reactive() ? this : nullptr);
+        return inBounds(p) ? this : nullptr;
 
     }
 

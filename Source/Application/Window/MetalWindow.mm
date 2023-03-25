@@ -14,7 +14,7 @@
 
 namespace Flux {
 
-    MetalWindow::MetalWindow(const String &title, Int windowWidth, Int windowHeight) {
+    MetalWindow::MetalWindow(const String &title, Int windowWidth, Int windowHeight, Component* rootComponent) {
 
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
@@ -49,10 +49,20 @@ namespace Flux {
 
         if(!this->context) throw Exceptions::Exception("Failed to create Skia metal context.");
 
-        this->rootComponent = Factory::createComponent<Component>(Point(0, 0), Point(windowWidth,windowHeight));
+        this->component = rootComponent ? rootComponent : Factory::createComponent<Component>(Point(0, 0), Point(f32(windowWidth), f32(windowHeight)));
 
-        this->cursorManager = Shared<CursorManager>::make();
-        this->cursorManager->setComponent(this->rootComponent);
+        if(auto* cast = dynamic_cast<CursorManager*>(component)) {
+            
+            this->manager = cast;
+            this->manager->setComponent(component);
+            
+        }
+        else {
+            
+            this->manager = Factory::createCursorManager();
+            this->manager->setComponent(this->component);
+            
+        }
 
     }
 

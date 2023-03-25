@@ -8,7 +8,7 @@ namespace Flux {
 
     public:
 
-        MetalWindow(const String &title, Int windowWidth, Int windowHeight);
+        MetalWindow(const String &title, Int windowWidth, Int windowHeight, Component* rootComponent = nullptr);
 
         void draw(const Float64 &deltaTime) override;
 
