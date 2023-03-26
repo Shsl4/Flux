@@ -50,7 +50,9 @@ namespace Flux::Audio {
 
     void IIRFilter::process(AudioBuffer<Float64> const& buffer) {
 
-        for(size_t channel = 0; channel < buffer.channels(); ++channel) {
+        assert(channelCount() <= buffer.channels());
+
+        for(size_t channel = 0; channel < channelCount(); ++channel) {
 
             Float64* data = buffer[channel];
             

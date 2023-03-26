@@ -4,9 +4,6 @@
 A C++ Audio and UI playground
 ## Building
 This project depends on Skia, GLFW, RtMidi, RtAudio, Vulkan-Headers and Nucleus, which must be compiled locally. A python script is provided to automate this process.
-
-> ⚠️ This commit only supports macOS arm64 and Windows x64 compilation. Linux has not been tested and will probably fail.
-
 ### macOS
 Install the required build tools:
 ```sh
@@ -38,4 +35,29 @@ python3 setup.py
 Open the generated Visual Studio project:
 ```sh
 open Flux.lnk
+```
+### Linux (Debian)
+Install the required build tools:
+```sh
+sudo apt install cmake
+sudo apt install ninja-build
+sudo apt install python3
+```
+Make sure required linux libraries are installed:
+```sh
+sudo apt install pulseaudio
+sudo apt install alsa
+sudo apt install libfreetype-dev
+sudo apt install libasound2-dev
+```
+Clone the project and launch the setup script:
+```sh
+git clone https://github.com/Shsl4/Flux.git --recursive
+cd Flux
+python3 setup.py
+```
+Open the project with a CMake compatible IDE such as CLion or use the makefile build:
+```sh
+cd .cmake
+make
 ```

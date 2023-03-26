@@ -24,9 +24,9 @@ namespace Flux::Audio {
 
     void Filter::process(AudioBuffer<Float64> const& buffer) {
 
-        assert(buffer.channels() <= channels);
+        assert(channels <= buffer.channels());
         
-        for(size_t channel = 0; channel < buffer.channels(); ++channel) {
+        for(size_t channel = 0; channel < channels; ++channel) {
             
             for (UInt sample = 0; sample < bufferSize(); ++sample) {
                 

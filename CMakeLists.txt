@@ -71,11 +71,17 @@ set(OpenGL_GL_PREFERENCE GLVND)
 
 find_package(X11 REQUIRED)
 find_package(Threads REQUIRED)
+find_package(ALSA REQUIRED)
+find_package(PulseAudio REQUIRED)
+find_package(Freetype REQUIRED)
+find_package(Fontconfig REQUIRED)
+find_library(PULSEAUDIO_LIBRARY NAMES pulse)
+find_package(OpenGL REQUIRED)
 
 target_include_directories(Flux PUBLIC ${X11_INCLUDE_DIR})
 
-target_link_libraries(Flux PUBLIC debug ${X11_LIBRARIES} ${X11_Xrandr_LIB} Threads::Threads ${CMAKE_DL_LIBS} ${FLUX_DEBUG_DEPENDENCIES})
-target_link_libraries(Flux PUBLIC optimized ${X11_LIBRARIES} ${X11_Xrandr_LIB} Threads::Threads ${CMAKE_DL_LIBS} ${FLUX_RELEASE_DEPENDENCIES})
+target_link_libraries(Flux PUBLIC debug ${X11_LIBRARIES} ${X11_Xrandr_LIB} ${ALSA_LIBRARIES} ${FREETYPE_LIBRARIES} ${Fontconfig_LIBRARIES} ${OPENGL_LIBRARIES} pulse pulse-simple Threads::Threads ${CMAKE_DL_LIBS} ${FLUX_DEBUG_DEPENDENCIES})
+target_link_libraries(Flux PUBLIC optimized ${X11_LIBRARIES} ${X11_Xrandr_LIB} ${ALSA_LIBRARIES} ${FREETYPE_LIBRARIES} ${OPENGL_LIBRARIES} pulse pulse-simple Threads::Threads ${CMAKE_DL_LIBS} ${FLUX_RELEASE_DEPENDENCIES})
 
 endif()
 

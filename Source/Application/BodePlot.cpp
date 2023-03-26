@@ -66,8 +66,8 @@ namespace Flux {
 
         if(!filter) return;
         
-        const Range logRange = { log10(9.0f), log10(f32(filter->sampleRate()) / 2.0f) };
-        const Range sizeRange = { size().y, 0.0f };
+        const Range<Float32> logRange = { log10(9.0f), log10(f32(filter->sampleRate()) / 2.0f) };
+        const Range<Float32> sizeRange = { size().y, 0.0f };
         const Range<Float32> linRange = Range<Float32>::makeLinearRange();
         const Point position = globalTransform().position;
         const Point scale = size();
@@ -136,11 +136,11 @@ namespace Flux {
     void BodePlot::drag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) {
 
         // Setup our range objects
-        const Range logRange = { log10(9.0f), log10(f32(filter->sampleRate()) / 2.0f) };
-        const Range freqRange = { 9.0f, (f32(filter->sampleRate()) / 2.0f) * 0.95f };
-        const Range resonanceRange = { 0.1f, 6.0f };
-        const Range hSizeRange = { 0.0f, size().x };
-        const Range vSizeRange = { size().y, 0.0f };
+        const Range<Float32> logRange = { log10(9.0f), log10(f32(filter->sampleRate()) / 2.0f) };
+        const Range<Float32> freqRange = { 9.0f, (f32(filter->sampleRate()) / 2.0f) * 0.95f };
+        const Range<Float32> resonanceRange = { 0.1f, 6.0f };
+        const Range<Float32> hSizeRange = { 0.0f, size().x };
+        const Range<Float32> vSizeRange = { size().y, 0.0f };
 
         // Transpose our mouse value to our logarithmic range
         const Float32 logValue = Range<Float32>::translateValue(f32(x), hSizeRange, logRange);
@@ -214,9 +214,9 @@ namespace Flux {
         paint.setStrokeWidth(0.5f);
         paint.setColor(scheme.base.skColor());
 
-        const Range logRange = { log10(9.0f), log10(f32(filter->sampleRate()) / 2.0f) };
+        const Range<Float32> logRange = { log10(9.0f), log10(f32(filter->sampleRate()) / 2.0f) };
         const Range<Float32> linRange = Range<Float32>::makeLinearRange();
-        const Range sizeRange = { size().y, 0.0f };
+        const Range<Float32> sizeRange = { size().y, 0.0f };
         const Point position = globalTransform().position;
         const Point scale = size();
 
@@ -327,7 +327,7 @@ namespace Flux {
             const Float64 normalizedResponse = (finalResponse - mindB) / (maxdB - mindB);
             const Float64 normalizedFrequency = Range<Float64>::translateValue(log10(freq), logRange, linRange);
 
-            if(!isfinite(normalizedResponse)) continue;
+            if(!std::isfinite(normalizedResponse)) continue;
 
             const Float32 drawX = pos.x + f32(normalizedFrequency) * size().x;
             const Float32 drawY = pos.y + size().y - f32(normalizedResponse) * size().y;
@@ -383,7 +383,7 @@ namespace Flux {
             const Float64 normalizedResponse = Range<Float64>::translateValue(response, phaseRange64, linRange);
             const Float64 normalizedFrequency = Range<Float64>::translateValue(log10(freq), logRange, linRange);
 
-            if(!isfinite(normalizedResponse)) continue;
+            if(!std::isfinite(normalizedResponse)) continue;
 
             const Float32 drawX = pos.x + f32(normalizedFrequency) * size().x;
             const Float32 drawY = pos.y + size().y - f32(normalizedResponse) * size().y;

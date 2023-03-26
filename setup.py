@@ -166,7 +166,7 @@ def build(debug):
         shutil.copy(f'Nucleus/.build/{path}/Nucleus{postfix}.lib', f'.build/{path}')
 
     else:
-        shutil.copy(f'skia/.build/{path}/libSkia.a', f'.build/{path}')
+        shutil.copy(f'skia/.build/{path}/libskia.a', f'.build/{path}')
         shutil.copy('rtmidi/.build/librtmidi.a', f'.build/{path}')
         shutil.copy('rtaudio/.build/librtaudio.a', f'.build/{path}')
         shutil.copy('glfw/.build/src/libglfw3.a', f'.build/{path}')
