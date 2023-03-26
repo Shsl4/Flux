@@ -14,7 +14,7 @@ namespace Flux::Audio {
         
         NODISCARD Float64 argument(Float64 omega) const override;
 
-        bool process(Float64* buffer) override;
+        void process(AudioBuffer<Float64> const& buffer) override;
 
         void setMix(Float64 value);
 
@@ -22,7 +22,7 @@ namespace Flux::Audio {
 
     protected:
         
-        Float64 processSingle(Float64 xn) override;
+        Float64 processSingle(Float64 xn, size_t channel) override;
 
         void recalculateCoefficients() override = 0;
 

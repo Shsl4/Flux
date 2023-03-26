@@ -2,8 +2,7 @@
 
 #include <Flux/UI/Stack.h>
 #include <Flux/Factory.h>
-#include <skia/include/core/SkFont.h>
-#include <skia/include/core/SkTextBlob.h>
+#include <UI/Fonts.h>
 
 namespace Flux {
 
@@ -62,6 +61,8 @@ namespace Flux {
         NODISCARD FORCEINLINE Float32 textSize() const { return this->renderer->textSize(); }
 
     protected:
+        
+        void colorChanged() override;
 
         void realign();
 

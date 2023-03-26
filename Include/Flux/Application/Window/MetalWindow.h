@@ -14,8 +14,15 @@ namespace Flux {
 
         void resized(Int width, Int height) override;
 
+        NODISCARD CursorManager* cursorManager() const override { return this->manager; }
+
+        NODISCARD Component* mainComponent() const override { return this->component; }
+
     private:
-    
+
+        Component* component = nullptr;
+        CursorManager* manager = nullptr;
+        
         void* mtkView = nullptr;
         void* mtlQueue = nullptr;
         sk_sp<GrDirectContext> context = nullptr;

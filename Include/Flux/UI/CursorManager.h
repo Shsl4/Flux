@@ -22,6 +22,8 @@ namespace Flux {
 
         virtual void handleCursorMoved(Float64 x, Float64 y);
 
+        virtual void handleDrag(Float64 deltaX, Float64 deltaY);
+
         virtual void handleKeyDown(Key const& key);
         
         virtual void handleKeyUp(Key const& key);

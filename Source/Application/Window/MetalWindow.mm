@@ -49,12 +49,16 @@ namespace Flux {
 
         if(!this->context) throw Exceptions::Exception("Failed to create Skia metal context.");
 
-        this->component = rootComponent ? rootComponent : Factory::createComponent<Component>(Point(0, 0), Point(f32(windowWidth), f32(windowHeight)));
+        this->component = Factory::createComponent<Component>(Point(0, 0), Point(f32(windowWidth), f32(windowHeight)));
 
-        if(auto* cast = dynamic_cast<CursorManager*>(component)) {
+        if(rootComponent) {
+            this->component->addChild(rootComponent);
+        }
+        
+        if(auto* cast = dynamic_cast<CursorManager*>(rootComponent)) {
             
             this->manager = cast;
-            this->manager->setComponent(component);
+            this->manager->setComponent(rootComponent);
             
         }
         else {

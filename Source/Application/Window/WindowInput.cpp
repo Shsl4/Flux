@@ -16,7 +16,7 @@ namespace Flux {
             windowFromHandle(window)->cursorManager()->handleKeyUp({ static_cast<char>(key), mods });
         }
 
-        // Application::instance->audioDevice->simulateMessage(key, action);
+        Application::instance()->audioDevice->simulateMessage(key, action);
         
     }
 

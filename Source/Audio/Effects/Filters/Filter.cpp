@@ -1,22 +1,40 @@
 #include <Audio/Effects/Filters/Filter.h>
-#include <memory>
 
 namespace Flux::Audio {
 
     void Filter::prepare(Float64 rate, UInt size) {
 
+        state.clear();
+
+        for (size_t i = 0; i < channelCount(); ++i) {
+            
+            MutableArray<Float64> arr(stateCount);
+            
+            for (size_t j = 0; j < stateCount; ++j) { arr += 0.0; }
+            
+            state += arr;
+            
+        }
+        
         AudioObject::prepare(rate, size);
+        
         recalculateCoefficients();
         
     }
 
-    bool Filter::process(Float64* buffer) {
+    void Filter::process(AudioBuffer<Float64> const& buffer) {
+
+        assert(buffer.channels() <= channels);
         
-        for (UInt sample = 0; sample < bufferSize(); ++sample) {
-            buffer[sample] = processSingle(buffer[sample]);
+        for(size_t channel = 0; channel < buffer.channels(); ++channel) {
+            
+            for (UInt sample = 0; sample < bufferSize(); ++sample) {
+                
+                buffer[channel][sample] = processSingle(buffer[channel][sample], channel);
+                
+            }
+            
         }
-        
-        return true;
         
     }
 

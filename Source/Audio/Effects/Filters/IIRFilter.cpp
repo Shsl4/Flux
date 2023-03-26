@@ -26,55 +26,59 @@ namespace Flux::Audio {
         
     }
 
-    Float64 IIRFilter::processSingle(const Float64 xn) {
+    Float64 IIRFilter::processSingle(const Float64 xn, size_t channel) {
         
         const Float64& wetMix = this->filterMix;
         const Float64& dryMix = 1.0 - this->filterMix;
 
         const Float64 compound = wetMix * (coefficients[a0] * xn +
-                                           coefficients[a1] * state[x_z1] +
-                                           coefficients[a2] * state[x_z2] -
-                                           coefficients[b1] * state[y_z1] -
-                                           coefficients[b2] * state[y_z2]);
+                                           coefficients[a1] * state[channel][x_z1] +
+                                           coefficients[a2] * state[channel][x_z2] -
+                                           coefficients[b1] * state[channel][y_z1] -
+                                           coefficients[b2] * state[channel][y_z2]);
         
         const Float64 yn = dryMix * xn + compound;
-
-        state[x_z2] = state[x_z1];
-        state[x_z1] = xn;
-        state[y_z2] = state[y_z1];
-        state[y_z1] = yn;
+        
+        state[channel][x_z2] = state[channel][x_z1];
+        state[channel][x_z1] = xn;
+        state[channel][y_z2] = state[channel][y_z1];
+        state[channel][y_z1] = yn;
         
         return yn;
         
     }
 
-    bool IIRFilter::process(Float64* buffer) {
+    void IIRFilter::process(AudioBuffer<Float64> const& buffer) {
 
-        for (UInt sample = 0; sample < bufferSize(); ++sample) {
+        for(size_t channel = 0; channel < buffer.channels(); ++channel) {
 
-            const Float64 xn = buffer[sample];
+            Float64* data = buffer[channel];
             
-            const Float64& wetMix = this->filterMix;
-            const Float64& dryMix = 1.0 - this->filterMix;
+            for (UInt sample = 0; sample < bufferSize(); ++sample) {
 
-            const Float64 compound = wetMix * (coefficients[a0] * xn +
-                                               coefficients[a1] * state[x_z1] +
-                                               coefficients[a2] * state[x_z2] -
-                                               coefficients[b1] * state[y_z1] -
-                                               coefficients[b2] * state[y_z2]);
+                const Float64 xn = data[sample];
+            
+                const Float64& wetMix = this->filterMix;
+                const Float64& dryMix = 1.0 - this->filterMix;
+
+                const Float64 compound = wetMix * (coefficients[a0] * xn +
+                                                   coefficients[a1] * state[channel][x_z1] +
+                                                   coefficients[a2] * state[channel][x_z2] -
+                                                   coefficients[b1] * state[channel][y_z1] -
+                                                   coefficients[b2] * state[channel][y_z2]);
         
-            const Float64 yn = dryMix * xn + compound;
+                const Float64 yn = dryMix * xn + compound;
 
-            state[x_z2] = state[x_z1];
-            state[x_z1] = xn;
-            state[y_z2] = state[y_z1];
-            state[y_z1] = yn;
+                state[channel][x_z2] = state[channel][x_z1];
+                state[channel][x_z1] = xn;
+                state[channel][y_z2] = state[channel][y_z1];
+                state[channel][y_z1] = yn;
 
-            buffer[sample] = yn;
+                data[sample] = yn;
+            
+            }
             
         }
-
-        return true;
         
     }
 

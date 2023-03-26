@@ -42,7 +42,10 @@ namespace Flux {
         glfwSetWindowSizeCallback(this->handle, &Window::resizeCallback);
         
         this->component = Factory::createComponent<Component>(Point(0, 0), Point(f32(windowWidth), f32(windowHeight)));
-        this->component->addChild(rootComponent);
+
+        if(rootComponent) {
+            this->component->addChild(rootComponent);
+        }
         
         if(auto* cast = dynamic_cast<CursorManager*>(rootComponent)) {
             

@@ -57,6 +57,18 @@ namespace Flux {
         
     }
 
+    void SceneComponent::handleDrag(Float64 deltaX, Float64 deltaY) {
+
+        Point newPoint = toWorld(cursorPosition());
+        
+        for (auto const& elem : stateMap) {
+            
+            elem.value()->drag(elem.key(), newPoint.x, newPoint.y, deltaX, deltaY);
+            
+        }
+        
+    }
+
     void SceneComponent::draw(SkCanvas* canvas, const Float64 deltaTime) {
 
         zoomAnim.update(deltaTime);

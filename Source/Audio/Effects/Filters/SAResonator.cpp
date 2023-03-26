@@ -27,19 +27,19 @@ namespace Flux::Audio {
         
     }
 
-    Float64 SAResonator::processSingle(Float64 xn) {
+    Float64 SAResonator::processSingle(Float64 xn, size_t channel) {
 
         Float64 yn = coefficients[a0] * xn +
-                     coefficients[a2] * state[x_z2] -
-                     coefficients[b1] * state[y_z1] -
-                     coefficients[b2] * state[y_z2];
+                     coefficients[a2] * state[channel][x_z2] -
+                     coefficients[b1] * state[channel][y_z1] -
+                     coefficients[b2] * state[channel][y_z2];
 
         checkFloatUnderflow(yn);
 
-        state[x_z2] = state[x_z1];
-        state[x_z1] = xn;
-        state[y_z2] = state[y_z1];
-        state[y_z1] = yn;
+        state[channel][x_z2] = state[channel][x_z1];
+        state[channel][x_z1] = xn;
+        state[channel][y_z2] = state[channel][y_z1];
+        state[channel][y_z1] = yn;
         
         return yn;
         

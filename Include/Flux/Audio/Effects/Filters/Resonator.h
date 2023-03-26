@@ -16,7 +16,7 @@ namespace Flux::Audio {
 
     protected:
 
-        Float64 processSingle(Float64 xn) override;
+        Float64 processSingle(Float64 xn, size_t channel) override;
         
         void recalculateCoefficients() override;
         

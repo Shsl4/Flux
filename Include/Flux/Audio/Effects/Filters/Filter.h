@@ -17,7 +17,7 @@ namespace Flux::Audio {
         
         void prepare(Float64 rate, UInt size) override;
 
-        bool process(Float64* buffer) override;
+        void process(AudioBuffer<Float64> const& buffer) override;
         
         NODISCARD virtual Float64 magnitude(Float64 omega) const;
         NODISCARD virtual Float64 argument(Float64 omega) const;
@@ -27,6 +27,7 @@ namespace Flux::Audio {
         
         NODISCARD FORCEINLINE Float64 cutoff() const { return cutoffFrequency; }
         NODISCARD FORCEINLINE Float64 resonance() const { return q; }
+        NODISCARD FORCEINLINE size_t channelCount() const { return channels; }
 
     protected:
 
@@ -40,10 +41,11 @@ namespace Flux::Audio {
         /**
          * \brief The z-1 storage registers
          */
-        Float64 state[stateCount] = {};
+        MutableArray<MutableArray<Float64>> state = {};
         
     private:
 
+        size_t channels = 2;
         Float64 cutoffFrequency = 440.0;
         Float64 q = 1.0;
         

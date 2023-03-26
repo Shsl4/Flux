@@ -27,14 +27,14 @@ namespace Flux::Audio {
         
     }
 
-    Float64 Resonator::processSingle(const Float64 xn) {
+    Float64 Resonator::processSingle(const Float64 xn, size_t channel) {
         
         const Float64 yn = coefficients[a0] * xn -
-                           coefficients[b1] * state[y_z1] -
-                           coefficients[b2] * state[y_z2];
+                           coefficients[b1] * state[channel][y_z1] -
+                           coefficients[b2] * state[channel][y_z2];
 
-        state[y_z2] = state[y_z1];
-        state[y_z1] = yn;
+        state[channel][y_z2] = state[channel][y_z1];
+        state[channel][y_z1] = yn;
 
         return yn;
         

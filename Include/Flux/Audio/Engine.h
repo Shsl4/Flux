@@ -1,14 +1,10 @@
 #pragma once
 
-#include "AudioEngine.h"
-#include "../MIDI/MidiManager.h"
-
 #include <Nucleus/Nucleus.h>
-#include <Flux/Audio/Effects/MultiProcessor.h>
-#include <Flux/Audio/Effects/Filters/IIRFilter.h>
-#include <Audio/Pipeline/Pipeline.h>
 
-using namespace Nucleus;
+#include <Audio/AudioEngine.h>
+#include <MIDI/MidiManager.h>
+#include <Audio/Effects/Filters/IIRFilter.h>
 
 namespace Flux {
 
@@ -36,17 +32,27 @@ namespace Flux {
             
         }
 
-        bool process(Float64* buffer) override {
-
+        bool playing() const { return velocity > 0.0; }
+        
+        void process(AudioBuffer<Float64> const& buffer) override {
+            
+            if(!playing()) return;
+            
             for (UInt sample = 0; sample < bufferSize(); ++sample) {
-                buffer[sample] = processSingle(buffer[sample]);
-            }
+                
+                auto proc = processSingle(buffer[0][sample], 0);
+                
+                for (size_t channel = 0; channel < buffer.channels(); ++channel) {
+                    
+                    buffer[channel][sample] += proc;
+                    
+                }
 
-            return true;
+            }
             
         }
         
-        Float64 processSingle(Float64 xn) override {
+        Float64 processSingle(Float64 xn, size_t channel) override {
             
             auto r  = signal() * velocity;
             updatePhase();
@@ -80,6 +86,69 @@ namespace Flux {
         Float64 phaseIncrement = 0.0;
         
     };
+
+    class Oscillator : public Audio::AudioObject {
+        
+    public:
+
+        Oscillator() {
+            for(size_t i = 0; i < 16; ++i) {
+                voices += Allocator<SawVoice>::construct();
+            }
+            activeVoices = Map<UInt, SawVoice*>(16);
+        }
+
+        void prepare(Float64 rate, UInt size) override {
+
+            for(auto const& voice : voices) {
+                voice->prepare(rate, size);
+            }
+            
+        }
+
+        void process(AudioBuffer<Float64> const& buffer) {
+
+            for(auto const& voice : voices) {
+                voice->process(buffer);
+            }
+            
+        }
+
+        void startNote(MidiMessage const& message) {
+
+            if(activeVoices.containsKey(message.noteNumber())) return;
+            
+            for(auto const& voice : voices) {
+                
+                if(!voice->playing()) {
+
+                    voice->setFrequency(message.noteFrequency());
+                    voice->setVelocity(message.linearValue());
+                    activeVoices.add({ message.noteNumber(), voice });
+                    break;
+                    
+                }
+                
+            }
+            
+        }
+
+        void stopNote(MidiMessage const& message) {
+
+            while(!activeVoices.containsKey(message.noteNumber())) return;
+            
+            activeVoices[message.noteNumber()]->setVelocity(0.0);
+            activeVoices.removeByKey(message.noteNumber());
+            
+        }
+
+
+    private:
+
+        Map<UInt, SawVoice*> activeVoices = {};
+        SmartArray<SawVoice> voices = {};
+        
+    };
     
     class Engine : public AudioEngine, public MidiManager {
 
@@ -100,6 +169,9 @@ namespace Flux {
         void closed() override;
 
     private:
+        
+        Oscillator osc;
+        Audio::LowPassFilter fil;
 
         Int pressCount = 0;
         UInt lastPressed = 0;

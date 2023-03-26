@@ -73,9 +73,7 @@ namespace Flux {
         const Float64 deltaX = lastCursorX - cursorX;
         const Float64 deltaY = lastCursorY - cursorY;
 
-        for (auto const& elem : stateMap) {
-            elem.value()->drag(elem.key(), x, y, deltaX, deltaY);
-        }
+        handleDrag(deltaX, deltaY);
 
         // If a component is under the cursor.
         if (auto* component = master->componentAtPosition(cursorPosition())) {
@@ -99,6 +97,16 @@ namespace Flux {
         // No component is bHovered, so stop hovering the old component if any.
         clearHoveredComponent();
 
+    }
+
+    void CursorManager::handleDrag(Float64 deltaX, Float64 deltaY) {
+
+        for (auto const& elem : stateMap) {
+            
+            elem.value()->drag(elem.key(), cursorX, cursorY, deltaX, deltaY);
+            
+        }
+        
     }
 
     void CursorManager::handleKeyDown(Key const& key) {

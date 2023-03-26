@@ -10,9 +10,9 @@ namespace Flux {
         if(textValue.isEmpty()) return;
 
         const Point pos = globalTransform().position;
-
+        
         canvas->drawSimpleText(&textValue[0], textValue.size(), SkTextEncoding::kUTF8,
-                               pos.x + 2.0f, pos.y + size().y - renderOffset, font, paint);
+                               pos.x, pos.y + size().y - renderOffset, font, paint);
 
     }
 
@@ -88,8 +88,7 @@ namespace Flux {
 
     TextRenderer::TextRenderer(String const& text, Float32 textSize) {
 
-        auto typeface = SkTypeface::MakeFromFile("../Resources/Fonts/VarelaRound-Regular.ttf");
-        this->font = SkFont(typeface);
+        this->font = Fonts::varelaRound;
         setColor(Colors::white);
         setText(text);
         setTextSize(textSize);
@@ -125,6 +124,10 @@ namespace Flux {
 
     void Text::modified() {
         realign();
+    }
+
+    void Text::colorChanged() {
+        renderer->setColor(color());
     }
 
     void Text::realign() {

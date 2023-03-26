@@ -73,6 +73,8 @@ namespace Flux {
 
         void handleButtonDown(MouseButton button) override;
 
+        void handleDrag(Float64 deltaX, Float64 deltaY) override;
+
         void scroll(Float64 deltaX, Float64 deltaY) override;
 
         void doubleClick(MouseButton button, Float64 x, Float64 y) override;

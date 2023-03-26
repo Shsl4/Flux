@@ -161,6 +161,12 @@ namespace Flux {
 
         }
 
+        FORCEINLINE static ColorScheme random(){
+
+            return fromColor(Color::randomColor());
+
+        }
+
         Color lightest = Colors::black;
         Color lighter = Colors::black;
         Color base = Colors::black;

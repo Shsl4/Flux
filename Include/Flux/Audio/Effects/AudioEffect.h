@@ -2,15 +2,17 @@
 
 #include <Flux/Audio/AudioObject.h>
 
+#include <Audio/AudioBuffer.h>
+
 namespace Flux::Audio {
 
     class AudioEffect : public AudioObject {
         
     public:
                 
-        virtual bool process(Float64* buffer) = 0;
+        virtual void process(AudioBuffer<Float64> const& buffer) = 0;
         
-        virtual Float64 processSingle(Float64 xn) { return 0.0; }
+        virtual Float64 processSingle(Float64 xn, size_t channel) { return 0.0; }
         
         constexpr static Float64 kSmallestPositiveFloatValue = 1.175494351e-38;
         constexpr static Float64 kSmallestNegativeFloatValue = -1.175494351e-38;

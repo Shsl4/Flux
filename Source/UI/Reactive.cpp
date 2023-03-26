@@ -40,7 +40,7 @@ namespace Flux {
     }
 
     void Reactive::keyDown(Key const& key) {
-        Console::log("{} received {}.\n", Type::name(*this), &(key.key));
+        Console::log("{} received {}.\n", Type::name(*this), (key.key));
     }
 
     void Reactive::keyUp(Key const& key) {
