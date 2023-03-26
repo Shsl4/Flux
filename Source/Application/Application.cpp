@@ -23,8 +23,6 @@ namespace Flux {
 
         application = this;
 
-        auto* errorFile = freopen("LibErrors.log", "w", stderr);
-
         this->console = Unique<Console>::make();
         this->factory = Unique<Factory>::make();
 
@@ -44,11 +42,11 @@ namespace Flux {
         constexpr Float32 fw = 100.0f;
         constexpr Float32 fh = 100.0f;
 
-        Point s = {fw, fh };
+        initializeAudio();
+        
+        Point s = { fw, fh };
 
         mainWindow->mainComponent()->addChild(Factory::createComponent<FrameInfo>(Point::zero, s));
-
-        initializeAudio();
         
         this->shouldRun = true;
 
@@ -61,8 +59,6 @@ namespace Flux {
         glfwMakeContextCurrent(nullptr);
 
         this->factory = nullptr;
-
-        fclose(errorFile);
 
         glfwTerminate();
 

@@ -79,7 +79,7 @@ namespace Flux {
         frame.size.width = width;
         view.frame = frame;
 
-        rootComponent->setSize({f32(width), f32(height)});
+        component->setSize({f32(width), f32(height)});
         
     }
 
@@ -97,7 +97,7 @@ namespace Flux {
             
             canvas->scale(dpiScale, dpiScale);
 
-            this->rootComponent->draw(canvas, deltaTime);
+            this->component->draw(canvas, deltaTime);
                         
             context->flushAndSubmit();
 

@@ -1,4 +1,4 @@
-﻿#include <Application/BodePlot.h>
+#include <Application/BodePlot.h>
 
 namespace Flux {
     

@@ -17,9 +17,6 @@ namespace Flux {
     }
 
     Engine::Engine() {
-        
-        AudioEngine::listDevices();
-        MidiManager::listDevices();
 
     }
 
@@ -30,7 +27,6 @@ namespace Flux {
         
         auto* graph = Factory::createComponent<BodePlot>(Point(0, 0), Point(1280, 720));
         graph->setFilter(&fil);
-
         Factory::windows()[0]->mainComponent()->addChild(graph);
         
     }

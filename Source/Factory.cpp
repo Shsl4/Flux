@@ -79,7 +79,9 @@ namespace Flux {
                 throw Exceptions::Exception("Unsupported backend.");
             #endif
             case RenderBackend::Vulkan:
+            #ifndef __APPLE__
                 window = Allocator<VKWindow>::construct(name, width, height, component);
+            #endif
                 break;
             case RenderBackend::DirectX:
             default:

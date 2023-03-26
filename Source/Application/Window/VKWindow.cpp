@@ -1,4 +1,4 @@
-﻿#define GLFW_INCLUDE_VULKAN
+#define GLFW_INCLUDE_VULKAN
 #include <vulkan/vulkan.h>
 #include <GLFW/glfw3.h>
 #include <Application/Window/VKWindow.h>
@@ -7,11 +7,12 @@
 #include <skia/include/gpu/GrDirectContext.h>
 #include <skia/include/gpu/vk/GrVkBackendContext.h>
 #include <skia/include/gpu/vk/GrVkTypes.h>
-#include <skia/include/gpu/vk/GrVkVulkan.h>
 #include <skia/include/gpu/vk/VulkanExtensions.h>
 
 #include <Factory.h>
 #include <set>
+
+#ifdef SK_VULKAN
 
 namespace Flux {
 
@@ -330,3 +331,5 @@ namespace Flux {
     }
     
 }
+
+#endif

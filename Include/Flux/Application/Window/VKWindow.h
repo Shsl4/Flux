@@ -1,8 +1,11 @@
-﻿#pragma once
+#pragma once
 
 #include <Application/Window/Window.h>
+#include <vulkan/vulkan.h>
 
 namespace Flux {
+
+#ifdef SK_VULKAN
     
     class VKWindow : public Window {
 
@@ -66,12 +69,14 @@ namespace Flux {
 
         void createSkiaContext(VkContext* context);
 
-        static NODISCARD bool suitableDevice(VkContext* context, VkPhysicalDevice dev);
+        NODISCARD static bool suitableDevice(VkContext* context, VkPhysicalDevice dev);
 
-        static NODISCARD UInt32 rateDevice(VkPhysicalDevice dev);
+        NODISCARD static UInt32 rateDevice(VkPhysicalDevice dev);
         
-        static NODISCARD QueueFamilyIndices findQueueFamilies(VkContext* context, VkPhysicalDevice device);
+        NODISCARD static QueueFamilyIndices findQueueFamilies(VkContext* context, VkPhysicalDevice device);
 
     };
+
+#endif
 
 }

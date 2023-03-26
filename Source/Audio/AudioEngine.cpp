@@ -27,6 +27,12 @@ namespace Flux {
             throw Exceptions::Exception("Failed to initialize audio system.\n");
         }
 
+        std::function<void(RtAudioErrorType, const std::string&)> callback = [](RtAudioErrorType err, std::string const& msg){
+            Console::error("{}\n", msg.c_str());
+        };
+        
+        audio->setErrorCallback(callback);
+        
     }
 
     AudioEngine::~AudioEngine() {
@@ -121,19 +127,21 @@ namespace Flux {
 
         this->sr = outData ? outData->info.preferredSampleRate : (inData ? inData->info.preferredSampleRate : 0);
 
-        // TODO: TRY / CATCH
-        audio->openStream(&outData->params, &inData->params, RTAUDIO_FLOAT64,
-                          static_cast<UInt>(sr),&bufSize, &audioCallback, this, &options);
+        RtAudioErrorType err = audio->openStream(&outData->params, &inData->params, RTAUDIO_FLOAT64,
+                          static_cast<UInt>(sr), &bufSize, &audioCallback, this, &options);
+        
+        if(err != RtAudioErrorType::RTAUDIO_NO_ERROR){
+            
+            this->outputChannels = 0;
+            this->inputChannels = 0;
+            this->sr = 0.0;
+
+            Console::error("Failed to open audio device!\n");
+            return false;
+            
+        }
 
         audio->startStream();
-
-        /*
-        this->outputChannels = 0;
-        this->inputChannels = 0;
-        this->sr = 0.0;
-
-        Console::error("Failed to open audio device: {}\n", e.getMessage());
-        return false;*/
 
         prepare(sr, bufSize);
 
