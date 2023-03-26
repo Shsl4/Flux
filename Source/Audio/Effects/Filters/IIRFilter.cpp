@@ -26,6 +26,14 @@ namespace Flux::Audio {
         
     }
 
+    std::complex<Float64> IIRFilter::openTransfer(Float64 omega) const {
+
+        const std::complex<Float64> z1(std::cos(omega), -sin(omega));
+        const std::complex<Float64> z2(std::cos(2.0 * omega), -sin(2.0 * omega));
+        return coefficients[b1] * z1 + coefficients[b2] * z2;
+        
+    }
+
     Float64 IIRFilter::processSingle(const Float64 xn, size_t channel) {
         
         const Float64& wetMix = this->filterMix;

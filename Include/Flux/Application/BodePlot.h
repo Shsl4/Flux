@@ -36,6 +36,24 @@ namespace Flux {
         NumberType maxValue;
 
     };
+        
+    inline Float64 freqToRad(Float64 f, Float64 ny) {
+        return (f * Math::pi<Float64>) / ny;
+    }
+    
+    inline MutableArray<Float64> distributeAround(Float64 freq, Float64 ny, UInt count) {
+
+        auto values = MutableArray<Float64>(count);
+        const Float64 baseRad = freqToRad(9.0, ny);
+
+        // todo: distribute around f
+        for (size_t i = 0; i < count; ++i) {
+            values += baseRad + (Math::pi<Float64> - baseRad) * pow(f64(i) / f64(count), 5.0);
+        }
+
+        return values;
+
+    }
 
     class BodePlot : public Component {
         
@@ -54,6 +72,8 @@ namespace Flux {
         void setFilter(Audio::Filter* fil);
 
         void keyDown(Key const& key) override;
+
+        void setCallback(Function<void(BodePlot*)> const& valueChanged);
 
     protected:
         
@@ -76,6 +96,8 @@ namespace Flux {
 
         void recalculatePath();
 
+        Function<void(BodePlot*)> callback = nullptr;
+
         SkPath path;
         Audio::Filter* filter = nullptr;
         ColorScheme scheme = ColorScheme::coral;
@@ -86,7 +108,7 @@ namespace Flux {
         DrawMode mode = DrawMode::frequency;
 
         static inline const MutableArray<Float32> gainsToDraw = { -18.0f, -12.0f, -6.0f, 0.0f, 6.0f, 12.0f, 18.0f };
-        static inline const MutableArray<Float32> phasesToDraw = { -300.0f, -240.0f, -180.0f, -120.0f, -60.0f };
+        static inline const MutableArray<Float32> phasesToDraw = { -315.0f, -270.0f, -225.0f, -180.0f, -135.0f, -90.0f, -45.0f };
 
         static const inline Range<Float32> phaseRange = { -360.0f, 0.0f };
         static const inline Range<Float64> phaseRange64 = { -360.0, 0.0 };

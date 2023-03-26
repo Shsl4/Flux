@@ -165,6 +165,23 @@ namespace Flux {
 
         NODISCARD virtual Component* componentAtPosition(Point const& p);
 
+        template<typename T>
+        NODISCARD T* firstComponentOf() const {
+
+            for (auto const& child : childrenArray) {
+                
+                if(T* obj = dynamic_cast<T*>(child)) {
+                    
+                    return obj;
+                    
+                }
+                
+            }
+
+            return nullptr;
+            
+        }
+
         virtual void draw(SkCanvas* canvas, Float64 deltaTime);
 
         virtual void initialize();

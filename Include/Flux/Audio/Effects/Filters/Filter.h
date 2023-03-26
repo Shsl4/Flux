@@ -21,6 +21,7 @@ namespace Flux::Audio {
         
         NODISCARD virtual Float64 magnitude(Float64 omega) const;
         NODISCARD virtual Float64 argument(Float64 omega) const;
+        NODISCARD virtual std::complex<Float64> openTransfer(Float64 omega) const;
         
         virtual void setCutoffFrequency(Float64 cutoff);
         virtual void setResonance(Float64 value);

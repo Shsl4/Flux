@@ -35,9 +35,9 @@ namespace Flux {
         constexpr Int windowWidth = 1280;
         constexpr Int windowHeight = 720;
         
-        //auto* scene = Factory::createComponent<SceneComponent>(Point::zero, Point(windowWidth, windowHeight));
+        auto* scene = Factory::createComponent<SceneComponent>(Point::zero, Point(windowWidth, windowHeight));
         
-        this->mainWindow = Factory::createWindow(nullptr, RenderBackend::Best, "Application", windowWidth, windowHeight);
+        this->mainWindow = Factory::createWindow(scene, RenderBackend::Best, "Application", windowWidth, windowHeight);
 
         constexpr Float32 fw = 100.0f;
         constexpr Float32 fh = 100.0f;

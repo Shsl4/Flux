@@ -14,6 +14,8 @@ namespace Flux::Audio {
         
         NODISCARD Float64 argument(Float64 omega) const override;
 
+        NODISCARD std::complex<Float64> openTransfer(Float64 omega) const override;
+
         void process(AudioBuffer<Float64> const& buffer) override;
 
         void setMix(Float64 value);

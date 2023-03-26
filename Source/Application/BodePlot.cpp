@@ -32,6 +32,8 @@ namespace Flux {
             Text* text = Factory::createComponent<Text>(Point(0.0f, 0.0f), Point(100, 100),
                 value.key(), textSize, VAlignment::bottom, HAlignment::center);
 
+            text->setReactive(false);
+
             text->setColor(scheme.lightest);
             
             frequencyTexts.add({ value.value(), text });
@@ -43,6 +45,8 @@ namespace Flux {
         for (size_t i = 0; i < 7; ++i) {
             
             Text* text = Factory::createComponent<Text>(Point(0.0f, 0.0f), Point(100, 100), "", textSize, VAlignment::bottom, HAlignment::right);
+
+            text->setReactive(false);
 
             text->setColor(scheme.lightest);
             
@@ -154,6 +158,10 @@ namespace Flux {
         filter->setResonance(f64(q));
         filter->setCutoffFrequency(f64(freq));
 
+        if(callback) {
+            callback(this);
+        }
+
         // Recalculate the filter's frequency response.
         recalculatePath();
         
@@ -206,6 +214,10 @@ namespace Flux {
             
         }
         
+    }
+
+    void BodePlot::setCallback(Function<void(BodePlot*)> const& valueChanged) {
+        this->callback = valueChanged;
     }
 
     void BodePlot::drawGrid(SkCanvas* canvas, Float64 deltaTime) {
@@ -265,24 +277,6 @@ namespace Flux {
 
         }
         
-    }
-    
-    Float64 freqToRad(Float64 f, Float64 ny) {
-        return (f * Math::pi<Float64>) / ny;
-    }
-    
-    MutableArray<Float64> distributeAround(Float64 freq, Float64 ny, UInt count) {
-
-        auto values = MutableArray<Float64>(count);
-        const Float64 baseRad = freqToRad(9.0, ny);
-
-        // todo: distribute around f
-        for (size_t i = 0; i < count; ++i) {
-            values += baseRad + (Math::pi<Float64> - baseRad) * pow(f64(i) / f64(count), 5.0);
-        }
-
-        return values;
-
     }
 
     void BodePlot::recalculatePath() {

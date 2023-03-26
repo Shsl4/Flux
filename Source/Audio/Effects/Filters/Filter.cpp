@@ -46,6 +46,10 @@ namespace Flux::Audio {
         return 0.0;
     }
 
+    std::complex<Float64> Filter::openTransfer(Float64 omega) const {
+        return 0.0;
+    }
+
     void Filter::setCutoffFrequency(const Float64 cutoff) {
 
         assert(cutoff >= 0.0);

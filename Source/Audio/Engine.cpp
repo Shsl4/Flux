@@ -5,6 +5,9 @@
 
 #include <Application/BodePlot.h>
 
+#include "Application/NyquistPlot.h"
+#include "UI/SceneComponent.h"
+
 namespace Flux {
 
     void Engine::opened() {
@@ -24,10 +27,21 @@ namespace Flux {
         
         osc.prepare(rate, size);
         fil.prepare(rate, size);
+
+        auto* scene = Factory::windows()[0]->mainComponent()->firstComponentOf<SceneComponent>();
         
-        auto* graph = Factory::createComponent<BodePlot>(Point(0, 0), Point(1280, 720));
+        auto* graph = Factory::createComponent<BodePlot>(Point(0, 0), Point(1280 / 2, 720 / 2));
         graph->setFilter(&fil);
-        Factory::windows()[0]->mainComponent()->addChild(graph);
+        
+        auto* nyq = Factory::createComponent<NyquistPlot>(Point(1280 / 2, 0), Point(720 / 2, 720 / 2));
+        nyq->setFilter(&fil);
+
+        graph->setCallback([nyq](BodePlot* plot) {
+           nyq->recalculateResponse(); 
+        });
+        
+        scene->addChild(graph);
+        scene->addChild(nyq);
         
     }
 
