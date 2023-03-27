@@ -88,6 +88,7 @@ namespace Flux {
         osc.process(audioBuffer);
         fil.process(audioBuffer);
 
+        // TODO: Fix heap use after free when closing window
         oscPlot->feed(audioBuffer);
 
     }

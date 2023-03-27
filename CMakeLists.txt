@@ -37,6 +37,7 @@ set(FLUX_DEPENDENCIES_INCLUDES ${CMAKE_CURRENT_LIST_DIR}/Libraries/
 set(FLUX_ALL ${FLUX_SOURCES} ${FLUX_HEADERS} ${FLUX_INLINE})
 
 add_compile_definitions(FLUX_VERSION="${CMAKE_PROJECT_VERSION}")
+add_compile_definitions(FLUX_RESOURCES=\"${CMAKE_CURRENT_LIST_DIR}/Resources\")
 
 add_executable(Flux ${FLUX_SOURCES} ${FLUX_HEADERS} ${FLUX_INLINE})
 

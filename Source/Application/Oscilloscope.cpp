@@ -39,7 +39,7 @@ namespace Flux {
 
         const size_t bufferSize = buffer.bufferSize();
 
-        memcpy(data.data(), data.data() + bufferSize, sizeof(Float64) * (windowSize - bufferSize));
+        memmove(data.data(), data.data() + bufferSize, sizeof(Float64) * (windowSize - bufferSize));
         memcpy(data.data() + (windowSize - bufferSize), buffer[0], sizeof(Float64) * bufferSize);
 
     }

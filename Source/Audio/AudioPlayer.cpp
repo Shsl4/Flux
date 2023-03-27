@@ -37,7 +37,7 @@ namespace Flux {
         this->playHead = 0;
     }
 
-    AudioPlayer::AudioPlayer() : wavefile("../Resources/Audio/100bpm_virtual_riot.wav") {
+    AudioPlayer::AudioPlayer() : wavefile(String::format("{}/Audio/100bpm_virtual_riot.wav", FLUX_RESOURCES)) {
 
     }
 
