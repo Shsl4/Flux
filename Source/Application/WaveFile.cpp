@@ -8,16 +8,16 @@ namespace Flux {
 
         file.load(path);
 
-        this->chunkId = file.readMultiple<char>(4).data();
+        this->chunkId = String(file.readMultiple<char>(4).data(), 4);
 
         nthrowif(chunkId != "RIFF", "Not a riff file.");
 
         this->chunkSize = file.read<Int32>();
-        this->format = file.readMultiple<char>(4).data();
+        this->format = String(file.readMultiple<char>(4).data(), 4);
 
         nthrowif(format != "WAVE", "Not a wave file.");
 
-        this->subChunk1Id = file.readMultiple<char>(4).data();
+        this->subChunk1Id = String(file.readMultiple<char>(4).data(), 4);
 
         nthrowif(subChunk1Id != "fmt ", "Format chunk expected but not found.");
 
@@ -31,7 +31,7 @@ namespace Flux {
 
         nthrowif(bitsPerSample != 16, "Only 16 bits wave files are supported.");
 
-        this->subChunk2Id = file.readMultiple<char>(4).data();
+        this->subChunk2Id = String(file.readMultiple<char>(4).data(), 4);
 
         nthrowif(subChunk2Id != "data", "Data chunk expected but not found.");
 
