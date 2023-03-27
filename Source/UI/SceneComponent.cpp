@@ -1,4 +1,4 @@
-﻿#include <UI/SceneComponent.h>
+#include <UI/SceneComponent.h>
 #include <Examples/ColorsExample.h>
 #include <Factory.h>
 
@@ -8,9 +8,10 @@ namespace Flux {
         
         setColor(Colors::transparent);
 
-        Point textSize = { 100, 14 };
+        Point textSize = { 100, 20 };
         
-        this->offsetText = Factory::createComponent<Text>(s - Point(100, 20), Point(100, 20.0f), "(0, 0)", 14.0f, VAlignment::bottom, HAlignment::right);
+        this->offsetText = Factory::createComponent<Text>(s - Point(100, 20), textSize, "(0, 0)", 14.0f, VAlignment::bottom, HAlignment::right);
+        
         this->scaleText = Factory::createComponent<Text>(s - textSize - Point(0, 20), textSize, "x1.00", 14.0f, VAlignment::bottom, HAlignment::right);
 
     }

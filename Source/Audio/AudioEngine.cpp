@@ -141,9 +141,9 @@ namespace Flux {
             
         }
 
-        audio->startStream();
-
         prepare(sr, bufSize);
+
+        audio->startStream();
 
         opened();
 

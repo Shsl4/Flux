@@ -9,9 +9,7 @@ namespace Flux::Audio {
     class AudioEffect : public AudioObject {
         
     public:
-                
-        virtual void process(AudioBuffer<Float64> const& buffer) = 0;
-        
+
         virtual Float64 processSingle(Float64 xn, size_t channel) { return 0.0; }
         
         constexpr static Float64 kSmallestPositiveFloatValue = 1.175494351e-38;

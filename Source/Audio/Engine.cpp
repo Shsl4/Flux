@@ -7,6 +7,7 @@
 
 #include "Application/NyquistPlot.h"
 #include "UI/SceneComponent.h"
+#include "Application/Oscilloscope.h"
 
 namespace Flux {
 
@@ -36,13 +37,20 @@ namespace Flux {
         auto* nyq = Factory::createComponent<NyquistPlot>(Point(1280 / 2, 0), Point(720 / 2, 720 / 2));
         nyq->setFilter(&fil);
 
+        this->oscPlot = Factory::createComponent<Oscilloscope>(Point(0, 720 / 2), Point(1280 / 2, 720 / 2));
+
         graph->setCallback([nyq](BodePlot* plot) {
            nyq->recalculateResponse(); 
         });
         
         scene->addChild(graph);
         scene->addChild(nyq);
-        
+        scene->addChild(oscPlot);
+
+        player.prepare(rate, size);
+
+        player.play();
+
     }
 
     void Engine::receiveMessage(MidiMessage const& message) {
@@ -75,9 +83,12 @@ namespace Flux {
         memset(outputBuffer, 0, sizeof(Float64) * numOutputChannels() * bufferSize());
 
         const auto audioBuffer = AudioBuffer(outputBuffer, numOutputChannels(), bufferSize());
-        
+
+        player.process(audioBuffer);
         osc.process(audioBuffer);
         fil.process(audioBuffer);
+
+        oscPlot->feed(audioBuffer);
 
     }
 

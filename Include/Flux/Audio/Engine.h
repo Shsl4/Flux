@@ -5,6 +5,8 @@
 #include <Audio/AudioEngine.h>
 #include <MIDI/MidiManager.h>
 #include <Audio/Effects/Filters/IIRFilter.h>
+#include "Application/Oscilloscope.h"
+#include "AudioPlayer.h"
 
 namespace Flux {
 
@@ -32,7 +34,7 @@ namespace Flux {
             
         }
 
-        bool playing() const { return velocity > 0.0; }
+        NODISCARD bool playing() const { return velocity > 0.0; }
         
         void process(AudioBuffer<Float64> const& buffer) override {
             
@@ -106,7 +108,7 @@ namespace Flux {
             
         }
 
-        void process(AudioBuffer<Float64> const& buffer) {
+        void process(AudioBuffer<Float64> const& buffer) override {
 
             for(auto const& voice : voices) {
                 voice->process(buffer);
@@ -169,9 +171,11 @@ namespace Flux {
         void closed() override;
 
     private:
-        
+
+        Oscilloscope* oscPlot;
         Oscillator osc;
         Audio::LowPassFilter fil;
+        AudioPlayer player;
 
         Int pressCount = 0;
         UInt lastPressed = 0;

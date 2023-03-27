@@ -106,9 +106,6 @@ namespace Flux {
         constexpr Float64 pi = Math::pi<Float64>;
         constexpr UInt points = 500;
         const Float32 circleRadius = size().x / 4.0f;
-
-        std::complex<Float64> mx = 0.0;
-        std::complex<Float64> first = 0.0;
         
         const static auto values = distributeLinear(points, 2.0 * pi);
 
@@ -117,13 +114,7 @@ namespace Flux {
             const std::complex<Float64> cplx = filter->openTransfer(values[i]);
             const Float64 real = cplx.real();
             const Float64 imag = cplx.imag();
-            
-            Float64 v = std::sqrt(real * real + imag * imag);
 
-            if(v > std::sqrt(mx.real() * mx.real() + mx.imag() * mx.imag())) {
-                mx = cplx;
-            }
-            
             const Float32 drawX = pos.x + circleRadius * f32(real) + size().x / 2.0f;
             const Float32 drawY = pos.y + circleRadius * f32(imag) + size().y / 2.0f;
 
@@ -131,7 +122,6 @@ namespace Flux {
 
             if(i == 0){
                 firstPoint = newPoint;
-                first = cplx;
                 path.moveTo(newPoint.x, newPoint.y);
             }
             else{
