@@ -93,8 +93,6 @@ namespace Flux {
 
         const auto& ch = children();
 
-        const Float32 totalHeight = childrenHeight();
-
         Float32 newY = initialDrawY();
 
         for(auto* child : ch){

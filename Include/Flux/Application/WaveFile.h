@@ -10,21 +10,25 @@ namespace Flux {
 
         explicit WaveFile(String const& path);
 
+        explicit WaveFile(MutableArray<MutableArray<Float64>> const& data, size_t sampleRate);
+
         bool write(String const& path);
 
+        String name;
         String chunkId;
-        Int32 chunkSize;
+        UInt32 chunkSize;
         String format;
         String subChunk1Id;
-        Int32 subChunk1Size;
-        Int16 audioFormat;
-        Int16 channelCount;
-        Int32 sampleRate;
-        Int32 byteRate;
-        Int16 blockAlign;
-        Int16 bitsPerSample;
+        UInt32 subChunk1Size;
+        UInt16 audioFormat;
+        UInt16 channelCount;
+        UInt32 sampleRate;
+        UInt32 byteRate;
+        UInt16 blockAlign;
+        UInt16 bitsPerSample;
+        UInt16 cbSize;
         String subChunk2Id;
-        Int32 subChunk2Size;
+        UInt32 subChunk2Size;
         size_t samplesPerChannel;
 
         MutableArray<MutableArray<Float64>> buffers;

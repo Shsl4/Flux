@@ -14,7 +14,7 @@ namespace Flux{
 
     public:
 
-        CoolAnimation(class Stack* p) : st(p){
+        CoolAnimation(class Stack* p) : stack(p){
             setAutoReverse(true);
             setDuration(1.0f);
             setLooping(true);
@@ -23,7 +23,7 @@ namespace Flux{
     protected:
 
         void process(Float64 deltaTime) override;
-        Stack* st;
+        Stack* stack;
 
     };
 
@@ -49,7 +49,7 @@ namespace Flux{
     };
 
     void CoolAnimation::process(Float64 deltaTime) {
-        st->setSpacing(Math::easeInOut(0.0f, 100.0f, f32(progress()), 2));
+        stack->setSpacing(Math::easeInOut(0.0f, 100.0f, f32(progress()), 2));
     }
 
     class StacksExample : public CoolStack<VStack> {

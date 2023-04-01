@@ -29,6 +29,8 @@ namespace Flux {
 
     bool Factory::valid(Component* component) { return factory->components.contains(component); }
 
+    bool Factory::valid(Window* component) { return factory->activeWindows.contains(component); }
+
     void Factory::dispose(Component* component) {
 
         if(!valid(component)) return;
@@ -98,6 +100,18 @@ namespace Flux {
 
     Window* Factory::createWindow(const RenderBackend backEnd, String const& name, const Int width, const Int height) {
         return createWindow(nullptr, backEnd, name, width, height);
+    }
+
+    WaveFile* Factory::loadWaveFile(String const& name){
+    
+        for(auto const& file : factory->waveFiles){
+            if(file->name == name) return file;
+        }
+        
+        WaveFile* waveFile = Allocator<WaveFile>::construct(name);
+        factory->waveFiles += waveFile;
+        return waveFile;
+    
     }
 
     CursorManager* Factory::createCursorManager() {

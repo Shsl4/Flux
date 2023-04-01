@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Flux/UI/Component.h>
+#include <Application/WaveFile.h>
 #include <Flux/Application/Window/Window.h>
 
 namespace Flux {
@@ -35,11 +36,15 @@ namespace Flux {
         
         static Window* createWindow(RenderBackend backEnd, String const& name, Int width, Int height);
         
+        static WaveFile* loadWaveFile(String const& name);
+        
         static CursorManager* createCursorManager();
         
         static void destroyWindow(Window* window);
                 
         static bool valid(Component* component);
+
+        static bool valid(Window* component);
 
         static void dispose(Component* component);
 
@@ -52,6 +57,7 @@ namespace Flux {
         SmartArray<Component> components = {};
         SmartArray<CursorManager> managers = {};
         SmartArray<Window> activeWindows = {};
+        SmartArray<WaveFile> waveFiles = {};
 
     };
 

@@ -13,7 +13,6 @@ namespace Flux {
 
     void Engine::opened() {
 
-        
     }
 
     void Engine::closed() {
@@ -21,34 +20,33 @@ namespace Flux {
     }
 
     Engine::Engine() {
-
+        module.initialize();
     }
 
     void Engine::prepare(Float64 rate, UInt size) {
         
         osc.prepare(rate, size);
-        fil.prepare(rate, size);
+        module.prepare(rate, size);
 
-        auto* scene = Factory::windows()[0]->mainComponent()->firstComponentOf<SceneComponent>();
-        
-        auto* graph = Factory::createComponent<BodePlot>(Point(0, 0), Point(1280 / 2, 720 / 2));
-        graph->setFilter(&fil);
-        
-        auto* nyq = Factory::createComponent<NyquistPlot>(Point(1280 / 2, 0), Point(720 / 2, 720 / 2));
-        nyq->setFilter(&fil);
+        module.openWindow();
 
-        this->oscPlot = Factory::createComponent<Oscilloscope>(Point(0, 720 / 2), Point(1280 / 2, 720 / 2));
-
-        graph->setCallback([nyq](BodePlot* plot) {
-           nyq->recalculateResponse(); 
-        });
-        
-        scene->addChild(graph);
-        scene->addChild(nyq);
-        scene->addChild(oscPlot);
-
+        player.loadFile(FLUX_RESOURCES"/Audio/100bpm_virtual_riot.wav");
         player.prepare(rate, size);
 
+        player.transpose(2);
+        player.resample().write(FLUX_RESOURCES"/Audio/transposed.wav");
+
+        player.transpose(0);
+        player.setReverse(true);
+        player.resample().write(FLUX_RESOURCES"/Audio/reversed.wav");
+
+        player.setReverse(false);
+        player.setStartTime(21.25);
+        player.setEndTime(21.50);
+        player.resample().write(FLUX_RESOURCES"/Audio/resampled.wav");
+
+        player.resetStartAndEnd();
+        player.setLooping(true);
         player.play();
 
     }
@@ -86,10 +84,7 @@ namespace Flux {
 
         player.process(audioBuffer);
         osc.process(audioBuffer);
-        fil.process(audioBuffer);
-
-        // TODO: Fix heap use after free when closing window
-        oscPlot->feed(audioBuffer);
+        module.process(audioBuffer);
 
     }
 

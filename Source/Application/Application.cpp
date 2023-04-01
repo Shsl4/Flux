@@ -57,6 +57,8 @@ namespace Flux {
         Console::log("Exiting Application.\n");
 
         glfwMakeContextCurrent(nullptr);
+        
+        this->audioDevice->close();
 
         this->factory = nullptr;
 

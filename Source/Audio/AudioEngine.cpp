@@ -123,7 +123,7 @@ namespace Flux {
         this->inputChannels = inData ? inData->params.nChannels : 0;
 
         RtAudio::StreamOptions options;
-        options.flags = RTAUDIO_NONINTERLEAVED;
+        options.flags = RTAUDIO_NONINTERLEAVED | RTAUDIO_MINIMIZE_LATENCY;
 
         this->sr = outData ? outData->info.preferredSampleRate : (inData ? inData->info.preferredSampleRate : 0);
 

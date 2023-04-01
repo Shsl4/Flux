@@ -1,41 +1,12 @@
-﻿#pragma once
+#pragma once
 
 #include <UI/Component.h>
 
 #include <Audio/Effects/Filters/Filter.h>
+#include <Utility/Range.h>
 #include <UI/Text.h>
 
 namespace Flux {
-    
-    template<typename NumberType>
-    struct Range{
-        
-        Range(NumberType min, NumberType max) : minValue(min), maxValue(max) {}
-
-        NODISCARD static Range makeLinearRange() { return { static_cast<NumberType>(0), static_cast<NumberType>(1) }; }
-
-        NODISCARD FORCEINLINE NumberType min() const{ return this->minValue; }
-
-        NODISCARD FORCEINLINE NumberType max() const{ return this->maxValue; }
-
-        NODISCARD FORCEINLINE NumberType clamp(NumberType v) const { return Math::clamp(v, minValue, maxValue); }
-
-        NODISCARD FORCEINLINE NumberType clampAround(NumberType v) const { return Math::clampAround(v, minValue, maxValue); }
-
-        static NumberType translateValue(NumberType value, Range fromRange, Range toRange){
-
-            NumberType fromValue = fromRange.max() - fromRange.min();
-            NumberType toValue = toRange.max() - toRange.min();
-            return (value - fromRange.min()) * toValue / fromValue + toRange.min();
-
-        }
-
-    private:
-
-        NumberType minValue;
-        NumberType maxValue;
-
-    };
         
     inline Float64 freqToRad(Float64 f, Float64 ny) {
         return (f * Math::pi<Float64>) / ny;
@@ -58,6 +29,14 @@ namespace Flux {
     class BodePlot : public Component {
         
     public:
+
+        class Listener{
+
+        public:
+
+            virtual void valueChanged(BodePlot* plot, Float64 f, Float64 q) = 0;
+
+        };
         
         BodePlot(Point const& p, Point const& s);
 
@@ -73,7 +52,13 @@ namespace Flux {
 
         void keyDown(Key const& key) override;
 
-        void setCallback(Function<void(BodePlot*)> const& valueChanged);
+        void recalculatePath();
+
+        NODISCARD FORCEINLINE Audio::Filter* fil() const { return this->filter; }
+
+        void addListener(Listener* listener);
+
+        void removeListener(Listener* listener);
 
     protected:
         
@@ -94,18 +79,14 @@ namespace Flux {
 
         void recalculateFrequencyResponse();
 
-        void recalculatePath();
-
-        Function<void(BodePlot*)> callback = nullptr;
-
         SkPath path;
+        MutableArray<Listener*> listeners = {};
         Audio::Filter* filter = nullptr;
-        ColorScheme scheme = ColorScheme::coral;
+        DrawMode mode = DrawMode::frequency;
+        ColorScheme scheme = ColorScheme::flatBlue;
         Map<Float32, Text*> frequencyTexts = {};
         MutableArray<Text*> gainTexts = {};
         Float32 textSize = 12.0f;
-
-        DrawMode mode = DrawMode::frequency;
 
         static inline const MutableArray<Float32> gainsToDraw = { -18.0f, -12.0f, -6.0f, 0.0f, 6.0f, 12.0f, 18.0f };
         static inline const MutableArray<Float32> phasesToDraw = { -315.0f, -270.0f, -225.0f, -180.0f, -135.0f, -90.0f, -45.0f };
@@ -114,7 +95,6 @@ namespace Flux {
         static const inline Range<Float64> phaseRange64 = { -360.0, 0.0 };
         static const inline Range<Float32> gainRange = { -20.0f, 20.0f };
 
-        
     };
 
 }

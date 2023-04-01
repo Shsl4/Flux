@@ -7,6 +7,7 @@
 #include <Audio/Effects/Filters/IIRFilter.h>
 #include "Application/Oscilloscope.h"
 #include "AudioPlayer.h"
+#include "Application/FilterModule.h"
 
 namespace Flux {
 
@@ -172,9 +173,8 @@ namespace Flux {
 
     private:
 
-        Oscilloscope* oscPlot;
         Oscillator osc;
-        Audio::LowPassFilter fil;
+        FilterModule module;
         AudioPlayer player;
 
         Int pressCount = 0;

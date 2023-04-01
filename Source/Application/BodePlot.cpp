@@ -73,7 +73,6 @@ namespace Flux {
         const Range<Float32> logRange = { log10(9.0f), log10(f32(filter->sampleRate()) / 2.0f) };
         const Range<Float32> sizeRange = { size().y, 0.0f };
         const Range<Float32> linRange = Range<Float32>::makeLinearRange();
-        const Point position = globalTransform().position;
         const Point scale = size();
 
         for (size_t p = 1; p <= 4; ++p) {
@@ -83,7 +82,7 @@ namespace Flux {
             for (size_t d = 1; d <= 9; ++d) {
                 
                 const Float32 freq = pw * f32(d);
-                const Float32 drawX = Range<Float32>::translateValue(log10(freq), logRange, linRange)* scale.x + position.x;
+                const Float32 drawX = Range<Float32>::translateValue(log10(freq), logRange, linRange) * scale.x;
                 
                 if(frequencyTexts.containsKey(freq)) {
 
@@ -140,11 +139,12 @@ namespace Flux {
     void BodePlot::drag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) {
 
         // Setup our range objects
+        const Point pos = globalTransform().position;
         const Range<Float32> logRange = { log10(9.0f), log10(f32(filter->sampleRate()) / 2.0f) };
         const Range<Float32> freqRange = { 9.0f, (f32(filter->sampleRate()) / 2.0f) * 0.95f };
         const Range<Float32> resonanceRange = { 0.1f, 6.0f };
-        const Range<Float32> hSizeRange = { 0.0f, size().x };
-        const Range<Float32> vSizeRange = { size().y, 0.0f };
+        const Range<Float32> hSizeRange = { pos.x, size().x + pos.x };
+        const Range<Float32> vSizeRange = { size().y + pos.y, pos.y };
 
         // Transpose our mouse value to our logarithmic range
         const Float32 logValue = Range<Float32>::translateValue(f32(x), hSizeRange, logRange);
@@ -158,8 +158,8 @@ namespace Flux {
         filter->setResonance(f64(q));
         filter->setCutoffFrequency(f64(freq));
 
-        if(callback) {
-            callback(this);
+        for(auto const& listener : listeners) {
+            listener->valueChanged(this, f64(freq), f64(q));
         }
 
         // Recalculate the filter's frequency response.
@@ -170,6 +170,7 @@ namespace Flux {
     void BodePlot::draw(SkCanvas* canvas, Float64 deltaTime) {
         
         SkPaint paint;
+        paint.setAntiAlias(true);
         const auto t = globalTransform();
         const SkRect rect = SkRect::MakeXYWH(t.position.x, t.position.y, t.size.x, t.size.y);
 
@@ -216,13 +217,10 @@ namespace Flux {
         
     }
 
-    void BodePlot::setCallback(Function<void(BodePlot*)> const& valueChanged) {
-        this->callback = valueChanged;
-    }
-
     void BodePlot::drawGrid(SkCanvas* canvas, Float64 deltaTime) {
 
         SkPaint paint;
+        paint.setAntiAlias(true);
         paint.setStrokeWidth(0.5f);
         paint.setColor(scheme.base.skColor());
 
@@ -237,7 +235,7 @@ namespace Flux {
             for (auto& elem : gainsToDraw) {
 
                 const Float32 drawY = Range<Float32>::translateValue(elem, gainRange, sizeRange);
-                canvas->drawLine(position.x, drawY, position.x + scale.x, drawY, paint);
+                canvas->drawLine(position.x, drawY + position.y, position.x + scale.x, drawY + position.y, paint);
 
             }
             
@@ -247,18 +245,18 @@ namespace Flux {
             for (auto& elem : phasesToDraw) {
 
                 const Float32 drawY = Range<Float32>::translateValue(elem, phaseRange, sizeRange);
-                canvas->drawLine(position.x, drawY, position.x + scale.x, drawY, paint);
+                canvas->drawLine(position.x, drawY + position.y, position.x + scale.x, drawY + position.y, paint);
 
             }
             
         }
-        
+
         for (size_t p = 1; p <= 4; ++p) {
-            
+
             const Float32 pw = std::pow(10.0f, f32(p));
 
             for (size_t d = 1; d <= 9; ++d) {
-                
+
                 const Float32 freq = pw * f32(d);
                 const Float32 drawX = Range<Float32>::translateValue(log10(freq), logRange, linRange) * scale.x + position.x;
 
@@ -266,13 +264,6 @@ namespace Flux {
 
                 canvas->drawLine(drawX, position.y, drawX, position.y + scale.y, paint);
 
-                if(frequencyTexts.containsKey(freq)) {
-
-                    Text* text = frequencyTexts[freq];
-                    text->setPosition({ drawX - text->size().x / 2.0f, size().y - text->size().y });
-                    
-                }
-                
             }
 
         }
@@ -303,7 +294,7 @@ namespace Flux {
         const Float64 sr = filter->sampleRate();
         const Float64 nyquist = sr / 2.0;
         constexpr Float64 pi = Math::pi<Float64>;
-        constexpr UInt points = 500;
+        constexpr UInt points = 300;
         constexpr Float64 mindB = -20.0;
         constexpr Float64 maxdB = 20.0;
 
@@ -326,8 +317,6 @@ namespace Flux {
             const Float32 drawX = pos.x + f32(normalizedFrequency) * size().x;
             const Float32 drawY = pos.y + size().y - f32(normalizedResponse) * size().y;
 
-            assert(drawX < size().x);
-            
             Point newPoint = { drawX, drawY };
 
             if(i == 0){
@@ -337,9 +326,13 @@ namespace Flux {
 
                 path.moveTo(lastPoint.x, lastPoint.y);
 
-                if(Math::dneq(finalResponse, mindB))
+                if(Math::dneq(finalResponse, mindB)){
                     path.lineTo(newPoint.x, newPoint.y);
-                
+                }
+                else if(lastPoint.y != (pos.y + size().y)){
+                    path.lineTo(newPoint.x, pos.y + size().y);
+                }
+
             }
 
             lastPoint = newPoint;
@@ -359,7 +352,7 @@ namespace Flux {
         lastPoint.y += size().y;
 
         constexpr Float64 pi = Math::pi<Float64>;
-        constexpr UInt points = 500;
+        constexpr UInt points = 300;
 
         const Float64 sr = filter->sampleRate();
         const Float64 nyquist = sr / 2.0;
@@ -391,9 +384,13 @@ namespace Flux {
 
                 path.moveTo(lastPoint.x, lastPoint.y);
 
-                if(Math::dneq(response, phaseRange64.min()))
+                if(Math::dneq(response, phaseRange64.min())){
                     path.lineTo(newPoint.x, newPoint.y);
-                
+                }
+                else if(lastPoint.y != (pos.y + size().y)){
+                    path.lineTo(newPoint.x, pos.y + size().y);
+                }
+
             }
 
             lastPoint = newPoint;
@@ -401,5 +398,13 @@ namespace Flux {
         }
         
     }
-    
+
+    void BodePlot::addListener(BodePlot::Listener *listener) {
+        if(listener) listeners += listener;
+    }
+
+    void BodePlot::removeListener(BodePlot::Listener *listener) {
+        listeners -= listener;
+    }
+
 }

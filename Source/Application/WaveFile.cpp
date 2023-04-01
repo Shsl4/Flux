@@ -2,40 +2,109 @@
 
 namespace Flux {
 
+    WaveFile::WaveFile(MutableArray<MutableArray<Float64>> const& data, size_t sampleRate) {
+    
+        this->chunkId = "RIFF";
+        this->format = "WAVE";
+        this->subChunk1Id = "fmt ";
+        this->subChunk1Size = 16;
+        this->audioFormat = 1;
+        this->channelCount = data.size();
+        this->sampleRate = static_cast<UInt32>(sampleRate);
+        this->bitsPerSample = 32;
+        this->byteRate = this->sampleRate * channelCount * bitsPerSample / 8;
+        this->blockAlign = channelCount * bitsPerSample / 8;
+        
+        this->samplesPerChannel = data[0].size();
+        
+        this->subChunk2Id = "data";
+        this->subChunk2Size = static_cast<UInt32>(samplesPerChannel) * channelCount * bitsPerSample / 8;
+        
+        this->buffers = data;
+        
+        this->chunkSize = 36 + subChunk2Size;
+
+    }
+
+    Float64 threeBytesToNormalizedFloat(MutableArray<unsigned char> const& data) {
+    
+        constexpr static Int32 int24Max = 8388607;
+        
+        if(data[2] & 0x80){
+                        
+            return f64((0xff << 24) | (data[2] << 16) | (data[1] << 8) | data[0]) / int24Max;
+            
+        }
+        
+        return f64((data[2] << 16) | (data[1] << 8) | data[0]) / int24Max;
+
+    }
+
+
     WaveFile::WaveFile(const String &path) {
 
         File file = File();
 
         file.load(path);
+        
+        this->name = path;
 
         this->chunkId = String(file.readMultiple<char>(4).data(), 4);
 
         nthrowif(chunkId != "RIFF", "Not a riff file.");
 
-        this->chunkSize = file.read<Int32>();
+        this->chunkSize = file.read<UInt32>();
         this->format = String(file.readMultiple<char>(4).data(), 4);
 
         nthrowif(format != "WAVE", "Not a wave file.");
 
-        this->subChunk1Id = String(file.readMultiple<char>(4).data(), 4);
+        auto subchunk = String(file.readMultiple<char>(4).data(), 4);
+        auto subChunkSize = file.read<UInt32>();
+        
+        while(subchunk != "fmt "){
+            
+            for(Int32 i = 0; i < subChunkSize; ++i){
+                file.read<char>();
+            }
+            
+            subchunk = String(file.readMultiple<char>(4).data(), 4);
+            subChunkSize = file.read<UInt32>();
+            
+        }
 
-        nthrowif(subChunk1Id != "fmt ", "Format chunk expected but not found.");
+        this->subChunk1Id = subchunk;
+        this->subChunk1Size = subChunkSize;
 
-        this->subChunk1Size = file.read<Int32>();
-        this->audioFormat = file.read<Int16>();
-        this->channelCount = file.read<Int16>();
-        this->sampleRate = file.read<Int32>();
-        this->byteRate = file.read<Int32>();
-        this->blockAlign = file.read<Int16>();
-        this->bitsPerSample = file.read<Int16>();
+        nthrowif(this->subChunk1Size == 40, "Extensible wave format is unsupported.");
+        
+        this->audioFormat = file.read<UInt16>();
+        this->channelCount = file.read<UInt16>();
+        this->sampleRate = file.read<UInt32>();
+        this->byteRate = file.read<UInt32>();
+        this->blockAlign = file.read<UInt16>();
+        this->bitsPerSample = file.read<UInt16>();
 
-        nthrowif(bitsPerSample != 16, "Only 16 bits wave files are supported.");
+        if(subChunkSize == 18){
+            this->cbSize = file.read<UInt16>();
+        }
 
-        this->subChunk2Id = String(file.readMultiple<char>(4).data(), 4);
-
-        nthrowif(subChunk2Id != "data", "Data chunk expected but not found.");
-
-        this->subChunk2Size = file.read<Int32>();
+        subchunk = String(file.readMultiple<char>(4).data(), 4);
+        subChunkSize = file.read<UInt32>();
+        
+        while(subchunk != "data"){
+            
+            for(Int32 i = 0; i < subChunkSize; ++i){
+                file.read<char>();
+            }
+            
+            subchunk = String(file.readMultiple<char>(4).data(), 4);
+            subChunkSize = file.read<UInt32>();
+            
+        }
+        
+        
+        this->subChunk2Id = subchunk;
+        this->subChunk2Size = subChunkSize;
 
         this->samplesPerChannel = subChunk2Size / (channelCount * (bitsPerSample / 8));
 
@@ -45,13 +114,63 @@ namespace Flux {
             buffers += MutableArray<Float64>::filled(samplesPerChannel);
         }
 
-        for(size_t i = 0; i < samplesPerChannel; ++i){
+        if(bitsPerSample == 8){
+         
+            for(size_t i = 0; i < samplesPerChannel; ++i){
 
-            for(size_t channel = 0; channel < channelCount; ++channel) {
-                buffers[channel][i] = f64(file.read<Int16>()) / std::numeric_limits<Int16>::max();
+                for(size_t channel = 0; channel < channelCount; ++channel) {
+                    buffers[channel][i] = f64(file.read<Int8>()) / std::numeric_limits<Int8>::max();
+                }
+
             }
-
+            
+            return;
+            
         }
+        
+        if(bitsPerSample == 16){
+         
+            for(size_t i = 0; i < samplesPerChannel; ++i){
+
+                for(size_t channel = 0; channel < channelCount; ++channel) {
+                    buffers[channel][i] = f64(file.read<Int16>()) / std::numeric_limits<Int16>::max();
+                }
+
+            }
+            
+            return;
+            
+        }
+        
+        if(bitsPerSample == 24){
+         
+            for(size_t i = 0; i < samplesPerChannel; ++i){
+
+                for(size_t channel = 0; channel < channelCount; ++channel) {
+                    buffers[channel][i] = threeBytesToNormalizedFloat(file.readMultiple<unsigned char>(3));
+                }
+
+            }
+            
+            return;
+            
+        }
+        
+        if(bitsPerSample == 32){
+         
+            for(size_t i = 0; i < samplesPerChannel; ++i){
+
+                for(size_t channel = 0; channel < channelCount; ++channel) {
+                    buffers[channel][i] = f64(file.read<Int32>()) / std::numeric_limits<Int32>::max();
+                }
+
+            }
+            
+            return;
+            
+        }
+        
+        throw Exceptions::Exception("Unsupported bits per sample");
 
     }
 
@@ -75,17 +194,67 @@ namespace Flux {
         file.write(&subChunk2Id[0], subChunk2Id.size());
         file.write(subChunk2Size);
 
-        for(size_t sample = 0; sample < samplesPerChannel; ++sample){
+        if(bitsPerSample == 8){
+            
+            for(size_t sample = 0; sample < samplesPerChannel; ++sample){
 
-            for (int channel = 0; channel < channelCount; ++channel) {
+                for (int channel = 0; channel < channelCount; ++channel) {
 
-                file.write(static_cast<Int16>(buffers[channel][sample] * std::numeric_limits<Int16>::max()));
+                    file.write(static_cast<Int8>(buffers[channel][sample] * std::numeric_limits<Int8>::max()));
+
+                }
+
+            }
+            
+        }
+        
+        if(bitsPerSample == 16){
+            
+            for(size_t sample = 0; sample < samplesPerChannel; ++sample){
+
+                for (int channel = 0; channel < channelCount; ++channel) {
+
+                    file.write(static_cast<Int16>(buffers[channel][sample] * std::numeric_limits<Int16>::max()));
+
+                }
+
+            }
+            
+        }
+
+        if(bitsPerSample == 24){
+
+            for(size_t sample = 0; sample < samplesPerChannel; ++sample){
+
+                for (int channel = 0; channel < channelCount; ++channel) {
+
+                    constexpr static Int32 int24Max = 8388607;
+                    auto v = i32(buffers[channel][sample] * int24Max);
+
+                    file.write(reinterpret_cast<const char*>(&v), 3);
+
+                }
 
             }
 
+        }
+        
+        if(bitsPerSample == 32){
+            
+            for(size_t sample = 0; sample < samplesPerChannel; ++sample){
+
+                for (int channel = 0; channel < channelCount; ++channel) {
+
+                    file.write(static_cast<Int32>(buffers[channel][sample] * std::numeric_limits<Int32>::max()));
+
+                }
+
+            }
+            
         }
 
         return true;
 
     }
+
 }
