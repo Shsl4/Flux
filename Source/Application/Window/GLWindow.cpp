@@ -41,13 +41,14 @@ namespace Flux {
         glfwSetWindowCloseCallback(this->handle, &Window::closeCallback);
         glfwSetWindowSizeCallback(this->handle, &Window::resizeCallback);
         
-        this->component = Factory::createComponent<Component>(Point(0, 0), Point(f32(windowWidth), f32(windowHeight)));
-
         if(rootComponent) {
-            this->component->addChild(rootComponent);
+            this->component = rootComponent;
+        }
+        else {
+            this->component = Factory::createComponent<Component>(Point(0, 0), Point(f32(windowWidth), f32(windowHeight)));
         }
         
-        if(auto* cast = dynamic_cast<CursorManager*>(rootComponent)) {
+        if(auto* cast = dynamic_cast<CursorManager*>(component)) {
             
             this->manager = cast;
             this->manager->setComponent(rootComponent);
@@ -76,6 +77,11 @@ namespace Flux {
 
         canvas->save();
         canvas->scale(dpiScale, dpiScale);
+
+        SkPaint paint;
+        const SkRect rect = SkRect::MakeXYWH(0, 0, windowSize.x, windowSize.y);
+        paint.setColor(ColorScheme::onyx.base.skColor());
+        canvas->drawRect(rect, paint);
         
         this->component->draw(this->canvas, deltaTime);
 
@@ -124,6 +130,8 @@ namespace Flux {
         this->canvas = this->surface->getCanvas();
 
         if(!this->canvas) throw Exceptions::Exception("Failed to get Skia Canvas.");
+
+        this->windowSize = { f32(width), f32(height) };
         
     }
 

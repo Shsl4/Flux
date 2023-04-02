@@ -12,7 +12,7 @@ namespace Flux {
         const Point pos = globalTransform().position;
         
         canvas->drawSimpleText(&textValue[0], textValue.size(), SkTextEncoding::kUTF8,
-                               pos.x, pos.y + size().y - renderOffset, font, paint);
+                               pos.x, pos.y + size().y, font, paint);
 
     }
 

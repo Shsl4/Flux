@@ -36,7 +36,7 @@ namespace Flux {
             }
             
             text->draw(canvas, deltaTime);
-
+            
         }
 
     private:

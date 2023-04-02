@@ -138,6 +138,8 @@ namespace Flux {
 
     void BodePlot::drag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) {
 
+        if(button != MouseButton::Left) return;
+
         // Setup our range objects
         const Point pos = globalTransform().position;
         const Range<Float32> logRange = { log10(9.0f), log10(f32(filter->sampleRate()) / 2.0f) };

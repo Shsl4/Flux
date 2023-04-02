@@ -27,6 +27,7 @@ namespace Flux {
         
         sk_sp<SkSurface> surface = nullptr;
         GrDirectContext* context = nullptr;
+        Point windowSize = {};
         
         Float32 dpiScale = 1.0f;
 

@@ -6,8 +6,6 @@ namespace Flux {
 
     struct WaveFile{
 
-    public:
-
         explicit WaveFile(String const& path);
 
         explicit WaveFile(MutableArray<MutableArray<Float64>> const& data, size_t sampleRate);

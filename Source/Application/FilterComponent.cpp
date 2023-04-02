@@ -7,8 +7,8 @@ namespace Flux {
 
         this->setColor(Colors::transparent);
         this->filterPlot = Factory::createComponent<BodePlot>(Point::zero, Point(500, 300));
-        this->frequencyKnob = Factory::createComponent<RotaryKnob>(Point::zero, 75);
-        this->resonanceKnob = Factory::createComponent<RotaryKnob>(Point::zero, 75);
+        this->frequencyKnob = Factory::createComponent<RotaryKnob>(Point::zero, 75.0f);
+        this->resonanceKnob = Factory::createComponent<RotaryKnob>(Point::zero, 75.0f);
 
         this->frequencyKnob->setRange({9.0, 22050.0 });
         this->frequencyKnob->setLabelText("Frequency");

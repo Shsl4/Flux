@@ -25,6 +25,8 @@ namespace Flux {
 
         virtual ComponentType* component() = 0;
 
+        virtual ~Module() = default;
+
     };
 
 }

@@ -7,6 +7,7 @@
 #include <Audio/Effects/Filters/IIRFilter.h>
 #include "Application/Oscilloscope.h"
 #include "AudioPlayer.h"
+#include "WaveTable.h"
 #include "Application/FilterModule.h"
 
 namespace Flux {
@@ -176,7 +177,9 @@ namespace Flux {
         Oscillator osc;
         FilterModule module;
         AudioPlayer player;
-
+        WaveTable table;
+        Oscilloscope* scope;
+        
         Int pressCount = 0;
         UInt lastPressed = 0;
         

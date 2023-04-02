@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Application/BodePlot.h>
+#include <Utility/Timer.h>
 
 namespace Flux {
 
@@ -20,11 +21,14 @@ namespace Flux {
 
     private:
 
+        Timer t;
+
         SkPath path;
+        SkPath p;
         SkPath pathToDraw;
         ColorScheme scheme = ColorScheme::coral;
 
-        size_t windowSize = 8192 * 6;
+        size_t windowSize = 512;
         MutableArray<Float64> data;
 
     };

@@ -13,6 +13,8 @@
 #include <Application/BodePlot.h>
 #include <UI/SceneComponent.h>
 
+#include "Utility/Timer.h"
+
 using namespace Flux;
 
 namespace Flux {
@@ -34,11 +36,12 @@ namespace Flux {
 
         constexpr Int windowWidth = 1280;
         constexpr Int windowHeight = 720;
-        
-        auto* scene = Factory::createComponent<SceneComponent>(Point::zero, Point(windowWidth, windowHeight));
-        
-        this->mainWindow = Factory::createWindow(scene, RenderBackend::Best, "Application", windowWidth, windowHeight);
 
+        /*
+        auto* scene = Factory::createComponent<SceneComponent>(Point::zero, Point(windowWidth, windowHeight)); 
+        this->mainWindow = Factory::createWindow(scene, RenderBackend::Best, "Application", windowWidth, windowHeight);
+        */
+        
         constexpr Float32 fw = 100.0f;
         constexpr Float32 fh = 100.0f;
 
@@ -46,7 +49,7 @@ namespace Flux {
         
         Point s = { fw, fh };
 
-        mainWindow->mainComponent()->addChild(Factory::createComponent<FrameInfo>(Point::zero, s));
+       factory->windows()[0]->mainComponent()->addChild(Factory::createComponent<FrameInfo>(Point::zero, s));
         
         this->shouldRun = true;
 

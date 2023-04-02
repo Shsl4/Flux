@@ -20,9 +20,7 @@ namespace Flux {
         paint.setStyle(SkPaint::kStroke_Style);
         paint.setStrokeWidth(2.0f);
         paint.setColor(scheme.lightest.skColor());
-
-        recalculatePath();
-
+        
         canvas->drawPath(path, paint);
 
         for (const auto& child : children()) {
@@ -33,6 +31,9 @@ namespace Flux {
 
     void Oscilloscope::initialize() {
         Component::initialize();
+        t.loop(1.0 / 60.0, [this] {
+            recalculatePath();
+        });
     }
 
     void Oscilloscope::feed(AudioBuffer<Float64> const& buffer) {
@@ -46,29 +47,29 @@ namespace Flux {
 
     void Oscilloscope::recalculatePath() {
 
-        path.reset();
-
+        p.reset();
+        
         const Point pos = globalTransform().position;
-
-        // TODO: Find a way to stabilize the drawing
-        for(size_t i = 0; i < windowSize; i += 15) {
+        
+        for(size_t i = 0; i < windowSize; ++i) {
 
             const Float64 value = (Math::clamp(data[i], -1.0, 1.0) + 1.0) / 2.0;
             const Float32 drawX = pos.x + size().x * (f32(i) / f32(windowSize));
-            const Float32 drawY = pos.y * 1.2f + size().y * f32(value) * 0.6f;
+            const Float32 drawY = pos.y + size().y * f32(value);
 
-            Point newPoint = { drawX, drawY };
+            const Point newPoint = { drawX, drawY };
 
             if(i == 0) {
-                path.moveTo(newPoint.x, newPoint.y);
+                p.moveTo(newPoint.x, newPoint.y);
             }
             else{
-                path.lineTo(newPoint.x, newPoint.y);
+                p.lineTo(newPoint.x, newPoint.y);
             }
 
         }
 
+        path = p;
+
     }
-
-
+    
 }

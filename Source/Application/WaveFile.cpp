@@ -9,7 +9,7 @@ namespace Flux {
         this->subChunk1Id = "fmt ";
         this->subChunk1Size = 16;
         this->audioFormat = 1;
-        this->channelCount = data.size();
+        this->channelCount = static_cast<UInt16>(data.size());
         this->sampleRate = static_cast<UInt32>(sampleRate);
         this->bitsPerSample = 32;
         this->byteRate = this->sampleRate * channelCount * bitsPerSample / 8;
@@ -63,7 +63,7 @@ namespace Flux {
         
         while(subchunk != "fmt "){
             
-            for(Int32 i = 0; i < subChunkSize; ++i){
+            for(UInt32 i = 0; i < subChunkSize; ++i){
                 file.read<char>();
             }
             
@@ -93,7 +93,7 @@ namespace Flux {
         
         while(subchunk != "data"){
             
-            for(Int32 i = 0; i < subChunkSize; ++i){
+            for(UInt32 i = 0; i < subChunkSize; ++i){
                 file.read<char>();
             }
             
@@ -112,6 +112,20 @@ namespace Flux {
 
         for(size_t i = 0; i < channelCount; ++i){
             buffers += MutableArray<Float64>::filled(samplesPerChannel);
+        }
+
+        if(audioFormat == 3) {
+
+            for(size_t i = 0; i < samplesPerChannel; ++i){
+
+                for(size_t channel = 0; channel < channelCount; ++channel) {
+                    buffers[channel][i] = f64(file.read<Float32>());
+                }
+
+            }
+            
+            return;
+            
         }
 
         if(bitsPerSample == 8){

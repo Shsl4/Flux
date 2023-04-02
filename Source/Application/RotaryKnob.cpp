@@ -29,7 +29,7 @@ namespace Flux {
             for(auto const& listener : listeners){
                 listener->valueChanged(this, this->currentValue);
             }
-
+            
         }
 
     }
@@ -75,7 +75,7 @@ namespace Flux {
         const Point& pos = t.position;
         const Point& s = t.size;
         const Float32 rad = s.x / 2.0f;
-        const Float32 diff = s.x * 0.1f;
+        const Float32 diff = s.x * 0.125f;
 
         const SkRect rect = SkRect::MakeXYWH(pos.x + diff, pos.y + diff, s.x - 2.0f * diff, s.x - 2.0f * diff);
 
@@ -90,7 +90,6 @@ namespace Flux {
         canvas->drawArc(rect, 120, f32(rotation), true, paint);
 
         paint.setColor(color().skColor());
-
         canvas->drawCircle(pos.x + s.x / 2.0f, pos.y + s.x / 2.0f, rad * 0.6f, paint);
 
         text->draw(canvas, deltaTime);

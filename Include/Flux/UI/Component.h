@@ -134,7 +134,7 @@ namespace Flux {
         void setColor(Color const& c);
 
         void setVisible(bool state);
-
+        
         Component* addChild(Component* component);
         
         NODISCARD UInt depth() const;
@@ -181,7 +181,7 @@ namespace Flux {
             return nullptr;
             
         }
-
+        
         virtual void draw(SkCanvas* canvas, Float64 deltaTime);
 
         virtual void initialize();

@@ -13,12 +13,12 @@ namespace Flux {
     
     }
 
-    void AudioPlayer::render(const AudioBuffer<Float64> &buffer, Float64 rate) {
+    void AudioPlayer::render(const AudioBuffer<Float64> &buffer, const Float64 rate) {
 
         const bool rev = reverses();
         const auto szHead = st(playHead);
         const auto fwdDiff = st((wavefile->samplesPerChannel - szHead) / speed / (wavefile->sampleRate / rate));
-        const auto backDiff = st(szHead / speed * wavefile->sampleRate / rate);
+        const auto backDiff = st(playHead / speed * wavefile->sampleRate / rate);
         const size_t diff = rev * backDiff + !rev * fwdDiff;
         const size_t maxSample = Math::min(buffer.bufferSize(), diff);
         const size_t maxChannel = std::min(buffer.channels(), st(wavefile->channelCount));
@@ -38,14 +38,14 @@ namespace Flux {
 
     }
 
-    void AudioPlayer::transpose(Int32 semitones) {
+    void AudioPlayer::transpose(const Int32 semitones) {
     
         static const Float64 a = std::pow(2.0, 1.0 / 12.0);
         this->speed = std::pow(a, semitones);
         
     }
 
-    void AudioPlayer::setPlayRate(Float64 rate){
+    void AudioPlayer::setPlayRate(const Float64 rate){
         this->speed = rate;
     }
 
@@ -63,15 +63,15 @@ namespace Flux {
 
         resetPlayHead();
 
-        const size_t samplesPerChannel = f64(endSample - startSample) / speed;
+        const auto samplesPerChannel = st(f64(endSample - startSample) / speed);
         const size_t totalSamples = samplesPerChannel * wavefile->channelCount;
 
-        auto array = MutableArray<Float64>::filled(totalSamples);
-        auto buffer = AudioBuffer(array.data(), wavefile->channelCount, samplesPerChannel);
+        const auto array = MutableArray<Float64>::filled(totalSamples);
+        const auto buffer = AudioBuffer(array.data(), wavefile->channelCount, samplesPerChannel);
 
         render(buffer, f64(wavefile->sampleRate));
 
-        MutableArray<MutableArray<Float64>> newData = MutableArray<MutableArray<Float64>>();
+        auto newData = MutableArray<MutableArray<Float64>>();
         
         for(size_t channel = 0; channel < wavefile->channelCount; ++channel){
             
@@ -111,7 +111,7 @@ namespace Flux {
         resetPlayHead();
     }
 
-    void AudioPlayer::setLooping(bool value){
+    void AudioPlayer::setLooping(const bool value){
         this->shouldLoop = value;
     }
 
@@ -126,9 +126,8 @@ namespace Flux {
     
     }
 
-    void AudioPlayer::setPlayHead(Float64 timeInSeconds) {
-    
-        Float64 sample = wavefile->sampleRate * timeInSeconds;
+    void AudioPlayer::setPlayHead(const Float64 timeInSeconds) {
+        const Float64 sample = wavefile->sampleRate * timeInSeconds;
 
         if(st(sample) > endSample || st(sample) < startSample) {
             finished(); return;
@@ -138,19 +137,19 @@ namespace Flux {
         
     }
 
-    void AudioPlayer::setStartTime(Float64 timeInSeconds){
+    void AudioPlayer::setStartTime(const Float64 timeInSeconds){
     
         if(!wavefile) return;
         
-        setStartSample(f64(wavefile->sampleRate) * timeInSeconds);
+        setStartSample(st(wavefile->sampleRate * timeInSeconds));
         
     }
 
-    void AudioPlayer::setEndTime(Float64 timeInSeconds){
+    void AudioPlayer::setEndTime(const Float64 timeInSeconds){
         
         if(!wavefile) return;
             
-        setEndSample(f64(wavefile->sampleRate) * timeInSeconds);
+        setEndSample(st(wavefile->sampleRate * timeInSeconds));
         
     }
 
@@ -167,7 +166,7 @@ namespace Flux {
         
     }
 
-    void AudioPlayer::setStartSample(size_t sample){
+    void AudioPlayer::setStartSample(const size_t sample){
     
         if(!wavefile) return;
 
@@ -193,7 +192,7 @@ namespace Flux {
     
     }
 
-    void AudioPlayer::setReverse(bool value){
+    void AudioPlayer::setReverse(const bool value){
         
         this->direction = value ? -1.0 : 1.0;
         
@@ -203,7 +202,7 @@ namespace Flux {
         
     }
 
-    void AudioPlayer::prepare(Float64 rate, UInt size) {
+    void AudioPlayer::prepare(const Float64 rate, const UInt size) {
         AudioObject::prepare(rate, size);
     }
 
