@@ -10,6 +10,7 @@ namespace Flux {
 
         static inline SkFont varelaRound = SkFont(SkTypeface::MakeFromFile(FLUX_RESOURCES"/Fonts/VarelaRound-Regular.ttf"));
         static inline SkFont notoSansMath = SkFont(SkTypeface::MakeFromFile(FLUX_RESOURCES"/Fonts/NotoSansMath-Regular.ttf"));
+        static inline SkFont manrope = SkFont(SkTypeface::MakeFromFile(FLUX_RESOURCES"/Fonts/Manrope-Regular.ttf"));
     
     };
     

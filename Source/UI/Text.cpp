@@ -9,10 +9,12 @@ namespace Flux {
 
         if(textValue.isEmpty()) return;
 
+        paint.setAntiAlias(true);
+        
         const Point pos = globalTransform().position;
         
         canvas->drawSimpleText(&textValue[0], textValue.size(), SkTextEncoding::kUTF8,
-                               pos.x, pos.y + size().y, font, paint);
+                               pos.x, pos.y + size().y - renderOffset, font, paint);
 
     }
 
@@ -88,7 +90,7 @@ namespace Flux {
 
     TextRenderer::TextRenderer(String const& text, Float32 textSize) {
 
-        this->font = Fonts::varelaRound;
+        this->font = Fonts::manrope;
         setColor(Colors::white);
         setText(text);
         setTextSize(textSize);
@@ -132,9 +134,15 @@ namespace Flux {
 
     void Text::realign() {
 
-        if(this->size().x < renderer->size().x || this->size().y < renderer->size().y){
+        if(this->size().x < renderer->size().x){
+            this->setSize({ renderer->size().x, size().y });
             Console::log("{}[Warning]: Text render size exceeds the container bounds! ({} at line {}){}\n",
                          Console::yellow, __FILE__, __LINE__, Console::reset);
+        }
+
+        if(this->size().y < renderer->size().y) {
+            this->setSize({ size().x, renderer->size().y });
+
         }
 
         this->renderer->setPosition({ textX(), textY() });
@@ -142,8 +150,8 @@ namespace Flux {
     }
 
     Float32 Text::textX() const {
-
-        Float32 offset = renderer->textSize() / 4.0f;
+        
+        const Float32 offset = 5.0f; //renderer->textSize() / 2.0f;
 
         if (hAlign == HAlignment::left) return offset;
 
@@ -152,8 +160,8 @@ namespace Flux {
     }
 
     Float32 Text::textY() const {
-
-        Float32 offset = renderer->textSize() / 4.0f;
+        
+        const Float32 offset = 5.0f; //renderer->textSize() / 2.0f;
 
         if(vAlign == VAlignment::top) return offset;
 
@@ -162,12 +170,9 @@ namespace Flux {
     }
 
     void Text::draw(SkCanvas *canvas, Float64 deltaTime) {
-        const Point pos = globalTransform().position;
-        canvas->save();
-        const SkRect rect { pos.x, pos.y, pos.x + size().x, pos.y + size().y };
-        canvas->clipRect(rect);
+        
         renderer->draw(canvas, deltaTime);
-        canvas->restore();
+
     }
 
     void Text::setAlignment(VAlignment v, HAlignment h) {

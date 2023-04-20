@@ -1,13 +1,7 @@
 #include <Audio/Engine.h>
-#include <chrono>
-
 #include <Application/Application.h>
-
-#include <Application/BodePlot.h>
-
-#include "Application/NyquistPlot.h"
-#include "UI/SceneComponent.h"
-#include "Application/Oscilloscope.h"
+#include <Application/NyquistPlot.h>
+#include <UI/SceneComponent.h>
 
 namespace Flux {
 
@@ -26,7 +20,6 @@ namespace Flux {
 
     void Engine::prepare(Float64 rate, UInt size) {
         
-        osc.prepare(rate, size);
         module.prepare(rate, size);
         table.prepare(rate, size);
 
@@ -57,23 +50,23 @@ namespace Flux {
 
     void Engine::receiveMessage(MidiMessage const& message) {
 
-        switch (message.event) {
+        switch (message.type()) {
 
-            case MidiEvent::NoteDown:
+            case MidiEvent::noteDown:
                 table.startNote(message);
                 break;
 
-            case MidiEvent::NoteUp:
+            case MidiEvent::noteUp:
                 table.stopNote(message);
                 break;
 
-            case MidiEvent::PitchBend:
+            case MidiEvent::pitchBend:
                 break;
 
-            case MidiEvent::CC:
+            case MidiEvent::cc:
                 break;
 
-            case MidiEvent::Invalid:
+            case MidiEvent::invalid:
                 break;
         }
             

@@ -125,6 +125,17 @@ namespace Flux {
         
     }
 
+    void CursorManager::focusReactive(Reactive* reactive) {
+
+        if(focused) {
+            focused->lostFocus();
+        }
+
+        focused = reactive;
+        focused->focused();
+        
+    }
+
     void CursorManager::setComponent(Component* value) { this->master = value; }
 
     void CursorManager::notifyDestruction(const Reactive* reactive) {

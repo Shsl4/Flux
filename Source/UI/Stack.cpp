@@ -48,6 +48,17 @@ namespace Flux {
 
     }
 
+    void HStack::childAdded(Component* component) {
+        Stack::childAdded(component);
+        if(size().y < component->size().y) {
+            this->setSize({ size().x, size().y + component->size().y });
+        }
+    }
+
+    void HStack::parentLinked() {
+        this->setSize({ parent()->size().x, size().y });
+    }
+
     Float32 HStack::initialDrawX() const {
 
         if (hAlign == HAlignment::left) return 0.0f;

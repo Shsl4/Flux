@@ -27,7 +27,7 @@ namespace Flux {
             throw Exceptions::Exception("Failed to initialize audio system.\n");
         }
 
-        std::function<void(RtAudioErrorType, const std::string&)> callback = [](RtAudioErrorType err, std::string const& msg){
+        const std::function callback = [](RtAudioErrorType err, std::string const& msg){
             Console::error("{}\n", msg.c_str());
         };
         
@@ -55,7 +55,7 @@ namespace Flux {
 
         size_t index = 0;
         
-        for (auto& id : audio->getDeviceIds()) {
+        for (const auto& id : audio->getDeviceIds()) {
 
             RtAudio::DeviceInfo info = audio->getDeviceInfo(id);
 
@@ -70,119 +70,227 @@ namespace Flux {
         assert(rate > 0.0);
         assert(size >= 16);
                 
-        this->sr = rate;
         this->bufSize = size;
+        this->sr = rate;
+        
+        this->inDevice = AudioDevice(audio, audio->getDefaultInputDevice());
+        this->outDevice = AudioDevice(audio, audio->getDefaultOutputDevice());
 
-        open(audio->getDefaultInputDevice(), audio->getDefaultOutputDevice());
+        nthrowif(!supportedSampleRates().contains(rate), "Unsupported sample rate!");
+        
+        open();
 
     }
 
     void AudioEngine::close() {
 
         if(audio->isStreamOpen()) {
+            
             audio->stopStream();
             audio->closeStream();
+            
             closed();
+            
         }
         
     }
 
-    struct DeviceData {
-
-        RtAudio::StreamParameters params;
-        RtAudio::DeviceInfo info;
-
-    };
-
-    Optional<DeviceData> streamParameters(RtAudio* audio, UInt device, bool output){
-
-        DeviceData data;
-
-        // TODO: TRY / CATCH
-        data.info = audio->getDeviceInfo(device);
+    MutableArray<Float64> AudioEngine::supportedSampleRates() const {
         
-        if((output && data.info.outputChannels == 0) || (!output && data.info.inputChannels == 0)) { return {}; }
-
-        data.params.deviceId = device;
-        data.params.nChannels = output ? data.info.outputChannels : data.info.inputChannels;
-
-        return Optional<DeviceData>(data);
-
+        if (inDevice.valid() && outDevice.valid()) {
+            return inDevice.sampleRates().intersect(outDevice.sampleRates());
+        }
+        
+        return inDevice.valid() ? inDevice.sampleRates() : outDevice.sampleRates();
+        
     }
 
-    bool AudioEngine::open(UInt inputId, UInt outputId) {
+    MutableArray<size_t> AudioEngine::supportedBufferSizes() const {
+
+        return { 16, 32, 64, 128, 512, 1024, 2048, 4096, 8192 };
+        
+    }
+
+    void AudioEngine::setSampleRate(const Float64 value) {
+
+        assert(value > 0.0);
+
+        if(!audio->isStreamOpen()) { this->sr = value; return; }
+
+        if(supportedSampleRates().contains(value)) {
+
+            this->sr = value;
+            
+            open();
+
+            return;
+            
+        }
+
+        throw Exceptions::Exception("Trying to set an unsupported sample rate.");
+
+    }
+    
+    void AudioEngine::setBufferSize(const UInt value) {
+
+        assert(value >= 16 && value % 2 == 0);
+        
+        this->bufSize = value;
+        
+        open();
+        
+    }
+
+    void AudioEngine::setInputDevice(AudioDevice const& dev) {
+
+        this->inDevice = dev;
+        open();
+        
+    }
+    
+    void AudioEngine::setOutputDevice(AudioDevice const& dev) {
+        
+        this->outDevice = dev;
+        open();
+        
+    }
+
+    void AudioEngine::writeConfig() {
+
+        config.favoriteApi = audio->getCurrentApi();
+        config.favoriteInput = inDevice.name();
+        config.favoriteOutput = outDevice.name();
+        config.favoriteSampleRate = st(sr);
+        config.favoriteBufferSize = bufSize;
+
+        Json json;
+        Serializer<AudioConfig>::serialize(json.archive().rootContainer(), config);
+        json.write("config.json");
+        
+    }
+
+    bool AudioEngine::open() {
 
         close();
 
-        auto inData = streamParameters(audio, inputId, false);
-        auto outData = streamParameters(audio, outputId, true);
-
-        if(!inData && !outData) return false;
-
-        this->outputChannels = outData ? outData->params.nChannels : 0;
-        this->inputChannels = inData ? inData->params.nChannels : 0;
-
-        RtAudio::StreamOptions options;
-        options.flags = RTAUDIO_NONINTERLEAVED | RTAUDIO_MINIMIZE_LATENCY;
-
-        this->sr = outData ? outData->info.preferredSampleRate : (inData ? inData->info.preferredSampleRate : 0);
-
-        RtAudioErrorType err = audio->openStream(&outData->params, &inData->params, RTAUDIO_FLOAT64,
-                          static_cast<UInt>(sr), &bufSize, &audioCallback, this, &options);
+        if(!inDevice.valid() && !outDevice.valid()) return false;
         
-        if(err != RtAudioErrorType::RTAUDIO_NO_ERROR){
+        RtAudio::StreamOptions options = { RTAUDIO_NONINTERLEAVED | RTAUDIO_MINIMIZE_LATENCY, 0,
+            "AudioStream", 0};
+        
+        auto outParams = outDevice.outParams();
+        auto inParams = inDevice.inParams();
+        
+        if(audio->openStream(outParams.nChannels > 0 ? &outParams : nullptr,
+            inParams.nChannels > 0 ? &inParams : nullptr,
+            RTAUDIO_FLOAT64, i32(sr), &bufSize, &audioCallback, this, &options)){
             
-            this->outputChannels = 0;
-            this->inputChannels = 0;
-            this->sr = 0.0;
-
             Console::error("Failed to open audio device!\n");
             return false;
             
         }
-
+        
         prepare(sr, bufSize);
 
         audio->startStream();
-
+        
         opened();
 
-        Console::log("AudioEngine initialized.\n");
-
-        if (inData){
-            Console::log("Input device: {}\n", audio->getDeviceInfo(inputId).name);
+        for (auto const& callback : openCallbacks) {
+            callback();
         }
 
-        if (outData){
-            Console::log("Output device: {}\n", audio->getDeviceInfo(outputId).name);
-        }
+        writeConfig();
 
+        Console::log("AudioEngine initialized using {} with {} sample rate and buffer size {}.\n", apiName(api()), sampleRate(), bufferSize());
+
+        Console::log("Latency: {}\n", audio->getStreamLatency());
+        
+        if (inDevice.valid()) { Console::log("Input device: {}\n", inDevice.name()); }
+
+        if (outDevice.valid()) { Console::log("Output device: {}\n", outDevice.name()); }
+        
         return true;
-
+        
     }
 
-    void AudioEngine::setSampleRate(Float64 value) {
-
-        assert(value > 0.0);
-        this->sr = value;
-
+    RtAudio::Api AudioEngine::api() const {
+        return audio->getCurrentApi();
     }
     
-    void AudioEngine::setBufferSize(UInt value) {
-
-        assert(value >= 16);
-        this->bufSize = value;
-
-    }
-
-    UInt AudioEngine::numOutputChannels() const { return this->outputChannels; }
+    UInt AudioEngine::numOutputChannels() const { return this->outDevice.outChannels(); }
     
-    UInt AudioEngine::numInputChannels() const { return this->inputChannels; }
+    UInt AudioEngine::numInputChannels() const { return this->inDevice.inChannels(); }
     
-    Float64 AudioEngine::sampleRate() const { return this->sr; }
+    Float64 AudioEngine::sampleRate() const { return sr; }
     
     UInt AudioEngine::bufferSize() const { return this->bufSize; }
     
+    void AudioEngine::setApi(RtAudio::Api value) {
+        
+        if(api() != value && apiSupported(value)) {
+
+            close();
+            Allocator<RtAudio>::destroy(this->audio);
+
+            this->audio = Allocator<RtAudio>::construct(value);
+
+            inDevice = AudioDevice(audio, audio->getDefaultInputDevice());
+            outDevice = AudioDevice(audio, audio->getDefaultOutputDevice());
+
+            nthrowif(!outDevice.sampleRates().contains(sr), "Unsupported sample rate!");
+
+            open();
+            
+        }
+        
+    }
+
+    void AudioEngine::addOpenCallback(Function<void()> const& callback) {
+        this->openCallbacks += callback;
+    }
+
+    MutableArray<AudioDevice> AudioEngine::enumerateInputDevices() const {
+
+        MutableArray<AudioDevice> devices;
+
+        for (auto const& id : audio->getDeviceIds()) {
+            if(audio->getDeviceInfo(id).inputChannels > 0) {
+                devices += AudioDevice(audio, id);
+            }
+        }
+
+        return devices;
+        
+    }
+
+    MutableArray<AudioDevice> AudioEngine::enumerateOutputDevices() const {
+
+        MutableArray<AudioDevice> devices;
+
+        for (auto const& id : audio->getDeviceIds()) {
+            if(audio->getDeviceInfo(id).outputChannels > 0) {
+                devices += AudioDevice(audio, id);
+            }
+        }
+
+        return devices;
+        
+    }
+
+    bool AudioEngine::apiSupported(RtAudio::Api api) {
+        
+        std::vector<RtAudio::Api> apis;
+        RtAudio::getCompiledApi(apis);
+        
+        for(auto const& elem : apis) {
+            if (api == elem) { return true; }
+        }
+        
+        return false;
+        
+    }
+
     void AudioEngine::opened() { }
     
     void AudioEngine::closed() { }

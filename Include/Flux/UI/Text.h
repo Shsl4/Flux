@@ -60,6 +60,10 @@ namespace Flux {
 
         NODISCARD FORCEINLINE Float32 textSize() const { return this->renderer->textSize(); }
 
+        NODISCARD FORCEINLINE HAlignment hAlignment() const { return this->hAlign; }
+        
+        NODISCARD FORCEINLINE VAlignment vAlignment() const { return this->vAlign; }
+
     protected:
         
         void colorChanged() override;

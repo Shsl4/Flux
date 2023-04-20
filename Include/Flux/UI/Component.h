@@ -163,6 +163,12 @@ namespace Flux {
 
         NODISCARD FORCEINLINE MutableArray<Component*> const& children() const { return this->childrenArray; }
 
+        NODISCARD bool isChild(const Component* component) const;
+
+        NODISCARD bool isNestedChild(const Component* component) const;
+
+        NODISCARD class Window* window() const;
+
         NODISCARD virtual Component* componentAtPosition(Point const& p);
 
         template<typename T>

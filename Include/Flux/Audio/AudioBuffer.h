@@ -2,10 +2,10 @@
 
 #include <Nucleus/Nucleus.h>
 
-using namespace Nucleus;
-
 namespace Flux {
 
+    using namespace Nucleus;
+    
     template<typename ValueType>
     class AudioBuffer {
 

@@ -40,7 +40,7 @@ namespace Flux {
     }
 
     void Reactive::keyDown(Key const& key) {
-        Console::log("{} received {}.\n", Type::name(*this), (key.key));
+        // Console::log("{} received {}.\n", Type::name(*this), (key.key));
     }
 
     void Reactive::keyUp(Key const& key) {
@@ -56,12 +56,12 @@ namespace Flux {
     }
 
     void Reactive::focused() {
-        Console::log("{} earned focus.\n", Type::name(*this));
+        // Console::log("{} earned focus.\n", Type::name(*this));
         this->bFocused = true;
     }
     
     void Reactive::lostFocus() {
-        Console::log("{} lost focus.\n", Type::name(*this));
+        // Console::log("{} lost focus.\n", Type::name(*this));
         this->bFocused = false;
     }
 

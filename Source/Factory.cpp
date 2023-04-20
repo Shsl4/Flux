@@ -37,9 +37,11 @@ namespace Flux {
     
         nthrowif(component->children().size() > 0, "Trying to destroy a component that has active children. "
                  "Make sure to use Component::dispose() to destroy components.");
-
-        Console::log("Disposing {}.\n", Type::name(*component));
-    
+        
+        for (auto const& window : windows()) {
+            window->cursorManager()->notifyDestruction(component);
+        }
+        
         factory->components.remove(component);
     
     }

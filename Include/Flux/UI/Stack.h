@@ -52,8 +52,12 @@ namespace Flux {
         HStack(Point const& p, Point const& s, VAlignment vAlign, HAlignment hAlign, bool stretch = false);
 
         void realign() override;
-
+        
     protected:
+        
+        void childAdded(Component* component) override;
+
+        void parentLinked() override;
 
         NODISCARD Float32 initialDrawX() const;
         NODISCARD Float32 childDrawY(Component* child) const;

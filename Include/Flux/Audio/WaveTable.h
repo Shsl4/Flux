@@ -58,6 +58,10 @@ namespace Flux {
 
         void stopAllNotes();
 
+        void setCurrentFrame(size_t frame);
+
+        NODISCARD FORCEINLINE size_t maxFrames() const{ return frames.size(); }
+
     private:
 
         MutableArray<MutableArray<Float64>> frames;

@@ -17,49 +17,6 @@ namespace Flux {
         
     }
 
-    UInt MidiMessage::cc() const {
-        return dataByte;
-    }
-
-    UInt MidiMessage::noteNumber() const {
-        return dataByte;
-    }
-
-    Float64 MidiMessage::noteFrequency() const {
-
-        return 440.0 * std::pow(2.0, (static_cast<Float64>(dataByte) - 69.0) / 12.0);
-        
-    }
-
-    Float64 MidiMessage::linearValue() const {
-        return static_cast<Float64>(valueByte) / 127.0;
-    }
-
-    String MidiMessage::toString() const {
-        
-        switch (event) {
-
-        case MidiEvent::Invalid:
-            return "Invalid";
-            
-        case MidiEvent::NoteDown:
-            return String::format("Note {} Down | Velocity: {}", dataByte, valueByte);
-            
-        case MidiEvent::NoteUp:
-            return String::format("Note {} Up | Velocity: {}", dataByte, valueByte);
-            
-        case MidiEvent::PitchBend:
-            return String::format("PitchBend | Value: {}", valueByte);
-            
-        case MidiEvent::CC:
-            return String::format("CC {} | Value: {}", dataByte, valueByte);
-            
-        }
-        
-        return "Invalid";
-        
-    }
-
     MidiManager::MidiManager() {
 
         std::vector<RtMidiIn::Api> apis;
@@ -191,7 +148,7 @@ namespace Flux {
 
         const UInt realNote = simulationOctave * 12 + note;
 
-        const MidiMessage message = { down ? MidiEvent::NoteDown : MidiEvent::NoteUp, realNote, simulationVelocity};
+        const MidiMessage message = { down ? MidiEvent::noteDown : MidiEvent::noteUp, realNote, simulationVelocity};
 
         receiveMessage(message);
         
@@ -212,11 +169,11 @@ namespace Flux {
     
         switch (value) {
         
-        case 144: return MidiEvent::NoteDown;
-        case 128: return MidiEvent::NoteUp;
-        case 224: return MidiEvent::PitchBend;
-        case 176: return MidiEvent::CC;
-        default: return MidiEvent::Invalid;
+        case 144: return MidiEvent::noteDown;
+        case 128: return MidiEvent::noteUp;
+        case 224: return MidiEvent::pitchBend;
+        case 176: return MidiEvent::cc;
+        default: return MidiEvent::invalid;
         
         }
     

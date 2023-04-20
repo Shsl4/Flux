@@ -2,10 +2,9 @@
 
 namespace Flux {
 
-    
     WaveTable::WaveTable(WaveFile* file, size_t frameSize) {
         
-        nthrowif(!file || file->channelCount == 0, "Creating wavetablw with an invalid file.");
+        nthrowif(!file || file->channelCount == 0, "Creating wavetable with an invalid file.");
 
         if(file->channelCount > 1) {
             Console::log("{}[Warning]: Creating a WaveTable with an audio file that has multiple channels."
@@ -32,7 +31,7 @@ namespace Flux {
             voices += Allocator<Voice>::construct();
         }
 
-        this->currentFrame = 0;
+        this->currentFrame = 1;
         
     }
 
@@ -108,6 +107,13 @@ namespace Flux {
         }
 
         activeVoices = {};
+        
+    }
+
+    void WaveTable::setCurrentFrame(size_t frame) {
+
+        assert(frame < maxFrames());
+        this->currentFrame = frame;
         
     }
     

@@ -1,13 +1,12 @@
 #include <Application/Application.h>
-#include <Application/WaveFile.h>
 
 using namespace Flux;
 
 int main() {
-
+    
     ExceptionHandler::run([] {
-
-        Application().run();
+        
+        Class::fromName("Flux::Application").unique<Application>()->run();
         
     });
         

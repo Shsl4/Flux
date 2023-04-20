@@ -22,6 +22,8 @@ namespace Flux {
         this->button = Factory::createComponent<Button>(Point::zero, size(), "(No choices)");
         this->stack = Factory::createComponent<VStack>(Point::zero, Point(s.x, 0.0f), VAlignment::top, HAlignment::left);
 
+        this->button->setCornerRadius(10.0);
+        
     }
 
     void DropdownMenu::initialize() {
@@ -32,7 +34,7 @@ namespace Flux {
         button->setColorScheme(scheme);
         button->label()->setTextSize(size().y / 2.0f);
         button->label()->setAlignment(VAlignment::center, HAlignment::left);
-        button->setAction([this]{
+        button->setAction([this](auto*){
 
             arrowTr.switchDirection();
             arrowTr.restartFromHere();
@@ -132,7 +134,7 @@ namespace Flux {
             btn->setColorScheme(ColorScheme::fromColor(scheme.lighter));
             btn->label()->setTextSize(size().y / 2.0f);
             btn->label()->setAlignment(VAlignment::center, HAlignment::left);
-            btn->setAction([=, this]{
+            btn->setAction([=, this](auto*){
                 choiceSelected(i);
             });
 

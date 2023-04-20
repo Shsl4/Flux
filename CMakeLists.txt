@@ -45,9 +45,9 @@ filterSources("${FLUX_ALL}")
 
 if(WIN32)
 
-target_link_libraries(Flux debug ${FLUX_DEBUG_DEPENDENCIES} winmm.lib dbghelp.lib d3d12.lib dxgi.lib d3dcompiler.lib opengl32.lib)
+target_link_libraries(Flux debug ${FLUX_DEBUG_DEPENDENCIES} winmm.lib dbghelp.lib d3d12.lib dxgi.lib d3dcompiler.lib opengl32.lib Dsound.lib)
 
-target_link_libraries(Flux optimized ${FLUX_RELEASE_DEPENDENCIES} winmm.lib dbghelp.lib d3d12.lib dxgi.lib d3dcompiler.lib  opengl32.lib)
+target_link_libraries(Flux optimized ${FLUX_RELEASE_DEPENDENCIES} winmm.lib dbghelp.lib d3d12.lib dxgi.lib d3dcompiler.lib  opengl32.lib Dsound.lib)
 
 elseif(APPLE)
 

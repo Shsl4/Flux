@@ -10,11 +10,15 @@ namespace Flux {
 
     class Application {
 
+        REFL_BODY(Application)
+    
     public:
 
         void run();
 
         void stop();
+
+        NODISCARD FORCEINLINE Engine* audioEngine() const { return this->audioDevice.pointer(); }
 
         NODISCARD FORCEINLINE static Application* instance() { return application; }
 

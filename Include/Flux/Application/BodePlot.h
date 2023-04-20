@@ -30,11 +30,13 @@ namespace Flux {
         
     public:
 
-        class Listener{
+        class Listener {
 
         public:
 
             virtual void valueChanged(BodePlot* plot, Float64 f, Float64 q) = 0;
+
+            virtual ~Listener() = default;
 
         };
         
@@ -53,12 +55,12 @@ namespace Flux {
         void keyDown(Key const& key) override;
 
         void recalculatePath();
-
-        NODISCARD FORCEINLINE Audio::Filter* fil() const { return this->filter; }
-
+        
         void addListener(Listener* listener);
 
         void removeListener(Listener* listener);
+
+        NODISCARD FORCEINLINE Audio::Filter* fil() const { return this->filter; }
 
     protected:
         

@@ -6,11 +6,11 @@ namespace Flux {
     const Point Point::zero = {};
 
     Component::Component(Transform const& t): localTransform(t) {
-            
+
     }
 
     Component::Component(Point const& p, Point const& s) : localTransform({ p, s, 0.0f }) {
-        
+
     }
 
     void Component::draw(SkCanvas* canvas, const Float64 deltaTime) {
@@ -170,6 +170,42 @@ namespace Flux {
         while (childrenArray.size() > 0){
             childrenArray[0]->dispose();
         }
+        
+    }
+
+    bool Component::isChild(const Component* component) const {
+        
+        for (auto const& child : childrenArray) {
+            if (component == child) return true;
+        }
+
+        return false;
+
+    }
+
+    bool Component::isNestedChild(const Component* component) const {
+
+        if(isChild(component)) return true;
+
+        for (auto const& child : childrenArray) {
+
+            if(child->isNestedChild(component)) return true;
+            
+        }
+
+        return false;
+        
+    }
+
+    Window* Component::window() const {
+
+        for (auto const& window : Factory::windows()) {
+
+            if(window->mainComponent() == this || window->mainComponent()->isNestedChild(this)) return window;
+            
+        }
+
+        return nullptr;
         
     }
 

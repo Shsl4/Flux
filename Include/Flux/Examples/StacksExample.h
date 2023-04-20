@@ -85,7 +85,7 @@ namespace Flux{
 
             auto button = Factory::createComponent<Button>(Point::zero, Point(150, 50), "Exit");
 
-            button->setAction([&] {
+            button->setAction([&](auto*) {
                 Application::instance()->stop();
             });
 

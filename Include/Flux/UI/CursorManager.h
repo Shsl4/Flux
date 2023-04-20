@@ -27,6 +27,8 @@ namespace Flux {
         virtual void handleKeyDown(Key const& key);
         
         virtual void handleKeyUp(Key const& key);
+
+        void focusReactive(Reactive* reactive);
         
         void setComponent(Component* value);
 
