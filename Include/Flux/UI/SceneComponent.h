@@ -79,6 +79,11 @@ namespace Flux {
 
         void doubleClick(MouseButton button, Float64 x, Float64 y) override;
 
+    protected:
+        void modified() override;
+
+    public:
+
         NODISCARD Component* componentAtPosition(Point const& p) override;
 
     private:

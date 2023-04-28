@@ -27,7 +27,17 @@ namespace Flux {
             return valid() && other.valid() && other.id == this->id;
         }
 
-        NODISCARD String name() const { return valid() ? info().name : "None"; }
+        NODISCARD String name() const {
+
+            if(!valid()) return "None";
+
+            auto inf = info();
+
+            // Fix a bug on macOS where if your device name contains an apostrophe, rtaudio would read it as \xd5
+            // and produce a string that cannot be drawn by skia.
+            return String(inf.name).replaceOccurrences("\xd5", "'");
+
+        }
 
         NODISCARD UInt32 inChannels() const { return valid() ? info().inputChannels : 0; }
         
@@ -44,25 +54,38 @@ namespace Flux {
         NODISCARD UInt32 deviceId() const { return id; }
 
         NODISCARD RtAudio::StreamParameters inParams() const {
-            return valid() ? RtAudio::StreamParameters(deviceId(), inChannels(), 0) : RtAudio::StreamParameters();
+            
+            RtAudio::StreamParameters params = {};
+            
+            if(valid()){
+                params.firstChannel = 0;
+                params.deviceId = deviceId();
+                params.nChannels = inChannels();
+            }
+            
+            return params;
+            
         }
 
         NODISCARD RtAudio::StreamParameters outParams() const {
-            return valid() ? RtAudio::StreamParameters(deviceId(), outChannels(), 0) : RtAudio::StreamParameters();
+
+            RtAudio::StreamParameters params = {};
+            
+            if(valid()){
+                params.firstChannel = 0;
+                params.deviceId = deviceId();
+                params.nChannels = outChannels();
+            }
+            
+            return params;
+            
         }
                 
-        NODISCARD MutableArray<Float64> sampleRates() const {
+        NODISCARD MutableArray<UInt> sampleRates() const {
 
             if(!valid()) return {};
-            
-            auto const v = info().sampleRates;
-            MutableArray<Float64> rates(v.size());
 
-            for(auto const& sr : v) {
-                rates += f64(sr);
-            }
-
-            return rates;
+            return info().sampleRates;
             
         }
 
@@ -76,21 +99,21 @@ namespace Flux {
         UInt32 id = 0;
         
     };
-    
+
     class AudioEngine {
-        
+
     public:
 
         AudioEngine();
-        
+
         virtual ~AudioEngine();
 
         void listDevices() const;
-        
-        void initialize(Float64 rate, UInt size);
 
-        void setSampleRate(Float64 value);
-        
+        void initialize();
+
+        void setSampleRate(UInt value);
+
         void setBufferSize(UInt value);
 
         void setInputDevice(AudioDevice const& dev);
@@ -98,47 +121,49 @@ namespace Flux {
         void setOutputDevice(AudioDevice const& dev);
 
         void writeConfig();
-        
+
         void close();
-        
+
         virtual void prepare(Float64 rate, UInt size) = 0;
-        
+
         virtual void process(Float64* inputBuffer, Float64* outputBuffer) = 0;
 
-        NODISCARD MutableArray<Float64> supportedSampleRates() const;
+        NODISCARD MutableArray<UInt> supportedSampleRates() const;
 
-        NODISCARD MutableArray<size_t> supportedBufferSizes() const;
+        NODISCARD static MutableArray<UInt> supportedBufferSizes() ;
 
         NODISCARD RtAudio::Api api() const;
-        
+
         NODISCARD UInt numOutputChannels() const;
-        
+
         NODISCARD UInt numInputChannels() const;
 
-        NODISCARD Float64 sampleRate() const;
+        NODISCARD UInt sampleRate() const;
 
         NODISCARD UInt bufferSize() const;
 
         NODISCARD AudioDevice inputDevice() const { return this->inDevice; }
 
         NODISCARD AudioDevice outputDevice() const { return this->outDevice; }
-        
+
         NODISCARD MutableArray<AudioDevice> enumerateInputDevices() const;
-        
+
         NODISCARD MutableArray<AudioDevice> enumerateOutputDevices() const;
 
         NODISCARD static bool apiSupported(RtAudio::Api api);
-        
+
         void setApi(RtAudio::Api value);
 
         void addOpenCallback(Function<void()> const& callback);
-    
+
+        void addSampleRateChangedCallback(Function<void(UInt)> const& callback);
+
     protected:
 
         virtual void opened();
-        
+
         virtual void closed();
-        
+
     private:
 
         RtAudio* audio = nullptr;
@@ -148,12 +173,13 @@ namespace Flux {
         AudioConfig config;
         AudioDevice inDevice = {};
         AudioDevice outDevice = {};
-        
+
         UInt bufSize = 0;
-        Float64 sr = 0.0;
+        UInt sr = 0.0;
 
         MutableArray<Function<void()>> openCallbacks;
-        
+        MutableArray<Function<void(UInt)>> sampleRateChangedCallbacks;
+
     };
     
 }

@@ -282,20 +282,20 @@ namespace Flux {
             MutableArray<String> sampleRates = {};
 
             for (auto const& sr : engine->supportedSampleRates()) {
-                sampleRates += String::fromFloatingPoint(sr);
+                sampleRates += String::fromInteger(sr);
             }
 
             sampleRateDropdown->setChoices(sampleRates);
-            sampleRateDropdown->setSelected(String::fromFloatingPoint(engine->sampleRate()));
+            sampleRateDropdown->setSelected(String::fromInteger(engine->sampleRate()));
             sampleRateDropdown->setCallback([this](size_t, String const& value) {
 
-                engine->setSampleRate(value.toFloat64());
+                engine->setSampleRate(value.toInteger());
                 
             });
             
             MutableArray<String> bufferSizes = {};
 
-            for (auto const& size : engine->supportedBufferSizes()) {
+            for (auto const& size : Flux::AudioEngine::supportedBufferSizes()) {
                 bufferSizes += String::fromInteger(size);
             }
 
@@ -518,7 +518,7 @@ namespace Flux {
 
         this->audioDevice = Shared<Engine>::make();
 
-        audioDevice->initialize(44100, 128);
+        audioDevice->initialize();
 
     }
 

@@ -1,5 +1,6 @@
 #include <Application/FilterComponent.h>
 #include <Application/RotaryKnob.h>
+#include <Application/Application.h>
 
 namespace Flux {
 
@@ -20,7 +21,7 @@ namespace Flux {
         this->resonanceKnob->setRange({0.1, 6.0 });
         this->resonanceKnob->setLabelText("Resonance");
         this->resonanceKnob->setDefaultValue(1.0);
-
+        
     }
 
     void FilterComponent::initialize() {

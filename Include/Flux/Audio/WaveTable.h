@@ -2,8 +2,7 @@
 
 #include <Audio/AudioObject.h>
 #include <Application/WaveFile.h>
-
-#include "MIDI/MidiManager.h"
+#include <MIDI/MidiManager.h>
 
 namespace Flux {
 

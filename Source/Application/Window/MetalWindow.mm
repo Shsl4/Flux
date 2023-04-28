@@ -49,13 +49,14 @@ namespace Flux {
 
         if(!this->context) throw Exceptions::Exception("Failed to create Skia metal context.");
 
-        this->component = Factory::createComponent<Component>(Point(0, 0), Point(f32(windowWidth), f32(windowHeight)));
-
         if(rootComponent) {
-            this->component->addChild(rootComponent);
+            this->component = rootComponent;
+        }
+        else {
+            this->component = Factory::createComponent<Component>(Point(0, 0), Point(f32(windowWidth), f32(windowHeight)));
         }
         
-        if(auto* cast = dynamic_cast<CursorManager*>(rootComponent)) {
+        if(auto* cast = dynamic_cast<CursorManager*>(component)) {
             
             this->manager = cast;
             this->manager->setComponent(rootComponent);
@@ -94,6 +95,11 @@ namespace Flux {
             auto surface = SkSurface::MakeFromMTKView(this->context.get(), view, kTopLeft_GrSurfaceOrigin, f32([view sampleCount]), kBGRA_8888_SkColorType, nullptr, nullptr);
             
             auto* canvas = surface->getCanvas();
+
+            SkPaint paint;
+            const SkRect rect = SkRect::MakeXYWH(0, 0, view.drawableSize.width, view.drawableSize.height);
+            paint.setColor(ColorScheme::onyx.base.skColor());
+            canvas->drawRect(rect, paint);
             
             canvas->scale(dpiScale, dpiScale);
 

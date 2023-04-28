@@ -31,7 +31,7 @@ namespace Flux {
             voices += Allocator<Voice>::construct();
         }
 
-        this->currentFrame = 1;
+        this->currentFrame = 0;
         
     }
 

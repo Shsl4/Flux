@@ -65,19 +65,19 @@ namespace Flux {
         
     }
 
-    void AudioEngine::initialize(const Float64 rate, const UInt size) {
-
-        assert(rate > 0.0);
-        assert(size >= 16);
+    void AudioEngine::initialize() {
                 
-        this->bufSize = size;
-        this->sr = rate;
-        
+        this->bufSize = 256;
+
         this->inDevice = AudioDevice(audio, audio->getDefaultInputDevice());
         this->outDevice = AudioDevice(audio, audio->getDefaultOutputDevice());
 
-        nthrowif(!supportedSampleRates().contains(rate), "Unsupported sample rate!");
-        
+        const MutableArray<UInt> rates = supportedSampleRates();
+
+        nthrowif(rates.size() == 0, "Input and output devices have incompatible sample rates!");
+
+        this->sr = rates[0];
+
         open();
 
     }
@@ -85,17 +85,20 @@ namespace Flux {
     void AudioEngine::close() {
 
         if(audio->isStreamOpen()) {
-            
-            audio->stopStream();
+
+            if(audio->isStreamRunning()){
+                audio->stopStream();
+            }
+
             audio->closeStream();
-            
+
             closed();
-            
+
         }
-        
+
     }
 
-    MutableArray<Float64> AudioEngine::supportedSampleRates() const {
+    MutableArray<UInt> AudioEngine::supportedSampleRates() const {
         
         if (inDevice.valid() && outDevice.valid()) {
             return inDevice.sampleRates().intersect(outDevice.sampleRates());
@@ -105,13 +108,13 @@ namespace Flux {
         
     }
 
-    MutableArray<size_t> AudioEngine::supportedBufferSizes() const {
+    MutableArray<UInt> AudioEngine::supportedBufferSizes() {
 
-        return { 16, 32, 64, 128, 512, 1024, 2048, 4096, 8192 };
+        return { 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192 };
         
     }
 
-    void AudioEngine::setSampleRate(const Float64 value) {
+    void AudioEngine::setSampleRate(const UInt value) {
 
         assert(value > 0.0);
 
@@ -120,6 +123,10 @@ namespace Flux {
         if(supportedSampleRates().contains(value)) {
 
             this->sr = value;
+            
+            for (auto const& callback : sampleRateChangedCallbacks) {
+                callback(sr);
+            }
             
             open();
 
@@ -144,6 +151,13 @@ namespace Flux {
     void AudioEngine::setInputDevice(AudioDevice const& dev) {
 
         this->inDevice = dev;
+
+        const MutableArray<UInt> rates = supportedSampleRates();
+
+        nthrowif(rates.size() == 0, "Input and output devices have incompatible sample rates!");
+
+        this->sr = rates[0];
+
         open();
         
     }
@@ -151,6 +165,13 @@ namespace Flux {
     void AudioEngine::setOutputDevice(AudioDevice const& dev) {
         
         this->outDevice = dev;
+
+        const MutableArray<UInt> rates = supportedSampleRates();
+
+        nthrowif(rates.size() == 0, "Input and output devices have incompatible sample rates!");
+
+        this->sr = rates[0];
+
         open();
         
     }
@@ -164,7 +185,7 @@ namespace Flux {
         config.favoriteBufferSize = bufSize;
 
         Json json;
-        Serializer<AudioConfig>::serialize(json.archive().rootContainer(), config);
+        Serializer<AudioConfig>::serialize(json.archive().root(), config);
         json.write("config.json");
         
     }
@@ -175,22 +196,22 @@ namespace Flux {
 
         if(!inDevice.valid() && !outDevice.valid()) return false;
         
-        RtAudio::StreamOptions options = { RTAUDIO_NONINTERLEAVED | RTAUDIO_MINIMIZE_LATENCY, 0,
+        RtAudio::StreamOptions options = { RTAUDIO_NONINTERLEAVED, 0,
             "AudioStream", 0};
         
         auto outParams = outDevice.outParams();
         auto inParams = inDevice.inParams();
-        
+
         if(audio->openStream(outParams.nChannels > 0 ? &outParams : nullptr,
             inParams.nChannels > 0 ? &inParams : nullptr,
-            RTAUDIO_FLOAT64, i32(sr), &bufSize, &audioCallback, this, &options)){
+            RTAUDIO_FLOAT64, sr, &bufSize, &audioCallback, this, &options)){
             
             Console::error("Failed to open audio device!\n");
             return false;
             
         }
         
-        prepare(sr, bufSize);
+        prepare(f64(sr), bufSize);
 
         audio->startStream();
         
@@ -221,8 +242,8 @@ namespace Flux {
     UInt AudioEngine::numOutputChannels() const { return this->outDevice.outChannels(); }
     
     UInt AudioEngine::numInputChannels() const { return this->inDevice.inChannels(); }
-    
-    Float64 AudioEngine::sampleRate() const { return sr; }
+
+    UInt AudioEngine::sampleRate() const { return sr; }
     
     UInt AudioEngine::bufferSize() const { return this->bufSize; }
     
@@ -231,6 +252,7 @@ namespace Flux {
         if(api() != value && apiSupported(value)) {
 
             close();
+
             Allocator<RtAudio>::destroy(this->audio);
 
             this->audio = Allocator<RtAudio>::construct(value);
@@ -248,6 +270,10 @@ namespace Flux {
 
     void AudioEngine::addOpenCallback(Function<void()> const& callback) {
         this->openCallbacks += callback;
+    }
+
+    void AudioEngine::addSampleRateChangedCallback(Function<void(UInt)> const& callback) {
+        this->sampleRateChangedCallbacks += callback;
     }
 
     MutableArray<AudioDevice> AudioEngine::enumerateInputDevices() const {
@@ -282,7 +308,7 @@ namespace Flux {
         
         std::vector<RtAudio::Api> apis;
         RtAudio::getCompiledApi(apis);
-        
+
         for(auto const& elem : apis) {
             if (api == elem) { return true; }
         }

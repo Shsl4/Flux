@@ -2,7 +2,7 @@
 
 #include <Nucleus/Nucleus.h>
 #include <vector>
-#include <Midi/MidiReceiver.h>
+#include <MIDI/MidiReceiver.h>
 
 class RtMidiIn;
 

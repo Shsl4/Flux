@@ -2,6 +2,7 @@
 
 #include <Nucleus/Nucleus.h>
 #include <atomic>
+#include <thread>
 
 namespace Flux {
 

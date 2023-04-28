@@ -142,7 +142,7 @@ def build(debug):
         if sys.platform == "win32":
             cmake_build('rtaudio', debug, ['-DRTAUDIO_BUILD_STATIC_LIBS=1', '-DRTAUDIO_STATIC_MSVCRT=0', '-DRTAUDIO_API_DS=1', '-DRTAUDIO_API_ASIO=1'])
         else:
-            cmake_build('rtaudio', debug, ['-DRTAUDIO_BUILD_STATIC_LIBS=1', '-DRTAUDIO_API_ASIO=1'])
+            cmake_build('rtaudio', debug, ['-DRTAUDIO_BUILD_STATIC_LIBS=1'])
         cmake_build('glfw', debug)
         cmake_build('Nucleus', debug)
     except Exception as message:

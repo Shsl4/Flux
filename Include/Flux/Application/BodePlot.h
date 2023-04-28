@@ -60,6 +60,8 @@ namespace Flux {
 
         void removeListener(Listener* listener);
 
+        void realignTexts() const;
+        
         NODISCARD FORCEINLINE Audio::Filter* fil() const { return this->filter; }
 
     protected:
@@ -73,8 +75,6 @@ namespace Flux {
             phase
         };
         
-        void realignTexts() const;
-
         void drawGrid(SkCanvas* canvas, Float64 deltaTime);
 
         void recalculatePhaseResponse();

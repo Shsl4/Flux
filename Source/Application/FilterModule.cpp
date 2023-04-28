@@ -30,7 +30,7 @@ namespace Flux {
 
     void FilterModule::prepare(Float64 rate, size_t size) {
 
-        this->filter->prepare(rate, size);
+        this->filter->prepare(rate, f64(size));
 
     }
 }

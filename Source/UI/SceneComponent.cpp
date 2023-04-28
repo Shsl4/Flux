@@ -11,11 +11,21 @@ namespace Flux {
         Point textSize = { 100, 20 };
         
         this->offsetText = Factory::createComponent<Text>(s - Point(100, 20), textSize, "(0, 0)", 14.0f, VAlignment::bottom, HAlignment::right);
-        
         this->scaleText = Factory::createComponent<Text>(s - textSize - Point(0, 20), textSize, "x1.00", 14.0f, VAlignment::bottom, HAlignment::right);
 
     }
-    
+
+
+    void SceneComponent::modified() {
+
+        Point textSize = { 100, 20 };
+
+        this->offsetText->setPosition(size() - textSize);
+        this->scaleText->setPosition(size() - textSize - Point(0, 20));
+
+    }
+
+
     void SceneComponent::initialize() {
         
     }
@@ -83,7 +93,7 @@ namespace Flux {
         canvas->restore();
 
         this->offsetText->setText(String::format("({}, {})", i32(offset.x), i32(offset.y)));
-        this->scaleText->setText(String::format("x{0,2}", scaling));
+        this->scaleText->setText(String::format("x{.2}", scaling));
 
         offsetText->draw(canvas, deltaTime);
         scaleText->draw(canvas, deltaTime);
@@ -129,6 +139,5 @@ namespace Flux {
     Point SceneComponent::toWorld(Point const& p) const {
         return (p + offset) / scaling;
     }
-
 
 }

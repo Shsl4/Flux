@@ -13,17 +13,28 @@ namespace Flux {
 
     }
 
-    Engine::Engine() : table(Factory::loadWaveFile(FLUX_RESOURCES"/Audio/Basic Shapes.wav")){
+    Engine::Engine(){
+        
         module.initialize();
+        wtModule.initialize();
+        
+        addSampleRateChangedCallback([this](Float64){
+            this->module.component()->plot()->realignTexts();
+        });
+
+        openDevice(0);
+
         // this->scope = Factory::createComponent<Oscilloscope>(Point::zero, Point(500,300));
     }
 
     void Engine::prepare(Float64 rate, UInt size) {
         
         module.prepare(rate, size);
-        table.prepare(rate, size);
+        wtModule.prepare(rate, size);
 
         module.openWindow();
+        wtModule.openWindow();
+
         // Factory::windows()[0]->mainComponent()->addChild(scope);
 
         player.loadFile(FLUX_RESOURCES"/Audio/100bpm_virtual_riot.wav");
@@ -44,7 +55,7 @@ namespace Flux {
 
         player.resetStartAndEnd();
         player.setLooping(true);
-        // player.play();
+        //player.play();
 
     }
 
@@ -53,11 +64,11 @@ namespace Flux {
         switch (message.type()) {
 
             case MidiEvent::noteDown:
-                table.startNote(message);
+                wtModule.processor()->startNote(message);
                 break;
 
             case MidiEvent::noteUp:
-                table.stopNote(message);
+                wtModule.processor()->stopNote(message);
                 break;
 
             case MidiEvent::pitchBend:
@@ -79,7 +90,7 @@ namespace Flux {
         const auto audioBuffer = AudioBuffer(outputBuffer, numOutputChannels(), bufferSize());
 
         player.process(audioBuffer);
-        table.process(audioBuffer);
+        wtModule.process(audioBuffer);
         module.process(audioBuffer);
         // scope->feed(audioBuffer);
 
