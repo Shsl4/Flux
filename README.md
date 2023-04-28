@@ -39,16 +39,11 @@ open Flux.lnk
 ### Linux (Debian)
 Install the required build tools:
 ```sh
-sudo apt install cmake
-sudo apt install ninja-build
-sudo apt install python3
+sudo apt install cmake ninja-build python3
 ```
 Make sure required linux libraries are installed:
 ```sh
-sudo apt install pulseaudio
-sudo apt install alsa
-sudo apt install libfreetype-dev
-sudo apt install libasound2-dev
+sudo apt install pulseaudio alsa libfreetype-dev libasound2-dev
 ```
 Clone the project and launch the setup script:
 ```sh
