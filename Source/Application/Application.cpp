@@ -226,7 +226,7 @@ namespace Flux {
             
     };
     
-    class AudioSettings : public Component {
+    class AudioSettings : public Component, public AudioEngine::Listener {
         
     public:
         
@@ -256,10 +256,16 @@ namespace Flux {
             inputDropdown->setStyle(style);
             outputDropdown->setStyle(style);
             
-            engine->addOpenCallback([this] {
-                refresh(false);
-            });
+            engine->addListener(this);
 
+        }
+
+        void audioDeviceOpened(AudioDevice const& in, AudioDevice const& out) override {
+            refresh(false);
+        }
+
+        void sampleRateChanged(size_t sampleRate) override {
+            refresh(false);
         }
 
         void refresh(bool notify = true) {
@@ -269,13 +275,13 @@ namespace Flux {
 
             auto apiNames = MutableArray<String>(apis.size());
             
-            for(auto const& api : apis) { apiNames += apiName(api); }
+            for(auto const& api : apis) { apiNames += RtAudio::getApiDisplayName(api); }
             
             driverDropdown->setChoices(apiNames);
-            driverDropdown->setSelected(apiName(engine->api()));
+            driverDropdown->setSelected(RtAudio::getApiDisplayName(engine->api()));
             driverDropdown->setCallback([this](size_t, String const& value) {
 
-                engine->setApi(nameToApi(value));
+                engine->setApi( RtAudio::getCompiledApiByDisplayName(value.begin().get()));
                 
             });
 
@@ -289,7 +295,7 @@ namespace Flux {
             sampleRateDropdown->setSelected(String::fromInteger(engine->sampleRate()));
             sampleRateDropdown->setCallback([this](size_t, String const& value) {
 
-                engine->setSampleRate(value.toInteger());
+                engine->setSampleRate(static_cast<UInt32>(value.toInteger()));
                 
             });
             
@@ -309,7 +315,7 @@ namespace Flux {
             
             MutableArray<String> inputDevices = { "None" };
 
-            for (auto const& dev : engine->enumerateInputDevices()) {
+            for (auto const& dev : engine->availableInputDevices()) {
                 inputDevices += dev.name();
             }
 
@@ -317,7 +323,7 @@ namespace Flux {
             inputDropdown->setSelected(engine->inputDevice().valid()? engine->inputDevice().name() : "None");
             inputDropdown->setCallback([this](size_t, String const& value) {
                 
-                for (auto const& dev : engine->enumerateInputDevices()) {
+                for (auto const& dev : engine->availableInputDevices()) {
 
                     if(dev.name() == value) {
                         
@@ -334,7 +340,7 @@ namespace Flux {
             
             MutableArray<String> outputDevices = { "None" };
 
-            for (auto const& dev : engine->enumerateOutputDevices()) {
+            for (auto const& dev : engine->availableOutputDevices()) {
                 outputDevices += dev.name();
             }
 
@@ -342,7 +348,7 @@ namespace Flux {
             outputDropdown->setSelected(engine->outputDevice().valid()? engine->outputDevice().name() : "None");
             outputDropdown->setCallback([this](size_t, String const& value) {
                 
-                for (auto const& dev : engine->enumerateOutputDevices()) {
+                for (auto const& dev : engine->availableOutputDevices()) {
 
                     if(dev.name() == value) {
                         

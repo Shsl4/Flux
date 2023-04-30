@@ -98,6 +98,14 @@ namespace Flux {
 
     }
 
+    void AudioEngine::addListener(Listener* listener) {
+        if(listener && !listeners.contains(listener)) { this->listeners += listener; }
+    }
+    
+    void AudioEngine::removeListener(Listener* listener) {
+        listeners.removeAll(listener);
+    }
+
     MutableArray<UInt> AudioEngine::supportedSampleRates() const {
         
         if (inDevice.valid() && outDevice.valid()) {
@@ -124,8 +132,8 @@ namespace Flux {
 
             this->sr = value;
             
-            for (auto const& callback : sampleRateChangedCallbacks) {
-                callback(sr);
+            for (const auto& listener : listeners) {
+                listener->sampleRateChanged(sr);
             }
             
             open();
@@ -217,13 +225,14 @@ namespace Flux {
         
         opened();
 
-        for (auto const& callback : openCallbacks) {
-            callback();
+        for (const auto& listener : listeners) {
+            listener->audioDeviceOpened(inDevice, outDevice);
         }
 
         writeConfig();
 
-        Console::log("AudioEngine initialized using {} with {} sample rate and buffer size {}.\n", apiName(api()), sampleRate(), bufferSize());
+        Console::log("AudioEngine initialized using {} with {} sample rate and buffer size {}.\n",
+            RtAudio::getApiDisplayName(api()), sampleRate(), bufferSize());
 
         Console::log("Latency: {}\n", audio->getStreamLatency());
         
@@ -235,9 +244,7 @@ namespace Flux {
         
     }
 
-    RtAudio::Api AudioEngine::api() const {
-        return audio->getCurrentApi();
-    }
+    RtAudio::Api AudioEngine::api() const { return audio->getCurrentApi(); }
     
     UInt AudioEngine::numOutputChannels() const { return this->outDevice.outChannels(); }
     
@@ -268,15 +275,7 @@ namespace Flux {
         
     }
 
-    void AudioEngine::addOpenCallback(Function<void()> const& callback) {
-        this->openCallbacks += callback;
-    }
-
-    void AudioEngine::addSampleRateChangedCallback(Function<void(UInt)> const& callback) {
-        this->sampleRateChangedCallbacks += callback;
-    }
-
-    MutableArray<AudioDevice> AudioEngine::enumerateInputDevices() const {
+    MutableArray<AudioDevice> AudioEngine::availableInputDevices() const {
 
         MutableArray<AudioDevice> devices;
 
@@ -290,7 +289,7 @@ namespace Flux {
         
     }
 
-    MutableArray<AudioDevice> AudioEngine::enumerateOutputDevices() const {
+    MutableArray<AudioDevice> AudioEngine::availableOutputDevices() const {
 
         MutableArray<AudioDevice> devices;
 
@@ -320,6 +319,17 @@ namespace Flux {
     void AudioEngine::opened() { }
     
     void AudioEngine::closed() { }
+    
+    size_t AudioEngine::findBestSampleRate() const {
 
+        const auto rates = supportedSampleRates();
+        
+        for (const auto& sampleRate : rates) {
+            if (sampleRate >= 44100) { return sampleRate; }
+        }
+
+        return rates.last();
+        
+    }
 }
 

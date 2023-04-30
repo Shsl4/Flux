@@ -17,10 +17,6 @@ namespace Flux {
         
         module.initialize();
         wtModule.initialize();
-        
-        addSampleRateChangedCallback([this](Float64){
-            this->module.component()->plot()->realignTexts();
-        });
 
         openDevice(0);
 

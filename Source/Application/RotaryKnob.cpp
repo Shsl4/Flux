@@ -102,7 +102,7 @@ namespace Flux {
     }
 
     void RotaryKnob::removeListener(RotaryKnob::Listener* listener) {
-        this->listeners.remove(listener);
+        this->listeners.removeAll(listener);
     }
 
     void RotaryKnob::setValue(Float64 newValue, bool notify) {

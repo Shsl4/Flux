@@ -30,12 +30,10 @@ namespace Flux {
         NODISCARD String name() const {
 
             if(!valid()) return "None";
-
-            auto inf = info();
-
-            // Fix a bug on macOS where if your device name contains an apostrophe, rtaudio would read it as \xd5
+            
+            // Fixes a bug on macOS where if your device name contains an apostrophe, rtaudio would read it as \xd5
             // and produce a string that cannot be drawn by skia.
-            return String(inf.name).replaceOccurrences("\xd5", "'");
+            return String(info().name).replaceOccurrences("\xd5", "'");
 
         }
 
@@ -104,6 +102,18 @@ namespace Flux {
 
     public:
 
+        class Listener {
+
+        public:
+            
+            virtual void audioDeviceOpened(AudioDevice const& in, AudioDevice const& out) = 0;
+            
+            virtual void sampleRateChanged(size_t sampleRate) = 0;
+
+            virtual ~Listener() = default;
+            
+        };
+
         AudioEngine();
 
         virtual ~AudioEngine();
@@ -120,17 +130,19 @@ namespace Flux {
 
         void setOutputDevice(AudioDevice const& dev);
 
+        void setApi(RtAudio::Api value);
+
         void writeConfig();
 
         void close();
+        
+        void addListener(Listener* listener);
 
-        virtual void prepare(Float64 rate, UInt size) = 0;
-
-        virtual void process(Float64* inputBuffer, Float64* outputBuffer) = 0;
-
+        void removeListener(Listener* listener);
+        
         NODISCARD MutableArray<UInt> supportedSampleRates() const;
 
-        NODISCARD static MutableArray<UInt> supportedBufferSizes() ;
+        NODISCARD static MutableArray<UInt> supportedBufferSizes();
 
         NODISCARD RtAudio::Api api() const;
 
@@ -141,23 +153,21 @@ namespace Flux {
         NODISCARD UInt sampleRate() const;
 
         NODISCARD UInt bufferSize() const;
-
+        
         NODISCARD AudioDevice inputDevice() const { return this->inDevice; }
 
         NODISCARD AudioDevice outputDevice() const { return this->outDevice; }
 
-        NODISCARD MutableArray<AudioDevice> enumerateInputDevices() const;
+        NODISCARD MutableArray<AudioDevice> availableInputDevices() const;
 
-        NODISCARD MutableArray<AudioDevice> enumerateOutputDevices() const;
+        NODISCARD MutableArray<AudioDevice> availableOutputDevices() const;
 
         NODISCARD static bool apiSupported(RtAudio::Api api);
+        
+        virtual void prepare(Float64 rate, UInt size) = 0;
 
-        void setApi(RtAudio::Api value);
-
-        void addOpenCallback(Function<void()> const& callback);
-
-        void addSampleRateChangedCallback(Function<void(UInt)> const& callback);
-
+        virtual void process(Float64* inputBuffer, Float64* outputBuffer) = 0;
+        
     protected:
 
         virtual void opened();
@@ -166,62 +176,27 @@ namespace Flux {
 
     private:
 
+        NODISCARD size_t findBestSampleRate() const;
+        
+        bool open();
+        
+        UInt bufSize = 0;
+        UInt sr = 0;
+        
         RtAudio* audio = nullptr;
 
-        bool open();
-
         AudioConfig config;
+        
         AudioDevice inDevice = {};
         AudioDevice outDevice = {};
-
-        UInt bufSize = 0;
-        UInt sr = 0.0;
-
-        MutableArray<Function<void()>> openCallbacks;
-        MutableArray<Function<void(UInt)>> sampleRateChangedCallbacks;
+        
+        MutableArray<Listener*> listeners;
 
     };
     
 }
 
-
 namespace Nucleus {
-
-    inline String apiName(RtAudio::Api api) {
-        
-        switch (api) {
-            case RtAudio::UNSPECIFIED: return "Invalid";
-            case RtAudio::MACOSX_CORE: return "CoreAudio";
-            case RtAudio::LINUX_ALSA: return "ALSA";
-            case RtAudio::UNIX_JACK: return "JACK";
-            case RtAudio::LINUX_PULSE: return "PulseAudio";
-            case RtAudio::LINUX_OSS: return "Open Sound System";
-            case RtAudio::WINDOWS_ASIO: return "ASIO";
-            case RtAudio::WINDOWS_WASAPI: return "Windows WASAPI";
-            case RtAudio::WINDOWS_DS: return "DirectSound";
-            case RtAudio::RTAUDIO_DUMMY: return "Dummy";
-            case RtAudio::NUM_APIS: return "Invalid";
-        }
-
-        return "Invalid";
-        
-    }
-
-    inline RtAudio::Api nameToApi(String const& name) {
-
-        if(name == "CoreAudio") return RtAudio::MACOSX_CORE;
-        if(name == "ALSA") return RtAudio::LINUX_ALSA;
-        if(name == "JACK") return RtAudio::UNIX_JACK;
-        if(name == "PulseAudio") return RtAudio::LINUX_PULSE;
-        if(name == "Open Sound System") return RtAudio::LINUX_OSS;
-        if(name == "ASIO") return RtAudio::WINDOWS_ASIO;
-        if(name == "Windows WASAPI") return RtAudio::WINDOWS_WASAPI;
-        if(name == "DirectSound") return RtAudio::WINDOWS_DS;
-        if(name == "Dummy") return RtAudio::RTAUDIO_DUMMY;
-
-        return RtAudio::UNSPECIFIED;
-        
-    }
     
     template<>
     class Serializer<Flux::AudioConfig> {
@@ -230,7 +205,7 @@ namespace Nucleus {
         
         static void serialize(Container* container, Flux::AudioConfig const& object) {
 
-            container->add("api", apiName(object.favoriteApi));
+            container->add("api", RtAudio::getApiDisplayName(object.favoriteApi));
             container->add("input", object.favoriteInput);
             container->add("output", object.favoriteOutput);
             container->add("sampleRate", object.favoriteSampleRate);
@@ -242,7 +217,7 @@ namespace Nucleus {
 
             Flux::AudioConfig obj;
 
-            obj.favoriteApi = nameToApi(container->get<String>("api"));
+            obj.favoriteApi = RtAudio::getCompiledApiByDisplayName(container->get<String>("api").begin().get());
             obj.favoriteInput = container->get<String>("input");
             obj.favoriteOutput = container->get<String>("output");
             obj.favoriteSampleRate = container->get<size_t>("sampleRate");

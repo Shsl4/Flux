@@ -42,7 +42,7 @@ namespace Flux {
             window->cursorManager()->notifyDestruction(component);
         }
         
-        factory->components.remove(component);
+        factory->components.removeAll(component);
     
     }
 
@@ -52,7 +52,7 @@ namespace Flux {
             Application::instance()->stop();
         }
 
-        factory->activeWindows.remove(window);
+        factory->activeWindows.removeAll(window);
         
     }
 
