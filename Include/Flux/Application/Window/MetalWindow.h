@@ -1,9 +1,14 @@
 #pragma once
 
 #include <Application/Window/Window.h>
+#include <UI/Graphics.h>
+
+#include <skia/include/core/SkRefCnt.h>
+#include <skia/include/core/SkSurface.h>
+#include <skia/include/gpu/GrDirectContext.h>
 
 namespace Flux {
-    
+
     class MetalWindow : public Window {
 
     public:
@@ -25,9 +30,10 @@ namespace Flux {
         
         void* mtkView = nullptr;
         void* mtlQueue = nullptr;
+        Graphics graphics;
         sk_sp<GrDirectContext> context = nullptr;
         Float32 dpiScale = 1.0f;
 
     };
-    
+
 }

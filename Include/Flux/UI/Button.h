@@ -77,27 +77,24 @@ namespace Flux{
             
         }
 
-        void draw(SkCanvas *canvas, Float64 deltaTime) override {
+        void draw(Graphics const& graphics) override {
 
-            fader.update(deltaTime);
+            fader.update(graphics.deltaTime());
 
-            SkPaint paint;
+            graphics.setColor(color());
 
-            paint.setColor(color().skColor());
+            const Transform transform = globalTransform();
 
-            const Point pos = globalTransform().position;
-            const SkRect rect = SkRect::MakeXYWH(pos.x, pos.y, size().x, size().y);
+            graphics.drawRoundedRect(transform, cornerRadius);
 
-            canvas->drawRoundRect(rect, cornerRadius, cornerRadius, paint);
+            graphics.setStyle(Graphics::Style::Stroke);
+            graphics.setColor(borderColor);
+            graphics.setStrokeWidth(0.5);
 
-            paint.setStyle(SkPaint::Style::kStroke_Style);
-            paint.setColor(borderColor.skColor());
-            paint.setStrokeWidth(0.5);
-
-            canvas->drawRoundRect(rect, cornerRadius, cornerRadius, paint);
+            graphics.drawRoundedRect(transform, cornerRadius);
 
             for(const auto& child : children()) {
-                child->draw(canvas, deltaTime);
+                child->draw(graphics);
             }
 
         }

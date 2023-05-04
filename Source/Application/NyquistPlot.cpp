@@ -7,50 +7,47 @@ namespace Flux {
         textSize = s.x * 0.025f;
     }
     
-    void NyquistPlot::draw(SkCanvas* canvas, Float64 deltaTime) {
+    void NyquistPlot::draw(Graphics const& graphics) {
 
-        SkPaint paint;
-        const auto t = globalTransform();
-        const SkRect rect = SkRect::MakeXYWH(t.position.x, t.position.y, t.size.x, t.size.y);
+        const Transform transform = globalTransform();
 
-        paint.setColor(color().skColor());
-        canvas->drawRect(rect, paint);
+        graphics.setColor(color());
+        graphics.drawRect(transform);
         
-        drawCircle(canvas, deltaTime);
+        drawCircle(graphics);
 
-        paint.setStyle(SkPaint::kStroke_Style);
-        paint.setStrokeWidth(2.0f);
-        paint.setColor(scheme.lightest.skColor());
+        graphics.setStyle(Graphics::Style::Stroke);
+        graphics.setStrokeWidth(2.0f);
+        graphics.setColor(scheme.lightest);
 
-        canvas->save();
-        canvas->clipRect(rect);
+        graphics.save();
+        graphics.clip(transform.position, transform.size);
         
-        canvas->drawPath(path, paint);
+        graphics.drawPath(path);
 
         for (const auto& child : children()) {
-            child->draw(canvas, deltaTime);
+            child->draw(graphics);
         }
 
-        canvas->restore();
+        graphics.restore();
         
     }
     
-    void NyquistPlot::drawCircle(SkCanvas* canvas, Float64 deltaTime) const {
+    void NyquistPlot::drawCircle(Graphics const& graphics) const {
 
-        SkPaint paint;
-        paint.setStrokeWidth(2.0f);
-        paint.setStyle(SkPaint::Style::kStroke_Style);
-        paint.setColor(scheme.base.skColor());
+        graphics.setStrokeWidth(2.0f);
+        graphics.setStyle(Graphics::Style::Stroke);
+        graphics.setColor(scheme.base);
 
         const Point position = globalTransform().position;
         const Point scale = size();
         
-        canvas->drawCircle(position.x + scale.x / 2.0f, position.y + scale.y / 2.0f, scale.x / 4.0f, paint);
+        graphics.drawCircle({position.x + scale.x / 2.0f, position.y + scale.y / 2.0f}, scale.x / 4.0f);
 
-        paint.setStrokeWidth(1.0f);
-        
-        canvas->drawLine(position.x + scale.x / 2.0f, position.y, position.x + scale.x / 2.0f, position.y + scale.y, paint);
-        canvas->drawLine(position.x, position.y + scale.y / 2.0f, position.x + scale.x, position.y + scale.y / 2.0f, paint);
+        graphics.setStrokeWidth(1.0f);
+
+        graphics.drawLine({position.x + scale.x / 2.0f, position.y}, {position.x + scale.x / 2.0f, position.y + scale.y});
+        graphics.drawLine({position.x, position.y + scale.y / 2.0f}, {position.x + scale.x, position.y + scale.y / 2.0f});
         
     }
     

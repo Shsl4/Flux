@@ -5,33 +5,33 @@
 
 namespace Flux {
 
-    void TextRenderer::draw(SkCanvas *canvas, Float64 deltaTime) {
+    void TextRenderer::draw(Graphics const& graphics) {
 
         if(textValue.isEmpty()) return;
 
-        paint.setAntiAlias(true);
-        
-        const Point pos = globalTransform().position;
-        
-        canvas->drawSimpleText(&textValue[0], textValue.size(), SkTextEncoding::kUTF8,
-                               pos.x, pos.y + size().y - renderOffset, font, paint);
+        Point position = globalTransform().position;
+
+        position.y += size().y - renderOffset;
+
+        graphics.setAntiAliasing(true);
+        graphics.setColor(color());
+        graphics.drawText(textValue, position, fontSize, font);
 
     }
 
     void TextRenderer::setText(const String &text) {
         this->textValue = text;
+        font.setSize(fontSize);
         recalcSize();
     }
 
     void TextRenderer::setTextSize(Float32 value) {
         fontSize = value;
-        font.setSize(fontSize);
+        font.setSize(value);
         recalcSize();
     }
 
     void TextRenderer::colorChanged() {
-
-        paint.setColor(color().skColor());
 
     }
 
@@ -82,15 +82,14 @@ namespace Flux {
 
         Float32 w = 0.0f, h = 0.0f;
         measureText(textValue.begin().get(), textValue.size(), SkTextEncoding::kUTF8,
-                    font, w, h, renderOffset);
+                    *font.skiaFont(), w, h, renderOffset);
 
         setSize({ w, h });
 
     }
 
-    TextRenderer::TextRenderer(String const& text, Float32 textSize) {
+    TextRenderer::TextRenderer(String const& text, Float32 textSize) : font(Fonts::manrope) {
 
-        this->font = Fonts::manrope;
         setColor(Colors::white);
         setText(text);
         setTextSize(textSize);
@@ -169,9 +168,9 @@ namespace Flux {
 
     }
 
-    void Text::draw(SkCanvas *canvas, Float64 deltaTime) {
+    void Text::draw(Graphics const& graphics) {
         
-        renderer->draw(canvas, deltaTime);
+        renderer->draw(graphics);
 
     }
 

@@ -68,31 +68,31 @@ namespace Flux {
 
     }
 
-    void RotaryKnob::draw(SkCanvas *canvas, Float64 deltaTime) {
+    void RotaryKnob::draw(Graphics const& graphics) {
 
-        SkPaint paint;
         const Transform t = globalTransform();
         const Point& pos = t.position;
         const Point& s = t.size;
         const Float32 rad = s.x / 2.0f;
         const Float32 diff = s.x * 0.125f;
 
-        const SkRect rect = SkRect::MakeXYWH(pos.x + diff, pos.y + diff, s.x - 2.0f * diff, s.x - 2.0f * diff);
+        graphics.setStyle(Graphics::Style::Fill);
+        graphics.setStrokeWidth(size().x / 10.0f);
+        graphics.setAntiAliasing(true);
 
-        paint.setStyle(SkPaint::Style::kFill_Style);
-        paint.setStrokeWidth(size().x / 10.0f);
-        paint.setAntiAlias(true);
+        const Point arcPos = {pos.x + diff, pos.y + diff};
+        const Point arcSize = {s.x - 2.0f * diff, s.x - 2.0f * diff};
 
-        paint.setColor(scheme.base.skColor());
-        canvas->drawArc(rect, 120, 300, true, paint);
+        graphics.setColor(scheme.base);
+        graphics.drawArc(arcPos, arcSize, 120, 300, true);
 
-        paint.setColor(scheme.lightest.skColor());
-        canvas->drawArc(rect, 120, f32(rotation), true, paint);
+        graphics.setColor(scheme.lightest);
+        graphics.drawArc(arcPos, arcSize, 120, f32(rotation), true);
 
-        paint.setColor(color().skColor());
-        canvas->drawCircle(pos.x + s.x / 2.0f, pos.y + s.x / 2.0f, rad * 0.6f, paint);
+        graphics.setColor(color());
+        graphics.drawCircle({ pos.x + s.x / 2.0f, pos.y + s.x / 2.0f }, rad * 0.6f);
 
-        text->draw(canvas, deltaTime);
+        text->draw(graphics);
         text->setReactive(false);
 
     }

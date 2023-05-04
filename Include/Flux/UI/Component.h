@@ -1,105 +1,11 @@
 #pragma once
 
-#define SK_GL
-
-#ifdef __APPLE__
-#define SK_METAL
-#elif defined(_WIN64)
-#define SK_DIRECT3D
-#define SK_VULKAN
-#else
-#define SK_VULKAN
-#endif
-
-#include <skia/include/core/SkColorSpace.h>
-#include <skia/include/core/SkCanvas.h>
-#include <skia/include/core/SkSurface.h>
-#include <skia/include/core/SkPathEffect.h>
 #include <Flux/UI/Reactive.h>
 #include <Flux/UI/Color.h>
-#include <Flux/UI/EdgeInsets.h>
+#include <Flux/UI/Transform.h>
+#include <Flux/UI/Graphics.h>
 
 namespace Flux {
-
-    struct Point {
-
-        Point() = default;
-        
-        Point(const Float32 x, const Float32 y) : x(x), y(y) {}
-        
-        Point operator+(Point const& other) const {
-            return { this->x + other.x, this->y + other.y };
-        }
-
-        Point operator-(Point const& other) const {
-            return { this->x - other.x, this->y - other.y };
-        }
-
-        Point operator-() const {
-            return { -this->x, -this->y };
-        }
-        
-        Point operator*(Point const& other) const {
-            return { this->x * other.x, this->y * other.y };
-        }
-        
-        Point operator/(Point const& other) const {
-            return { this->x / other.x, this->y / other.y };
-        }
-
-        Point& operator+=(Point const& other) {
-            this->x += other.x;
-            this->y += other.y;
-            return *this;
-        }
-
-        Point& operator-=(Point const& other) {
-            this->x -= other.x;
-            this->y -= other.y;
-            return *this;
-        }
-
-        Point operator/(Float32 s) const {
-            return { x / s, y / s };
-        }
-
-        Point operator*(Float32 s) const {
-            return { x * s, y * s };
-        }
-
-        Float32 x = 0.0f;
-        Float32 y = 0.0f;
-
-    public:
-
-        const static Point zero;
-
-    };
-
-    struct Transform {
-
-        Transform() = default;
-        
-        Transform(const Point& position, const Point& size, const Float32 rotation) : position(position), size(size),
-              rotation(rotation) {}
-
-        NODISCARD Transform mix(Transform const& other) const {
-
-            return { this->position + other.position, this->size, this->rotation + other.rotation};
-            
-        }
-
-        NODISCARD FORCEINLINE Point centeredPosition() const {
-
-            return { this->position.x + this->size.x / 2.0f, this->position.y + this->size.y / 2.0f };
-            
-        }
-
-        Point position = {};
-        Point size = {};
-        Float32 rotation = 0.0f;
-        
-    };
 
     class Component : public Reactive {
         
@@ -154,10 +60,6 @@ namespace Flux {
         NODISCARD FORCEINLINE Component* parent() const { return this->parentComponent; }
 
         NODISCARD FORCEINLINE Color const& color() const { return this->renderColor; }
-
-        NODISCARD FORCEINLINE EdgeInsets& insets() { return this->edgeInsets; }
-
-        NODISCARD FORCEINLINE EdgeInsets const& insets() const { return this->edgeInsets; }
         
         NODISCARD FORCEINLINE bool visible() const { return this->bVisible; }
 
@@ -188,7 +90,7 @@ namespace Flux {
             
         }
         
-        virtual void draw(SkCanvas* canvas, Float64 deltaTime);
+        virtual void draw(Graphics const& graphics);
 
         virtual void initialize();
 
@@ -220,7 +122,6 @@ namespace Flux {
         Color renderColor = Colors::white;
         Component* parentComponent = nullptr;
         MutableArray<Component*> childrenArray = {};
-        EdgeInsets edgeInsets = {};
         bool bVisible = true;
 
     };

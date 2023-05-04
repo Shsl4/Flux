@@ -11,7 +11,7 @@ namespace Flux {
 
         Oscilloscope(const Point &p, const Point &s);
 
-        void draw(SkCanvas *canvas, Float64 deltaTime) override;
+        void draw(Graphics const& graphics) override;
 
         void initialize() override;
 
@@ -23,9 +23,8 @@ namespace Flux {
 
         Timer t;
 
-        SkPath path;
-        SkPath p;
-        SkPath pathToDraw;
+        Path path;
+        Path p;
         ColorScheme scheme = ColorScheme::coral;
 
         size_t windowSize = 512;

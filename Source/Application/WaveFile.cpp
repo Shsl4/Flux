@@ -41,6 +41,11 @@ namespace Flux {
     }
 
 
+    template<typename Integral> requires std::is_integral_v<Integral>
+    Float64 nextNormalized(File& file){
+        return f64(file.read<Integral>()) / std::numeric_limits<Integral>::max();
+    }
+
     WaveFile::WaveFile(const String &path) {
 
         File file = File();
@@ -102,7 +107,6 @@ namespace Flux {
             
         }
         
-        
         this->subChunk2Id = subchunk;
         this->subChunk2Size = subChunkSize;
 
@@ -128,63 +132,31 @@ namespace Flux {
             
         }
 
-        if(bitsPerSample == 8){
-         
+        static const Map<UInt16, Function<Float64(File&)>> procMap = {
+                {8, &nextNormalized<Int8> },
+                {16, &nextNormalized<Int16> },
+                {24, [](File& file) { return threeBytesToNormalizedFloat(file.readMultiple<UInt8>(3)); }},
+                {32, &nextNormalized<Int32> },
+        };
+
+        try{
+
+            Function<Float64(File&)>& function = procMap[bitsPerSample];
+
             for(size_t i = 0; i < samplesPerChannel; ++i){
 
                 for(size_t channel = 0; channel < channelCount; ++channel) {
-                    buffers[channel][i] = f64(file.read<Int8>()) / std::numeric_limits<Int8>::max();
+                    buffers[channel][i] = function(file);
                 }
 
             }
-            
-            return;
-            
+
         }
-        
-        if(bitsPerSample == 16){
-         
-            for(size_t i = 0; i < samplesPerChannel; ++i){
+        catch (Exceptions::Exception const&){
 
-                for(size_t channel = 0; channel < channelCount; ++channel) {
-                    buffers[channel][i] = f64(file.read<Int16>()) / std::numeric_limits<Int16>::max();
-                }
+            throw Exceptions::Exception("Unsupported bits per sample");
 
-            }
-            
-            return;
-            
         }
-        
-        if(bitsPerSample == 24){
-         
-            for(size_t i = 0; i < samplesPerChannel; ++i){
-
-                for(size_t channel = 0; channel < channelCount; ++channel) {
-                    buffers[channel][i] = threeBytesToNormalizedFloat(file.readMultiple<unsigned char>(3));
-                }
-
-            }
-            
-            return;
-            
-        }
-        
-        if(bitsPerSample == 32){
-         
-            for(size_t i = 0; i < samplesPerChannel; ++i){
-
-                for(size_t channel = 0; channel < channelCount; ++channel) {
-                    buffers[channel][i] = f64(file.read<Int32>()) / std::numeric_limits<Int32>::max();
-                }
-
-            }
-            
-            return;
-            
-        }
-        
-        throw Exceptions::Exception("Unsupported bits per sample");
 
     }
 

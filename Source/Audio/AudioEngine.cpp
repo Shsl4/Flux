@@ -40,31 +40,6 @@ namespace Flux {
         Allocator<RtAudio>::destroy(audio);
     }
 
-    void AudioEngine::listDevices() const {
-
-        const UInt count = audio->getDeviceCount();
- 
-        if(count == 0) {
-
-            Console::log("There are no audio devices available.\n");
-            return;
-            
-        }
-
-        Console::log("Listing audio devices:\n");
-
-        size_t index = 0;
-        
-        for (const auto& id : audio->getDeviceIds()) {
-
-            RtAudio::DeviceInfo info = audio->getDeviceInfo(id);
-
-            Console::log("[{}] -> {} (In: {}, Out: {})\n", index++, info.name, info.inputChannels, info.outputChannels);
-                        
-        }
-        
-    }
-
     void AudioEngine::initialize() {
                 
         this->bufSize = 256;
@@ -72,11 +47,7 @@ namespace Flux {
         this->inDevice = AudioDevice(audio, audio->getDefaultInputDevice());
         this->outDevice = AudioDevice(audio, audio->getDefaultOutputDevice());
 
-        const MutableArray<UInt> rates = supportedSampleRates();
-
-        nthrowif(rates.size() == 0, "Input and output devices have incompatible sample rates!");
-
-        this->sr = rates[0];
+        this->sr = findBestSampleRate();
 
         open();
 
@@ -149,9 +120,7 @@ namespace Flux {
     void AudioEngine::setBufferSize(const UInt value) {
 
         assert(value >= 16 && value % 2 == 0);
-        
         this->bufSize = value;
-        
         open();
         
     }
@@ -159,13 +128,7 @@ namespace Flux {
     void AudioEngine::setInputDevice(AudioDevice const& dev) {
 
         this->inDevice = dev;
-
-        const MutableArray<UInt> rates = supportedSampleRates();
-
-        nthrowif(rates.size() == 0, "Input and output devices have incompatible sample rates!");
-
-        this->sr = rates[0];
-
+        this->sr = findBestSampleRate();
         open();
         
     }
@@ -173,13 +136,7 @@ namespace Flux {
     void AudioEngine::setOutputDevice(AudioDevice const& dev) {
         
         this->outDevice = dev;
-
-        const MutableArray<UInt> rates = supportedSampleRates();
-
-        nthrowif(rates.size() == 0, "Input and output devices have incompatible sample rates!");
-
-        this->sr = rates[0];
-
+        this->sr = findBestSampleRate();
         open();
         
     }
@@ -267,7 +224,7 @@ namespace Flux {
             inDevice = AudioDevice(audio, audio->getDefaultInputDevice());
             outDevice = AudioDevice(audio, audio->getDefaultOutputDevice());
 
-            nthrowif(!outDevice.sampleRates().contains(sr), "Unsupported sample rate!");
+            this->sr = findBestSampleRate();
 
             open();
             
@@ -323,7 +280,9 @@ namespace Flux {
     size_t AudioEngine::findBestSampleRate() const {
 
         const auto rates = supportedSampleRates();
-        
+
+        nthrowif(rates.size() == 0, "Input and output devices have incompatible sample rates!");
+
         for (const auto& sampleRate : rates) {
             if (sampleRate >= 44100) { return sampleRate; }
         }

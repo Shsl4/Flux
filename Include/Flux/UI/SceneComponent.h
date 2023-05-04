@@ -63,7 +63,7 @@ namespace Flux {
         
         SceneComponent(Point const& p, Point const& s);
         
-        void draw(SkCanvas* canvas, Float64 deltaTime) override;
+        void draw(Graphics const& graphics) override;
 
         void drag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) override;
 

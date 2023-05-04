@@ -13,26 +13,19 @@ namespace Flux {
 
     }
 
-    void Component::draw(SkCanvas* canvas, const Float64 deltaTime) {
+    void Component::draw(Graphics const& graphics) {
 
         if(!visible()) { return; }
 
         if(!color().transparent()){
 
-            SkPaint paint;
-            const auto t = globalTransform();
-            const SkRect rect = SkRect::MakeXYWH(t.position.x + edgeInsets.left,
-                                                 t.position.y + edgeInsets.top,
-                                                 t.size.x - edgeInsets.left - edgeInsets.right,
-                                                 t.size.y - edgeInsets.top - edgeInsets.bottom);
-
-            paint.setColor(renderColor.skColor());
-            canvas->drawRect(rect, paint);
+            graphics.setColor(renderColor);
+            graphics.drawRect(globalTransform());
 
         }
 
         for(const auto& child : childrenArray) {
-            child->draw(canvas, deltaTime);
+            child->draw(graphics);
         }
         
     }

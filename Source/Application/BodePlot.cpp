@@ -169,28 +169,23 @@ namespace Flux {
         
     }
 
-    void BodePlot::draw(SkCanvas* canvas, Float64 deltaTime) {
+    void BodePlot::draw(Graphics const& graphics) {
         
-        SkPaint paint;
-        paint.setAntiAlias(true);
-        const auto t = globalTransform();
-        const SkRect rect = SkRect::MakeXYWH(t.position.x, t.position.y, t.size.x, t.size.y);
+        graphics.setAntiAliasing(true);
+        graphics.setColor(color());
+        graphics.drawRect(globalTransform());
 
-        paint.setColor(color().skColor());
-        canvas->drawRect(rect, paint);
-        
         if(filter) {
-            drawGrid(canvas, deltaTime);
+            drawGrid(graphics);
         }
 
-        paint.setStyle(SkPaint::kStroke_Style);
-        paint.setStrokeWidth(2.0f);
-        paint.setColor(scheme.lightest.skColor());
-        
-        canvas->drawPath(path, paint);
+        graphics.setStyle(Graphics::Style::Stroke);
+        graphics.setStrokeWidth(2.0f);
+        graphics.setColor(scheme.lightest);
+        graphics.drawPath(path);
 
         for (const auto& child : children()) {
-            child->draw(canvas, deltaTime);
+            child->draw(graphics);
         }
         
     }
@@ -219,12 +214,11 @@ namespace Flux {
         
     }
 
-    void BodePlot::drawGrid(SkCanvas* canvas, Float64 deltaTime) {
+    void BodePlot::drawGrid(Graphics const& graphics) {
 
-        SkPaint paint;
-        paint.setAntiAlias(true);
-        paint.setStrokeWidth(0.5f);
-        paint.setColor(scheme.base.skColor());
+        graphics.setAntiAliasing(true);
+        graphics.setStrokeWidth(0.5f);
+        graphics.setColor(scheme.base);
 
         const Range<Float32> logRange = { log10(9.0f), log10(f32(filter->sampleRate()) / 2.0f) };
         const Range<Float32> linRange = Range<Float32>::makeLinearRange();
@@ -236,8 +230,8 @@ namespace Flux {
             
             for (auto& elem : gainsToDraw) {
 
-                const Float32 drawY = Range<Float32>::translateValue(elem, gainRange, sizeRange);
-                canvas->drawLine(position.x, drawY + position.y, position.x + scale.x, drawY + position.y, paint);
+                const auto drawY = Range<Float32>::translateValue(elem, gainRange, sizeRange);
+                graphics.drawLine({position.x, drawY + position.y}, {position.x + scale.x, drawY + position.y});
 
             }
             
@@ -246,8 +240,8 @@ namespace Flux {
 
             for (auto& elem : phasesToDraw) {
 
-                const Float32 drawY = Range<Float32>::translateValue(elem, phaseRange, sizeRange);
-                canvas->drawLine(position.x, drawY + position.y, position.x + scale.x, drawY + position.y, paint);
+                const auto drawY = Range<Float32>::translateValue(elem, phaseRange, sizeRange);
+                graphics.drawLine({position.x, drawY + position.y}, {position.x + scale.x, drawY + position.y});
 
             }
             
@@ -264,7 +258,7 @@ namespace Flux {
 
                 if(drawX > position.x + scale.x) return;
 
-                canvas->drawLine(drawX, position.y, drawX, position.y + scale.y, paint);
+                graphics.drawLine({drawX, position.y}, {drawX, position.y + scale.y});
 
             }
 

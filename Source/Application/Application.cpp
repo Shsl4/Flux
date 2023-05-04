@@ -1,7 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <Application/Application.h>
 
-#include <UI/DropdownMenu.h>
 #include <UI/Text.h>
 #include <UI/Stack.h>
 #include <UI/FrameInfo.h>
@@ -43,22 +42,20 @@ namespace Flux {
             this->callback = f;
         }
 
-        void draw(SkCanvas* canvas, Float64 deltaTime) override {
+        void draw(Graphics const& graphics) override {
 
-            SkPaint paint;
-            paint.setAntiAlias(true);
-            const auto t = globalTransform();
-            const SkRect rect = SkRect::MakeXYWH(t.position.x, t.position.y, t.size.x, t.size.y);
+            const Transform transform = globalTransform();
 
-            paint.setColor(style.scheme.base.skColor());
-            canvas->drawRoundRect(rect, 0, 0, paint);
-            paint.setColor(style.borderColor.skColor());
-            paint.setStyle(SkPaint::Style::kStroke_Style);
-            paint.setStrokeWidth(0.5);
-            canvas->drawRoundRect(rect, 0, 0, paint);
+            graphics.setAntiAliasing(true);
+            graphics.setColor(style.scheme.base);
+            graphics.drawRect(transform);
+            graphics.setColor(style.borderColor);
+            graphics.setStyle(Graphics::Style::Stroke);
+            graphics.setStrokeWidth(0.5f);
+            graphics.drawRect(transform);
 
             for(const auto& child : children()) {
-                child->draw(canvas, deltaTime);
+                child->draw(graphics);
             }
             
         }
@@ -422,22 +419,20 @@ namespace Flux {
             
         }
 
-        void draw(SkCanvas* canvas, Float64 deltaTime) override {
+        void draw(Graphics const& graphics) override {
 
-            SkPaint paint;
-            paint.setAntiAlias(true);
-            const auto t = globalTransform();
-            const SkRect rect = SkRect::MakeXYWH(t.position.x, t.position.y, t.size.x, t.size.y);
+            const auto transform = globalTransform();
 
-            paint.setColor(Color::fromHex(0x202020ff).skColor());
-            canvas->drawRoundRect(rect, 0, 0, paint);
-            paint.setColor(SkColors::kWhite);
-            paint.setStyle(SkPaint::Style::kStroke_Style);
-            paint.setStrokeWidth(0.5);
-            canvas->drawRoundRect(rect, 0, 0, paint);
+            graphics.setAntiAliasing(true);
+            graphics.setColor(Color::fromHex(0x202020ff));
+            graphics.drawRect(transform);
+            graphics.setColor(Colors::white);
+            graphics.setStyle(Graphics::Style::Stroke);
+            graphics.setStrokeWidth(0.5);
+            graphics.drawRect(transform);
 
             for(const auto& child : children()) {
-                child->draw(canvas, deltaTime);
+                child->draw(graphics);
             }
             
         }
@@ -471,7 +466,6 @@ namespace Flux {
         constexpr Int windowWidth = 1280;
         constexpr Int windowHeight = 720;
 
-        
         auto* scene = Factory::createComponent<SceneComponent>(Point::zero, Point(windowWidth, windowHeight)); 
         this->mainWindow = Factory::createWindow(scene, RenderBackend::Best, "Application", windowWidth, windowHeight);
         

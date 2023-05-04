@@ -12,7 +12,7 @@ namespace Flux {
 
         TextRenderer(String const& text, Float32 textSize);
 
-        void draw(SkCanvas *canvas, Float64 deltaTime) override;
+        void draw(Graphics const& graphics) override;
 
         void setText(String const& text);
 
@@ -33,11 +33,9 @@ namespace Flux {
         Float32 fontSize = 12.0f;
         Float32 renderOffset = 0.0f;
         String textValue = nullptr;
-        SkPaint paint;
-        SkFont font;
+        Font font;
 
     };
-
 
     class Text : public Component {
 
@@ -52,7 +50,7 @@ namespace Flux {
 
         void setTextSize(Float32 value);
 
-        void draw(SkCanvas *canvas, Float64 deltaTime) override;
+        void draw(Graphics const& graphics) override;
 
         void setAlignment(VAlignment vAlign, HAlignment hAlign);
 

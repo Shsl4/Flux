@@ -10,9 +10,9 @@ namespace Flux {
         
         NyquistPlot(Point const& p, Point const& s);
 
-        void draw(SkCanvas* canvas, Float64 deltaTime) override;
+        void draw(Graphics const& graphics) override;
 
-        void drawCircle(SkCanvas* canvas, Float64 deltaTime) const;
+        void drawCircle(Graphics const& graphics) const;
 
         void initialize() override;
         
@@ -24,7 +24,7 @@ namespace Flux {
 
         Text* reText = nullptr;
         Text* imText = nullptr;
-        SkPath path;
+        Path path;
         Float32 textSize = 12.0f;
         Audio::Filter* filter = nullptr;
         ColorScheme scheme = ColorScheme::coral;

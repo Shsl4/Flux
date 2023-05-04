@@ -60,9 +60,9 @@ namespace Flux{
 
         }
 
-        void draw(SkCanvas *canvas, Float64 deltaTime) override {
-            shift.update(deltaTime);
-            Component::draw(canvas, deltaTime);
+        void draw(Graphics const& graphics) override {
+            shift.update(graphics.deltaTime());
+            Component::draw(graphics);
         }
 
         ColorShift shift;

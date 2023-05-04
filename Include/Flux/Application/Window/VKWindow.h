@@ -3,6 +3,10 @@
 #include <Application/Window/Window.h>
 #include <vulkan/vulkan.h>
 
+#include <skia/include/core/SkRefCnt.h>
+#include <skia/include/core/SkSurface.h>
+#include <skia/include/gpu/GrDirectContext.h>
+
 namespace Flux {
 
 #ifdef SK_VULKAN

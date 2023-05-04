@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Nucleus/Nucleus.h>
-#include <skia/include/core/SkColor.h>
 
 using namespace Nucleus;
 
@@ -89,9 +88,7 @@ namespace Flux {
         }
 
         static Color randomColor();
-        
-        NODISCARD SkColor4f skColor() const { return *reinterpret_cast<const SkColor4f*>(this); }
-        
+
         NODISCARD bool transparent() const { return Math::feq(0.0f, a); }
         NODISCARD Float32 red() const { return r; }
         NODISCARD Float32 green() const { return g; }

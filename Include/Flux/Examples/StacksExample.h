@@ -36,11 +36,11 @@ namespace Flux{
             anim.play();
         }
 
-        void draw(SkCanvas *canvas, Float64 deltaTime) override {
+        void draw(Graphics const& graphics) override {
 
-            VStack::draw(canvas, deltaTime);
+            VStack::draw(graphics);
 
-            anim.update(deltaTime);
+            anim.update(graphics.deltaTime());
 
         }
 
@@ -100,10 +100,10 @@ namespace Flux{
 
     public:
 
-        void draw(SkCanvas *canvas, Float64 deltaTime) override {
+        void draw(Graphics const& graphics) override {
 
-            canvas->translate(posX, posY);
-            CoolStack::draw(canvas, deltaTime);
+            graphics.translate({posX, posY});
+            CoolStack::draw(graphics);
 
         }
 

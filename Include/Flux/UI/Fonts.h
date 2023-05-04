@@ -1,6 +1,6 @@
 #pragma once
 
-#include <skia/include/core/SkFont.h>
+#include <UI/Font.h>
 
 namespace Flux {
 
@@ -8,9 +8,9 @@ namespace Flux {
         
     public:
 
-        static inline SkFont varelaRound = SkFont(SkTypeface::MakeFromFile(FLUX_RESOURCES"/Fonts/VarelaRound-Regular.ttf"));
-        static inline SkFont notoSansMath = SkFont(SkTypeface::MakeFromFile(FLUX_RESOURCES"/Fonts/NotoSansMath-Regular.ttf"));
-        static inline SkFont manrope = SkFont(SkTypeface::MakeFromFile(FLUX_RESOURCES"/Fonts/Manrope-Regular.ttf"));
+        static inline Font varelaRound = Font(FLUX_RESOURCES"/Fonts/VarelaRound-Regular.ttf");
+        static inline Font notoSansMath = Font(FLUX_RESOURCES"/Fonts/NotoSansMath-Regular.ttf");
+        static inline Font manrope = Font(FLUX_RESOURCES"/Fonts/Manrope-Regular.ttf");
     
     };
     

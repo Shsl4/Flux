@@ -118,8 +118,6 @@ namespace Flux {
 
         virtual ~AudioEngine();
 
-        void listDevices() const;
-
         void initialize();
 
         void setSampleRate(UInt value);
@@ -226,7 +224,6 @@ namespace Nucleus {
             return obj;
         
         }
-        
         
     };
     

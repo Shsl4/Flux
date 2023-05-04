@@ -20,7 +20,7 @@ namespace Flux {
 
         }
 
-        void draw(SkCanvas* canvas, Float64 deltaTime) override {
+        void draw(Graphics const& graphics) override {
 
             const Float64 currentTime = glfwGetTime();
             ++frameCount;
@@ -35,7 +35,7 @@ namespace Flux {
 
             }
             
-            text->draw(canvas, deltaTime);
+            text->draw(graphics);
             
         }
 

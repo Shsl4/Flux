@@ -11,7 +11,7 @@ namespace Flux {
 
         AudioPlayerComponent(const Point &p, const Point &s, AudioPlayer *player);
 
-        void draw(SkCanvas *canvas, Float64 deltaTime) override;
+        void draw(Graphics const& graphics) override;
 
         void initialize() override;
 

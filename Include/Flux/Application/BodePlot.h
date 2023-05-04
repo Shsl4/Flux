@@ -46,7 +46,7 @@ namespace Flux {
 
         void drag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) override;
 
-        void draw(SkCanvas* canvas, Float64 deltaTime) override;
+        void draw(Graphics const& graphics) override;
 
         void initialize() override;
         
@@ -75,13 +75,13 @@ namespace Flux {
             phase
         };
         
-        void drawGrid(SkCanvas* canvas, Float64 deltaTime);
+        void drawGrid(Graphics const& graphics);
 
         void recalculatePhaseResponse();
 
         void recalculateFrequencyResponse();
 
-        SkPath path;
+        Path path;
         MutableArray<Listener*> listeners = {};
         Audio::Filter* filter = nullptr;
         DrawMode mode = DrawMode::frequency;

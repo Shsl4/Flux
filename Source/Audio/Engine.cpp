@@ -14,24 +14,12 @@ namespace Flux {
     }
 
     Engine::Engine(){
-        
-        module.initialize();
-        wtModule.initialize();
 
         openDevice(0);
 
-        // this->scope = Factory::createComponent<Oscilloscope>(Point::zero, Point(500,300));
     }
 
     void Engine::prepare(Float64 rate, UInt size) {
-        
-        module.prepare(rate, size);
-        wtModule.prepare(rate, size);
-
-        module.openWindow();
-        wtModule.openWindow();
-
-        // Factory::windows()[0]->mainComponent()->addChild(scope);
 
         player.loadFile(FLUX_RESOURCES"/Audio/100bpm_virtual_riot.wav");
         player.prepare(rate, size);
@@ -51,7 +39,8 @@ namespace Flux {
 
         player.resetStartAndEnd();
         player.setLooping(true);
-        //player.play();
+        player.transpose(1);
+        player.play();
 
     }
 
@@ -60,11 +49,9 @@ namespace Flux {
         switch (message.type()) {
 
             case MidiEvent::noteDown:
-                wtModule.processor()->startNote(message);
                 break;
 
             case MidiEvent::noteUp:
-                wtModule.processor()->stopNote(message);
                 break;
 
             case MidiEvent::pitchBend:
@@ -86,9 +73,6 @@ namespace Flux {
         const auto audioBuffer = AudioBuffer(outputBuffer, numOutputChannels(), bufferSize());
 
         player.process(audioBuffer);
-        wtModule.process(audioBuffer);
-        module.process(audioBuffer);
-        // scope->feed(audioBuffer);
 
     }
 

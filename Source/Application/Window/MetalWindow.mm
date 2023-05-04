@@ -12,6 +12,8 @@
 #include <Flux/UI/Component.h>
 #include <Flux/Factory.h>
 
+#include <skia/include/core/SkColorSpace.h>
+
 namespace Flux {
 
     MetalWindow::MetalWindow(const String &title, Int windowWidth, Int windowHeight, Component* rootComponent) {
@@ -96,14 +98,13 @@ namespace Flux {
             
             auto* canvas = surface->getCanvas();
 
-            SkPaint paint;
-            const SkRect rect = SkRect::MakeXYWH(0, 0, view.drawableSize.width, view.drawableSize.height);
-            paint.setColor(ColorScheme::onyx.base.skColor());
-            canvas->drawRect(rect, paint);
-            
-            canvas->scale(dpiScale, dpiScale);
+            graphics.updateDeltaTime(deltaTime);
+            graphics.updateCanvas(canvas);
+            graphics.setColor(ColorScheme::onyx.base);
+            graphics.drawRect(Point::zero, {f32(view.drawableSize.width), f32(view.drawableSize.height)});
+            graphics.scale({dpiScale, dpiScale});
 
-            this->component->draw(canvas, deltaTime);
+            this->component->draw(graphics);
                         
             context->flushAndSubmit();
 

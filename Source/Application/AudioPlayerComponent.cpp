@@ -9,8 +9,8 @@ namespace Flux {
 
     }
 
-    void AudioPlayerComponent::draw(SkCanvas *canvas, Float64 deltaTime) {
-        Component::draw(canvas, deltaTime);
+    void AudioPlayerComponent::draw(Graphics const& graphics) {
+        Component::draw(graphics);
     }
 
     void AudioPlayerComponent::initialize() {

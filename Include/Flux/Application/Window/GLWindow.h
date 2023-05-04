@@ -2,8 +2,11 @@
 
 #include <Application/Window/Window.h>
 
+#include <skia/include/core/SkRefCnt.h>
+#include <skia/include/core/SkSurface.h>
+#include <skia/include/gpu/GrDirectContext.h>
+
 namespace Flux {
-    
     
     class GLWindow : public Window {
 
@@ -24,7 +27,8 @@ namespace Flux {
         Component* component = nullptr;
         CursorManager* manager = nullptr;
         SkCanvas* canvas = nullptr;
-        
+        Graphics graphics;
+
         sk_sp<SkSurface> surface = nullptr;
         GrDirectContext* context = nullptr;
         Point windowSize = {};

@@ -6,6 +6,8 @@
 #include <skia/include/gpu/GrDirectContext.h>
 #include <skia/include/gpu/gl/GrGLInterface.h>
 #include <skia/include/gpu/gl/GrGLTypes.h>
+#include <skia/include/core/SkColorSpace.h>
+#include <skia/include/core/SkFont.h>
 
 namespace Flux {
     
@@ -77,13 +79,11 @@ namespace Flux {
 
         canvas->save();
         canvas->scale(dpiScale, dpiScale);
+        graphics.setColor(ColorScheme::onyx.base);
+        graphics.drawRect(Point::zero, windowSize);
+        graphics.updateDeltaTime(deltaTime);
 
-        SkPaint paint;
-        const SkRect rect = SkRect::MakeXYWH(0, 0, windowSize.x, windowSize.y);
-        paint.setColor(ColorScheme::onyx.base.skColor());
-        canvas->drawRect(rect, paint);
-        
-        this->component->draw(this->canvas, deltaTime);
+        this->component->draw(graphics);
 
         context->flush();
         canvas->restore();
@@ -132,6 +132,8 @@ namespace Flux {
         if(!this->canvas) throw Exceptions::Exception("Failed to get Skia Canvas.");
 
         this->windowSize = { f32(width), f32(height) };
+
+        graphics.updateCanvas(canvas);
         
     }
 

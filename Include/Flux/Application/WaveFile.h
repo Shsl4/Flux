@@ -24,7 +24,7 @@ namespace Flux {
         UInt32 byteRate;
         UInt16 blockAlign;
         UInt16 bitsPerSample;
-        UInt16 cbSize;
+        UInt16 cbSize{};
         String subChunk2Id;
         UInt32 subChunk2Size;
         size_t samplesPerChannel;

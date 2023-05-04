@@ -7,8 +7,6 @@
 #include <Application/Oscilloscope.h>
 #include <Audio/AudioPlayer.h>
 #include <Audio/WaveTable.h>
-#include <Application/FilterModule.h>
-#include <Application/WaveTableModule.h>
 
 namespace Flux {
     
@@ -32,11 +30,8 @@ namespace Flux {
 
     private:
 
-        FilterModule module;
-        WaveTableModule wtModule;
         AudioPlayer player;
-        Oscilloscope* scope = nullptr;
-        
+
     };
 
 }

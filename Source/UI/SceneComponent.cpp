@@ -80,23 +80,23 @@ namespace Flux {
         
     }
 
-    void SceneComponent::draw(SkCanvas* canvas, const Float64 deltaTime) {
+    void SceneComponent::draw(Graphics const& graphics) {
 
-        zoomAnim.update(deltaTime);
+        zoomAnim.update(graphics.deltaTime());
         
-        canvas->save();
-        canvas->translate(-offset.x, -offset.y);
-        canvas->scale(scaling, scaling);
+        graphics.save();
+        graphics.translate({-offset.x, -offset.y});
+        graphics.scale({scaling, scaling});
         
-        Component::draw(canvas, deltaTime);
+        Component::draw(graphics);
 
-        canvas->restore();
+        graphics.restore();
 
         this->offsetText->setText(String::format("({}, {})", i32(offset.x), i32(offset.y)));
         this->scaleText->setText(String::format("x{.2}", scaling));
 
-        offsetText->draw(canvas, deltaTime);
-        scaleText->draw(canvas, deltaTime);
+        offsetText->draw(graphics);
+        scaleText->draw(graphics);
         
     }
 

@@ -29,7 +29,7 @@ namespace Flux {
 
         void buttonUp(MouseButton button, Float64 x, Float64 y, Reactive *upTarget) override;
 
-        void draw(SkCanvas* canvas, Float64 deltaTime) override;
+        void draw(Graphics const& graphics) override;
 
         void addListener(Listener* listener);
 

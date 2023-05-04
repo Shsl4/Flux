@@ -3,8 +3,6 @@
 #include <GLFW/glfw3.h>
 #include <Flux/UI/CursorManager.h>
 #include <Flux/UI/Component.h>
-#include <skia/include/core/SkFont.h>
-#include <skia/include/gpu/GrDirectContext.h>
 
 #define GL_FRAMEBUFFER_BINDING 0x8CA6
 

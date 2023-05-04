@@ -1,5 +1,4 @@
 #include <Application/Oscilloscope.h>
-#include "Audio/Engine.h"
 
 namespace Flux {
 
@@ -8,23 +7,18 @@ namespace Flux {
         data = MutableArray<Float64>::filled(windowSize);
     }
 
-    void Oscilloscope::draw(SkCanvas *canvas, Float64 deltaTime) {
+    void Oscilloscope::draw(Graphics const& graphics) {
 
-        SkPaint paint;
-        const auto t = globalTransform();
-        const SkRect rect = SkRect::MakeXYWH(t.position.x, t.position.y, t.size.x, t.size.y);
+        graphics.setColor(color());
+        graphics.drawRect(globalTransform());
 
-        paint.setColor(color().skColor());
-        canvas->drawRect(rect, paint);
-
-        paint.setStyle(SkPaint::kStroke_Style);
-        paint.setStrokeWidth(2.0f);
-        paint.setColor(scheme.lightest.skColor());
-        
-        canvas->drawPath(path, paint);
+        graphics.setStyle(Graphics::Style::Stroke);
+        graphics.setStrokeWidth(2.0f);
+        graphics.setColor(scheme.lightest);
+        graphics.drawPath(path);
 
         for (const auto& child : children()) {
-            child->draw(canvas, deltaTime);
+            child->draw(graphics);
         }
 
     }
