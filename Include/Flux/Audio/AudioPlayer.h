@@ -1,11 +1,11 @@
 #pragma once
 
-#include <Audio/AudioObject.h>
+#include <Audio/AudioProcessor.h>
 #include <Application/WaveFile.h>
 
 namespace Flux {
 
-    class AudioPlayer : public Audio::AudioObject {
+    class AudioPlayer : public AudioProcessor {
 
     public:
 

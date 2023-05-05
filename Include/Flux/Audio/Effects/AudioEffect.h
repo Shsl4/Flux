@@ -1,12 +1,11 @@
 #pragma once
 
-#include <Flux/Audio/AudioObject.h>
-
+#include <Audio/AudioProcessor.h>
 #include <Audio/AudioBuffer.h>
 
 namespace Flux::Audio {
 
-    class AudioEffect : public AudioObject {
+    class AudioEffect : public AudioProcessor {
         
     public:
 

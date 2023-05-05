@@ -31,6 +31,7 @@ namespace Flux {
     private:
 
         AudioPlayer player;
+        WaveTable waveTable;
 
     };
 

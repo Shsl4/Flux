@@ -10,8 +10,6 @@ namespace Flux::Audio {
         
         virtual void prepare(Float64 rate, UInt size);
 
-        virtual void process(AudioBuffer<Float64> const& buffer) = 0;
-
         NODISCARD FORCEINLINE Float64 sampleRate() const { return sr; }
 
         NODISCARD FORCEINLINE UInt bufferSize() const { return sz; }

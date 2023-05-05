@@ -35,20 +35,26 @@ namespace Flux {
         
     }
 
+    WaveTable::WaveTable(WaveFile* file) : WaveTable(file, 2048) {
+
+    }
+
     void WaveTable::Voice::startPlaying(Float64 frequency, Float64 velocity) {
 
         this->playFrequency = frequency;
         this->velocity = Math::clamp(velocity, 0.0, 1.0);
         this->playHead = 0.0;
+        this->envelope.triggerEnvelope();
         
     }
 
     void WaveTable::Voice::stopPlaying() {
-        this->velocity = 0.0;
+        this->envelope.releaseEnvelope();
     }
 
-    WaveTable::WaveTable(WaveFile* file) : WaveTable(file, 2048) {
-        
+    void WaveTable::Voice::prepare(Float64 rate, UInt size) {
+        AudioObject::prepare(rate, size);
+        envelope.prepare(rate, size);
     }
 
     void WaveTable::process(AudioBuffer<Float64> const& buffer) {
@@ -57,7 +63,7 @@ namespace Flux {
 
             for(auto const& v : voices) {
 
-                auto t = v->tick(frames[currentFrame].data(), f64(frameSize), sampleRate());
+                auto t = v->tick(frames[currentFrame].data());
                 
                 for(size_t channel = 0; channel < buffer.channels(); ++channel) {
                 
@@ -101,9 +107,7 @@ namespace Flux {
     void WaveTable::stopAllNotes() {
 
         for(auto const& voice : voices) {
-                
             voice->stopPlaying();
-                
         }
 
         activeVoices = {};
@@ -116,5 +120,15 @@ namespace Flux {
         this->currentFrame = frame;
         
     }
-    
+
+    void WaveTable::prepare(Float64 rate, UInt size) {
+
+        AudioObject::prepare(rate, size);
+
+        for(auto& voice : voices){
+            voice->prepare(rate, size);
+        }
+
+    }
+
 }

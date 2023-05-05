@@ -13,7 +13,7 @@ namespace Flux {
 
     }
 
-    Engine::Engine(){
+    Engine::Engine() : waveTable(Factory::loadWaveFile(FLUX_RESOURCES"/Audio/Basic Shapes.wav")){
 
         openDevice(0);
 
@@ -39,8 +39,9 @@ namespace Flux {
 
         player.resetStartAndEnd();
         player.setLooping(true);
-        player.transpose(1);
-        player.play();
+        // player.play();
+
+        waveTable.prepare(rate, size);
 
     }
 
@@ -49,9 +50,11 @@ namespace Flux {
         switch (message.type()) {
 
             case MidiEvent::noteDown:
+                waveTable.startNote(message);
                 break;
 
             case MidiEvent::noteUp:
+                waveTable.stopNote(message);
                 break;
 
             case MidiEvent::pitchBend:
@@ -73,6 +76,7 @@ namespace Flux {
         const auto audioBuffer = AudioBuffer(outputBuffer, numOutputChannels(), bufferSize());
 
         player.process(audioBuffer);
+        waveTable.process(audioBuffer);
 
     }
 
