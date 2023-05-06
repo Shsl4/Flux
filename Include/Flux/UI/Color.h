@@ -115,6 +115,7 @@ namespace Flux {
         static inline const Color tintGreen = Color::fromHex(0x60f089ff);
         static inline const Color tintPink = Color::fromHex(0xf060c0ff);
         static inline const Color lightGray = Color::fromHex(0x252525ff);
+        static inline const Color lighterGray = Color::fromHex(0x505050ff);
         static inline const Color transparent = Color::fromHex(0xffffff00);
     };
 

@@ -8,7 +8,7 @@
 
 namespace Flux {
 
-    class WaveTableComponent : public Component, public RotaryKnob::Listener {
+    class WaveTableComponent : public Component, public Slider::Listener {
 
         class WaveTableRenderer : public Component {
 
@@ -38,7 +38,7 @@ namespace Flux {
 
         void initialize() override;
 
-        void valueChanged(RotaryKnob *knob, Float64 newValue) override;
+        void valueChanged(Slider *knob, Float64 newValue) override;
 
         void linkWaveTable(WaveTable* wt);
 

@@ -62,7 +62,7 @@ namespace Flux {
         this->filter = newFilter;
     }
 
-    void FilterComponent::valueChanged(RotaryKnob* knob, const Float64 newValue) {
+    void FilterComponent::valueChanged(Slider* knob, const Float64 newValue) {
         
         if (knob == frequencyKnob) {
             filter->setCutoffFrequency(newValue);

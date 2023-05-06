@@ -7,7 +7,7 @@
 
 namespace Flux {
     
-    class FilterComponent : public Component, public RotaryKnob::Listener, public BodePlot::Listener {
+    class FilterComponent : public Component, public Slider::Listener, public BodePlot::Listener {
     public:
 
         FilterComponent(Point const& p);
@@ -16,7 +16,7 @@ namespace Flux {
 
         void linkFilter(Audio::Filter* newFilter);
 
-        void valueChanged(RotaryKnob* knob, Float64 newValue) override;
+        void valueChanged(Slider* knob, Float64 newValue) override;
 
         void valueChanged(BodePlot* plot, Float64 f, Float64 q) override;
 

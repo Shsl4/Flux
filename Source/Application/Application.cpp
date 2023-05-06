@@ -471,6 +471,8 @@ namespace Flux {
         const auto hStack = Factory::createComponent<HStack>(Point::zero, Point(windowWidth, windowHeight), VAlignment::center, HAlignment::center);
 
         this->mainWindow = Factory::createWindow(hStack, RenderBackend::Best, "Application", windowWidth, windowHeight);
+
+        hStack->addChild(Factory::createComponent<Slider>(Point::zero, Point(250, 30)));
         
         initializeAudio();
         

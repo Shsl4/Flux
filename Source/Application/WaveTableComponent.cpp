@@ -99,7 +99,7 @@ namespace Flux {
         
     }
 
-    void WaveTableComponent::valueChanged(RotaryKnob *knob, Float64 newValue) {
+    void WaveTableComponent::valueChanged(Slider *knob, Float64 newValue) {
 
         if(knob == frameKnob){
 
