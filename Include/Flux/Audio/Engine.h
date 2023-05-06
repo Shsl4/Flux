@@ -7,6 +7,7 @@
 #include <Application/Oscilloscope.h>
 #include <Audio/AudioPlayer.h>
 #include <Audio/WaveTable.h>
+#include "Application/WaveTableComponent.h"
 
 namespace Flux {
     
@@ -32,7 +33,7 @@ namespace Flux {
 
         AudioPlayer player;
         WaveTable waveTable;
-
+        WaveTableComponent* wtComponent;
     };
 
 }

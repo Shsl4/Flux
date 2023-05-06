@@ -56,7 +56,7 @@ namespace Flux {
     }
 
     void HStack::parentLinked() {
-        this->setSize({ parent()->size().x, size().y });
+        // this->setSize({ parent()->size().x, size().y });
     }
 
     Float32 HStack::initialDrawX() const {

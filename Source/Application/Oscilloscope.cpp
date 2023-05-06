@@ -65,5 +65,10 @@ namespace Flux {
         path = p;
 
     }
-    
+
+    void Oscilloscope::setScheme(const ColorScheme &newScheme) {
+        this->scheme = newScheme;
+        setColor(scheme.darkest);
+    }
+
 }

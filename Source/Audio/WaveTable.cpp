@@ -8,7 +8,7 @@ namespace Flux {
 
         if(file->channelCount > 1) {
             Console::log("{}[Warning]: Creating a WaveTable with an audio file that has multiple channels."
-                        "Only the first channel will be used.{}", Console::yellow, Console::reset);
+                        " Only the first channel will be used.{}", Console::yellow, Console::reset);
         }
 
         nthrowif(file->buffers[0].size() % frameSize != 0, "Trying to create a wavetable with a file that cannot be"
@@ -39,10 +39,9 @@ namespace Flux {
 
     }
 
-    void WaveTable::Voice::startPlaying(Float64 frequency, Float64 velocity) {
+    void WaveTable::Voice::startPlaying(Float64 frequency) {
 
         this->playFrequency = frequency;
-        this->velocity = Math::clamp(velocity, 0.0, 1.0);
         this->playHead = 0.0;
         this->envelope.triggerEnvelope();
         
@@ -63,11 +62,11 @@ namespace Flux {
 
             for(auto const& v : voices) {
 
-                auto t = v->tick(frames[currentFrame].data());
+                auto t = v->tick(frames[currentFrame].data(), f64(frameSize));
                 
                 for(size_t channel = 0; channel < buffer.channels(); ++channel) {
                 
-                    buffer[channel][sample] += t * 0.2;
+                    buffer[channel][sample] += t * level;
                 
                 }
             
@@ -85,7 +84,7 @@ namespace Flux {
                 
             if(!voice->playing()) {
 
-                voice->startPlaying(message.noteFrequency(), message.linearValue());
+                voice->startPlaying(message.noteFrequency());
                 activeVoices.add({ message.noteNumber(), voice });
                 break;
                     
@@ -129,6 +128,10 @@ namespace Flux {
             voice->prepare(rate, size);
         }
 
+    }
+
+    void WaveTable::setLevel(Float64 value) {
+        this->level = Math::clamp(value, 0.0, 1.0);
     }
 
 }

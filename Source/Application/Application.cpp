@@ -14,6 +14,8 @@
 #include <UI/SceneComponent.h>
 
 #include <Utility/Timer.h>
+#include "Application/RotaryKnob.h"
+#include "Application/WaveTableComponent.h"
 
 using namespace Flux;
 
@@ -466,21 +468,22 @@ namespace Flux {
         constexpr Int windowWidth = 1280;
         constexpr Int windowHeight = 720;
 
-        auto* scene = Factory::createComponent<SceneComponent>(Point::zero, Point(windowWidth, windowHeight)); 
-        this->mainWindow = Factory::createWindow(scene, RenderBackend::Best, "Application", windowWidth, windowHeight);
+        auto hStack = Factory::createComponent<HStack>(Point::zero, Point(windowWidth, windowHeight), VAlignment::center, HAlignment::center);
+
+        this->mainWindow = Factory::createWindow(hStack, RenderBackend::Best, "Application", windowWidth, windowHeight);
         
         constexpr Float32 fw = 100.0f;
         constexpr Float32 fh = 100.0f;
 
-        initializeAudio();
-        
-        scene->addChild(Factory::createComponent<AudioSettings>(Point::zero, Point(500, 250), this->audioDevice.pointer()));
-        
         Point s = { fw, fh };
 
-        //factory->windows()[0]->mainComponent()->addChild(Factory::createComponent<FrameInfo>(Point::zero, s));
-        
+        Component* comp = this->mainWindow->mainComponent();
+
+        // comp->addChild(Factory::createComponent<FrameInfo>(Point::zero, s));
+
         this->shouldRun = true;
+
+        initializeAudio();
 
         Console::log("Created new Flux Application.\n");
 

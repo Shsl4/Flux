@@ -56,7 +56,7 @@ namespace Flux {
     }
 
     void Reactive::focused() {
-        // Console::log("{} earned focus.\n", Type::name(*this));
+        Console::log("{} earned focus.\n", Type::name(*this));
         this->bFocused = true;
     }
     

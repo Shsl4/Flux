@@ -53,7 +53,7 @@ namespace Flux {
 
     private:
 
-        ColorScheme scheme = ColorScheme::flatBlue;
+        ColorScheme scheme = ColorScheme::coolScheme;
         Float64 rotation = 0.0;
         Float64 currentValue = 0.0;
         Float64 defaultValue = 0.5;
@@ -63,8 +63,9 @@ namespace Flux {
         String labelExtension = "";
         UInt precision = 2;
         MutableArray<Listener*> listeners = {};
-        bool logarithmicProgress = true;
+        bool logarithmicProgress = false;
 
+        void refreshProgress();
     };
 
 }

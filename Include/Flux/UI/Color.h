@@ -132,6 +132,11 @@ namespace Flux {
 
     struct ColorScheme {
 
+        ColorScheme() = default;
+
+        ColorScheme(const Color &lightest, const Color &lighter, const Color &base, const Color &darker,
+                    const Color &darkest);
+
         static ColorScheme fromHSV(HSV const& hsv){
 
             ColorScheme scheme;
@@ -185,6 +190,7 @@ namespace Flux {
         const static ColorScheme treeBrown;
         const static ColorScheme lightOrange;
         const static ColorScheme yellow;
+        const static ColorScheme coolScheme;
 
     };
 

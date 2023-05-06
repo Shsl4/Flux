@@ -43,8 +43,16 @@ namespace Flux {
     }
 
     void RotaryKnob::updateText() {
-        const String fmt = "{0," + String::fromInteger(precision) + "}{1}";
-        this->text->setText(String::format(fmt, currentValue, labelExtension));
+
+        if(precision > 0){
+            const String fmt ="{." + String::fromInteger(precision) + "}{}";
+            this->text->setText(String::format(fmt, currentValue, labelExtension));
+
+        }
+        else{
+            this->text->setText(String::format("{}{}", i32(currentValue), labelExtension));
+        }
+
     }
 
     RotaryKnob::RotaryKnob(const Point &p, Float32 radius) : Component(p, { radius, radius * 1.25f }) {
@@ -76,18 +84,22 @@ namespace Flux {
         const Float32 rad = s.x / 2.0f;
         const Float32 diff = s.x * 0.125f;
 
-        graphics.setStyle(Graphics::Style::Fill);
-        graphics.setStrokeWidth(size().x / 10.0f);
+        graphics.setStyle(Graphics::Style::Stroke);
+        graphics.setStrokeWidth(size().x / 50.0f);
         graphics.setAntiAliasing(true);
 
         const Point arcPos = {pos.x + diff, pos.y + diff};
         const Point arcSize = {s.x - 2.0f * diff, s.x - 2.0f * diff};
 
         graphics.setColor(scheme.base);
-        graphics.drawArc(arcPos, arcSize, 120, 300, true);
+        graphics.drawArc(arcPos, arcSize, 120, 300, false);
+
+        graphics.setStyle(Graphics::Style::Stroke);
+        graphics.setStrokeWidth(size().x / 50.0f);
+        graphics.setAntiAliasing(true);
 
         graphics.setColor(scheme.lightest);
-        graphics.drawArc(arcPos, arcSize, 120, f32(rotation), true);
+        graphics.drawArc(arcPos, arcSize, 120, f32(rotation), false);
 
         graphics.setColor(color());
         graphics.drawCircle({ pos.x + s.x / 2.0f, pos.y + s.x / 2.0f }, rad * 0.6f);
@@ -111,17 +123,7 @@ namespace Flux {
 
         this->currentValue = valueRange.clamp(newValue);
 
-        Range<Float64> fRange = { 0.0, 300.0 };
-
-        if(logarithmicProgress){
-
-            const Range<Float64> logRange = { log10(valueRange.min()), log10(valueRange.max()) };
-            this->rotation = Range<Float64>::translateValue(log10(this->currentValue), logRange, fRange);
-
-        }
-        else{
-            this->rotation = Range<Float64>::translateValue(currentValue, valueRange, fRange);
-        }
+        refreshProgress();
 
         if(notify){
 
@@ -147,6 +149,8 @@ namespace Flux {
 
         this->defaultValue = valueRange.clamp(defaultValue);
 
+        refreshProgress();
+
     }
 
     void RotaryKnob::setLabelText(const String &value) {
@@ -160,12 +164,12 @@ namespace Flux {
 
     void RotaryKnob::setLabelPrecision(UInt p) {
         this->precision = p;
-
     }
 
     void RotaryKnob::setDefaultValue(Float64 value) {
         this->defaultValue = valueRange.clamp(value);
-        setValue(this->defaultValue);
+        setValue(defaultValue);
+        refreshProgress();
     }
 
     void RotaryKnob::buttonDown(MouseButton button, Float64 x, Float64 y) {
@@ -181,6 +185,22 @@ namespace Flux {
     void RotaryKnob::useLogarithmicProgress(bool value) {
         this->logarithmicProgress = value;
         setValue(this->currentValue, false);
+    }
+
+    void RotaryKnob::refreshProgress() {
+
+        Range<Float64> fRange = { 0.0, 300.0 };
+
+        if(logarithmicProgress){
+
+            const Range<Float64> logRange = { log10(valueRange.min()), log10(valueRange.max()) };
+            this->rotation = Range<Float64>::translateValue(log10(this->currentValue), logRange, fRange);
+
+        }
+        else{
+            this->rotation = Range<Float64>::translateValue(currentValue, valueRange, fRange);
+        }
+
     }
 
 }

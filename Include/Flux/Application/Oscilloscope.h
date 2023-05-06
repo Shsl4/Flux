@@ -17,6 +17,8 @@ namespace Flux {
 
         void feed(AudioBuffer<Float64> const& buffer);
 
+        void setScheme(ColorScheme const& newScheme);
+
         void recalculatePath();
 
     private:

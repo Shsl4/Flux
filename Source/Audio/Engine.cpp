@@ -16,6 +16,10 @@ namespace Flux {
     Engine::Engine() : waveTable(Factory::loadWaveFile(FLUX_RESOURCES"/Audio/Basic Shapes.wav")){
 
         openDevice(0);
+        this->wtComponent = Factory::createComponent<WaveTableComponent>(Point::zero);
+        this->wtComponent->linkWaveTable(&waveTable);
+
+        Factory::windows()[0]->mainComponent()->addChild(wtComponent);
 
     }
 

@@ -18,8 +18,6 @@ namespace Flux {
 
         void stop();
 
-        NODISCARD FORCEINLINE Engine* audioEngine() const { return this->audioDevice.pointer(); }
-
         NODISCARD FORCEINLINE static Application* instance() { return application; }
 
     private:
