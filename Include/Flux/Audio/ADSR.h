@@ -87,11 +87,17 @@ namespace Flux {
 
                 output -= dIncrement;
 
-                if (output <= s) { state = State::sustain; }
+                if (output <= s) {
+
+                    output = s;
+                    state = State::sustain;
+                    
+                }
 
                 break;
 
-            case State::sustain:
+        case State::sustain:
+            
                 break;
 
             case State::release:

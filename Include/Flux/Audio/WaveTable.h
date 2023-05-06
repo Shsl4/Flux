@@ -17,6 +17,8 @@ namespace Flux {
             
             NODISCARD FORCEINLINE Float64 tick(const Float64* frame, Float64 size) {
 
+                if(!playing()) return 0.0;
+                
                 const auto index = st(floor(playHead));
                 size_t nextIndex = index + 1;
 
@@ -27,7 +29,7 @@ namespace Flux {
 
                 playHead += size * playFrequency / sampleRate();
                 if(playHead >= size) { playHead -= size; }
-
+                
                 return (frac * frame[index] + nextFrac * frame[nextIndex]) * envelope.tick();
                 
             }
@@ -37,6 +39,8 @@ namespace Flux {
             void startPlaying(Float64 frequency);
             
             void stopPlaying();
+
+            ADSR* adsr() { return &this->envelope; }
 
             NODISCARD FORCEINLINE bool playing() const { return !envelope.idle(); }
         
@@ -66,6 +70,14 @@ namespace Flux {
 
         void setLevel(Float64 value);
 
+        void setAttack(Float64 value) const;
+
+        void setDecay(Float64 value) const;
+
+        void setSustain(Float64 value) const;
+
+        void setRelease(Float64 value) const;
+        
         NODISCARD FORCEINLINE size_t maxFrames() const{ return frames.size(); }
 
         NODISCARD FORCEINLINE Float64 currentLevel() const{ return level; }

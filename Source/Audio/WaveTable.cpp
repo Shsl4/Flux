@@ -57,17 +57,20 @@ namespace Flux {
     }
 
     void WaveTable::process(AudioBuffer<Float64> const& buffer) {
+
+        const auto* data = frames[currentFrame].data();
+        const auto size = f64(frameSize);
         
         for(size_t sample = 0; sample < buffer.bufferSize(); ++sample){
 
             for(auto const& v : voices) {
-
-                auto t = v->tick(frames[currentFrame].data(), f64(frameSize));
+                
+                const auto t = v->tick(data, size);
                 
                 for(size_t channel = 0; channel < buffer.channels(); ++channel) {
                 
-                    buffer[channel][sample] += t * level;
-                
+                    buffer[channel][sample] += t * level * 0.2;
+                    
                 }
             
             }
@@ -134,4 +137,28 @@ namespace Flux {
         this->level = Math::clamp(value, 0.0, 1.0);
     }
 
+    void WaveTable::setAttack(Float64 value) const {
+        for (const auto& voice : voices) {
+            voice->adsr()->setAttack(value);
+        }
+    }
+    
+    void WaveTable::setDecay(Float64 value) const {
+        for (const auto& voice : voices) {
+            voice->adsr()->setDecay(value);
+        }
+    }
+    
+    void WaveTable::setSustain(Float64 value) const {
+        for (const auto& voice : voices) {
+            voice->adsr()->setSustain(value);
+        }
+    }
+    
+    void WaveTable::setRelease(Float64 value) const {
+        for (const auto& voice : voices) {
+            voice->adsr()->setRelease(value);
+        }
+    }
+    
 }

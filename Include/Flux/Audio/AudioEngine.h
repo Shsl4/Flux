@@ -174,7 +174,7 @@ namespace Flux {
 
     private:
 
-        NODISCARD size_t findBestSampleRate() const;
+        NODISCARD UInt findBestSampleRate() const;
         
         bool open();
         

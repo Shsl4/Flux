@@ -452,7 +452,7 @@ namespace Flux {
 
     void Application::run() {
         
-        if(application) throw Exceptions::Exception( "Tried to run multiple Applications at the same time");
+        if(application) throw Exceptions::Exception("Tried to run multiple Applications at the same time");
 
         application = this;
 
@@ -468,22 +468,13 @@ namespace Flux {
         constexpr Int windowWidth = 1280;
         constexpr Int windowHeight = 720;
 
-        auto hStack = Factory::createComponent<HStack>(Point::zero, Point(windowWidth, windowHeight), VAlignment::center, HAlignment::center);
+        const auto hStack = Factory::createComponent<HStack>(Point::zero, Point(windowWidth, windowHeight), VAlignment::center, HAlignment::center);
 
         this->mainWindow = Factory::createWindow(hStack, RenderBackend::Best, "Application", windowWidth, windowHeight);
         
-        constexpr Float32 fw = 100.0f;
-        constexpr Float32 fh = 100.0f;
-
-        Point s = { fw, fh };
-
-        Component* comp = this->mainWindow->mainComponent();
-
-        // comp->addChild(Factory::createComponent<FrameInfo>(Point::zero, s));
-
-        this->shouldRun = true;
-
         initializeAudio();
+        
+        this->shouldRun = true;
 
         Console::log("Created new Flux Application.\n");
 

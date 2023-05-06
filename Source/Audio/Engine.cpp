@@ -80,6 +80,7 @@ namespace Flux {
         const auto audioBuffer = AudioBuffer(outputBuffer, numOutputChannels(), bufferSize());
 
         player.process(audioBuffer);
+        
         waveTable.process(audioBuffer);
 
     }

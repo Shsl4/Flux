@@ -48,6 +48,12 @@ namespace Flux {
         RotaryKnob* phaseKnob = nullptr;
         RotaryKnob* panKnob = nullptr;
         RotaryKnob* levelKnob = nullptr;
+
+        RotaryKnob* attackKnob = nullptr;
+        RotaryKnob* decayKnob = nullptr;
+        RotaryKnob* sustainKnob = nullptr;
+        RotaryKnob* releaseKnob = nullptr;
+        
         WaveTableRenderer* renderer = nullptr;
 
         VStack* stack = nullptr;

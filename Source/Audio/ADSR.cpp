@@ -20,7 +20,7 @@ namespace Flux {
 
     void ADSR::setChecked(Float64 &variable, Float64& increment, Float64 value) {
 
-        if(value > 0.0){
+        if(value >= 0.0){
             variable = value;
             increment = 1.0 / (sampleRate() * variable);
         }
@@ -35,6 +35,7 @@ namespace Flux {
 
         this->state = State::attack;
 
+        
     }
 
     void ADSR::releaseEnvelope() {

@@ -277,7 +277,7 @@ namespace Flux {
     
     void AudioEngine::closed() { }
     
-    size_t AudioEngine::findBestSampleRate() const {
+    UInt AudioEngine::findBestSampleRate() const {
 
         const auto rates = supportedSampleRates();
 

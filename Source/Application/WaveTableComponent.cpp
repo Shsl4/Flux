@@ -2,7 +2,7 @@
 
 namespace Flux {
 
-    WaveTableComponent::WaveTableComponent(const Point &pos) : Component(pos, Point(300, 250)){
+    WaveTableComponent::WaveTableComponent(const Point &pos) : Component(pos, Point(300, 300)){
 
         constexpr Float32 knobSize = 50;
 
@@ -36,28 +36,67 @@ namespace Flux {
         levelKnob->setLabelPrecision(2);
         levelKnob->addListener(this);
 
+        attackKnob = Factory::createComponent<RotaryKnob>(Point::zero, knobSize);
+        attackKnob->setRange({0.0, 5.0});
+        attackKnob->setDefaultValue(0.005);
+        attackKnob->setLabelText("Attack");
+        attackKnob->setLabelPrecision(3);
+        attackKnob->addListener(this);
+
+        decayKnob = Factory::createComponent<RotaryKnob>(Point::zero, knobSize);
+        decayKnob->setRange({0.0, 5.0});
+        decayKnob->setDefaultValue(0.5);
+        decayKnob->setLabelText("Decay");
+        decayKnob->setLabelPrecision(2);
+        decayKnob->addListener(this);
+
+        sustainKnob = Factory::createComponent<RotaryKnob>(Point::zero, knobSize);
+        sustainKnob->setRange({0.0, 1.0});
+        sustainKnob->setDefaultValue(1.0);
+        sustainKnob->setLabelText("Sustain");
+        sustainKnob->setLabelPrecision(2);
+        sustainKnob->addListener(this);
+
+        releaseKnob = Factory::createComponent<RotaryKnob>(Point::zero, knobSize);
+        releaseKnob->setRange({0.0, 5.0});
+        releaseKnob->setDefaultValue(0.1);
+        releaseKnob->setLabelText("Release");
+        releaseKnob->setLabelPrecision(2);
+        releaseKnob->addListener(this);
+
         renderer = Factory::createComponent<WaveTableRenderer>(Point::zero, Point(300, 150));
 
     }
 
     void WaveTableComponent::initialize() {
 
-        auto hStack = Factory::createComponent<HStack>(Point::zero, Point(size().x, 100), VAlignment::center, HAlignment::center);
+        auto hStack = Factory::createComponent<HStack>(Point::zero, Point(size().x, 75), VAlignment::center, HAlignment::center);
+        auto hStack2 = Factory::createComponent<HStack>(Point::zero, Point(size().x, 75), VAlignment::center, HAlignment::center);
 
         hStack->setVisible(true);
         hStack->setColor(Color::fromHex(0x252525ff));
-        hStack->setSpacing(10.0f);
+        hStack->setSpacing(20.0f);
+        
+        hStack2->setVisible(true);
+        hStack2->setColor(Color::fromHex(0x252525ff));
+        hStack2->setSpacing(20.0f);
 
         hStack->addChild(frameKnob);
         hStack->addChild(phaseKnob);
         hStack->addChild(panKnob);
         hStack->addChild(levelKnob);
 
-        stack->addChild(renderer);
-        stack->addChild(hStack);
+        hStack2->addChild(attackKnob);
+        hStack2->addChild(decayKnob);
+        hStack2->addChild(sustainKnob);
+        hStack2->addChild(releaseKnob);
 
         addChild(stack);
-
+        
+        stack->addChild(renderer);
+        stack->addChild(hStack);
+        stack->addChild(hStack2);
+        
     }
 
     void WaveTableComponent::valueChanged(RotaryKnob *knob, Float64 newValue) {
@@ -75,6 +114,22 @@ namespace Flux {
 
         if(knob == levelKnob){
             waveTable->setLevel(newValue);
+        }
+
+        if (knob == attackKnob) {
+            waveTable->setAttack(newValue);
+        }
+
+        if (knob == decayKnob) {
+            waveTable->setDecay(newValue);
+        }
+        
+        if (knob == sustainKnob) {
+            waveTable->setSustain(newValue);
+        }
+
+        if (knob == releaseKnob) {
+            waveTable->setRelease(newValue);
         }
 
     }
