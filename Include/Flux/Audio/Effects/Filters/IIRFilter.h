@@ -17,20 +17,12 @@ namespace Flux::Audio {
         NODISCARD std::complex<Float64> openTransfer(Float64 omega) const override;
 
         void process(AudioBuffer<Float64> const& buffer) override;
-
-        void setMix(Float64 value);
-
-        NODISCARD FORCEINLINE Float64 mix() const { return this->filterMix; }
-
+    
     protected:
         
         Float64 processSingle(Float64 xn, size_t channel) override;
 
         void recalculateCoefficients() override = 0;
-
-    private:
-
-        Float64 filterMix = 1.0;
         
     };
 

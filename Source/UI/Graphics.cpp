@@ -42,12 +42,12 @@ namespace Flux {
         paint->setAntiAlias(value);
     }
 
-    void Graphics::setStyle(Graphics::Style style) const {
+    void Graphics::setStrokeStyle(Graphics::StrokeStyle style) const {
 
-        static const Map<Graphics::Style, SkPaint::Style> map = {
-                { Graphics::Style::Fill, SkPaint::Style::kFill_Style },
-                { Graphics::Style::Stroke, SkPaint::Style::kStroke_Style },
-                { Graphics::Style::StrokeAndFill, SkPaint::Style::kStrokeAndFill_Style }
+        static const Map<Graphics::StrokeStyle, SkPaint::Style> map = {
+                { Graphics::StrokeStyle::fill, SkPaint::Style::kFill_Style },
+                { Graphics::StrokeStyle::stroke, SkPaint::Style::kStroke_Style },
+                { Graphics::StrokeStyle::strokeAndFill, SkPaint::Style::kStrokeAndFill_Style }
         };
 
         paint->setStyle(map[style]);
@@ -65,7 +65,6 @@ namespace Flux {
 
     void Graphics::drawLine(const Point &start, const Point &end) const {
         canvas->drawLine(start.x, start.y, end.x, end.y, *paint);
-        resetPaint();
     }
 
     void Graphics::drawArc(const Point &pos, const Point &size, Float32 startAngle, Float32 sweepAngle, bool center) const {

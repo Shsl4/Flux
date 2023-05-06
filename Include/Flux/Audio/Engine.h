@@ -7,7 +7,10 @@
 #include <Application/Oscilloscope.h>
 #include <Audio/AudioPlayer.h>
 #include <Audio/WaveTable.h>
+
+#include "Application/FilterComponent.h"
 #include "Application/WaveTableComponent.h"
+#include "Effects/Filters/IIRFilter.h"
 
 namespace Flux {
     
@@ -33,6 +36,8 @@ namespace Flux {
 
         AudioPlayer player;
         WaveTable waveTable;
+        Audio::LowPassFilter fil;
+        FilterComponent* filComponent;
         WaveTableComponent* wtComponent;
     };
 

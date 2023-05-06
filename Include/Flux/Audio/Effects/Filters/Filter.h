@@ -14,6 +14,11 @@ namespace Flux::Audio {
     class Filter : public AudioEffect {
     
     public:
+
+        constexpr static Float64 minResonance = 0.1;
+        constexpr static Float64 maxResonance = 8.0;
+        
+        constexpr static Float64 minCutoff = 9.0;
         
         void prepare(Float64 rate, UInt size) override;
 
@@ -25,10 +30,13 @@ namespace Flux::Audio {
         
         virtual void setCutoffFrequency(Float64 cutoff);
         virtual void setResonance(Float64 value);
-        
+        virtual void setMix(Float64 value);
+
         NODISCARD FORCEINLINE Float64 cutoff() const { return cutoffFrequency; }
         NODISCARD FORCEINLINE Float64 resonance() const { return q; }
+        NODISCARD FORCEINLINE Float64 mix() const { return m; }
         NODISCARD FORCEINLINE size_t channelCount() const { return channels; }
+
 
     protected:
 
@@ -49,6 +57,7 @@ namespace Flux::Audio {
         size_t channels = 2;
         Float64 cutoffFrequency = 440.0;
         Float64 q = 1.0;
+        Float64 m = 1.0;
         
     };
 

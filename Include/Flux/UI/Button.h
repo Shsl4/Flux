@@ -87,7 +87,7 @@ namespace Flux{
 
             graphics.drawRoundedRect(transform, cornerRadius);
 
-            graphics.setStyle(Graphics::Style::Stroke);
+            graphics.setStrokeStyle(Graphics::StrokeStyle::stroke);
             graphics.setColor(borderColor);
             graphics.setStrokeWidth(0.5);
 

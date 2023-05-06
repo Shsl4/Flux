@@ -27,7 +27,7 @@ namespace Flux {
 
         private:
 
-            ColorScheme scheme = ColorScheme::coolScheme;
+            ColorScheme scheme = ColorScheme::coolScheme(Colors::tintPurple);
             Path path;
 
         };

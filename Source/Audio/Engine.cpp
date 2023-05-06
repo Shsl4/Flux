@@ -16,10 +16,14 @@ namespace Flux {
     Engine::Engine() : waveTable(Factory::loadWaveFile(FLUX_RESOURCES"/Audio/Basic Shapes.wav")){
 
         openDevice(0);
+        
         this->wtComponent = Factory::createComponent<WaveTableComponent>(Point::zero);
-        this->wtComponent->linkWaveTable(&waveTable);
-
+        this->filComponent = Factory::createComponent<FilterComponent>(Point::zero);
+        
         Factory::windows()[0]->mainComponent()->addChild(wtComponent);
+        Factory::windows()[0]->mainComponent()->addChild(filComponent);
+
+        this->wtComponent->linkWaveTable(&waveTable);
 
     }
 
@@ -43,9 +47,12 @@ namespace Flux {
 
         player.resetStartAndEnd();
         player.setLooping(true);
-        // player.play();
+        player.play();
 
         waveTable.prepare(rate, size);
+        fil.prepare(rate, size);
+        
+        filComponent->setFilter(&fil);
 
     }
 
@@ -82,6 +89,8 @@ namespace Flux {
         player.process(audioBuffer);
         
         waveTable.process(audioBuffer);
+
+        fil.process(audioBuffer);
 
     }
 

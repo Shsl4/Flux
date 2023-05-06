@@ -69,9 +69,9 @@ namespace Flux {
     }
 
     void WaveTableComponent::initialize() {
-
-        auto hStack = Factory::createComponent<HStack>(Point::zero, Point(size().x, 75), VAlignment::center, HAlignment::center);
-        auto hStack2 = Factory::createComponent<HStack>(Point::zero, Point(size().x, 75), VAlignment::center, HAlignment::center);
+        
+        const auto hStack = Factory::createComponent<HStack>(Point::zero, Point(size().x, 75), VAlignment::center, HAlignment::center);
+        const auto hStack2 = Factory::createComponent<HStack>(Point::zero, Point(size().x, 75), VAlignment::center, HAlignment::center);
 
         hStack->setVisible(true);
         hStack->setColor(Color::fromHex(0x252525ff));
@@ -152,7 +152,7 @@ namespace Flux {
         graphics.setColor(color());
         graphics.drawRect(globalTransform());
 
-        graphics.setStyle(Graphics::Style::Stroke);
+        graphics.setStrokeStyle(Graphics::StrokeStyle::stroke);
         graphics.setStrokeWidth(2.0f);
         graphics.setAntiAliasing(true);
         graphics.setColor(scheme.lightest);
@@ -197,7 +197,7 @@ namespace Flux {
 
         Component::modified();
 
-        auto* wtComp = dynamic_cast<WaveTableComponent*>(parent()->parent());
+        const auto* wtComp = dynamic_cast<WaveTableComponent*>(parent()->parent());
 
         if(wtComp && wtComp->waveTable){
             calculateWaveform(wtComp->waveTable->frame(wtComp->waveTable->selectedFrame()));

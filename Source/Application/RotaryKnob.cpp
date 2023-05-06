@@ -84,7 +84,7 @@ namespace Flux {
         const Float32 rad = s.x / 2.0f;
         const Float32 diff = s.x * 0.125f;
 
-        graphics.setStyle(Graphics::Style::Stroke);
+        graphics.setStrokeStyle(Graphics::StrokeStyle::stroke);
         graphics.setStrokeWidth(size().x / 50.0f);
         graphics.setAntiAliasing(true);
 
@@ -94,7 +94,7 @@ namespace Flux {
         graphics.setColor(scheme.base);
         graphics.drawArc(arcPos, arcSize, 120, 300, false);
 
-        graphics.setStyle(Graphics::Style::Stroke);
+        graphics.setStrokeStyle(Graphics::StrokeStyle::stroke);
         graphics.setStrokeWidth(size().x / 50.0f);
         graphics.setAntiAliasing(true);
 
@@ -179,6 +179,12 @@ namespace Flux {
             updateText();
 
         }
+
+    }
+
+    void RotaryKnob::setScheme(const ColorScheme& newScheme) {
+        this->scheme = newScheme;
+        setColor(scheme.darkest);
 
     }
 

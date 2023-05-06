@@ -17,7 +17,6 @@ namespace Flux {
     const ColorScheme ColorScheme::treeBrown = ColorScheme::fromHex(0x7f5539ff);
     const ColorScheme ColorScheme::lightOrange = ColorScheme::fromHex(0xf48c06ff);
     const ColorScheme ColorScheme::yellow = ColorScheme::fromHex(0xffea00ff);
-    const ColorScheme ColorScheme::coolScheme = ColorScheme(Color::fromHex(0xb160f0ff), Colors::black, Color::fromHex(0x606060ff), Colors::black, Color::fromHex(0x202020ff));
 
     ColorScheme::ColorScheme(const Color &lightest, const Color &lighter, const Color &base, const Color &darker,
                              const Color &darkest) : lightest(lightest), lighter(lighter), base(base), darker(darker),

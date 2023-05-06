@@ -64,6 +64,8 @@ namespace Flux {
         
         NODISCARD FORCEINLINE Audio::Filter* fil() const { return this->filter; }
 
+        void setScheme(const ColorScheme& newScheme);
+
     protected:
         
         void modified() override;
@@ -85,7 +87,7 @@ namespace Flux {
         MutableArray<Listener*> listeners = {};
         Audio::Filter* filter = nullptr;
         DrawMode mode = DrawMode::frequency;
-        ColorScheme scheme = ColorScheme::flatBlue;
+        ColorScheme scheme = ColorScheme::coolScheme(Colors::tintGreen);
         Map<Float32, Text*> frequencyTexts = {};
         MutableArray<Text*> gainTexts = {};
         Float32 textSize = 12.0f;

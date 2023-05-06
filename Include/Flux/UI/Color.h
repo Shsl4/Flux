@@ -110,8 +110,12 @@ namespace Flux {
         static inline const Color blue = Color::fromHex(0x0000ffff);
         static inline const Color white = Color::fromHex(0xffffffff);
         static inline const Color black = Color::fromHex(0x000000ff);
+        static inline const Color tintPurple = Color::fromHex(0xb160f0ff);
+        static inline const Color tintBlue = Color::fromHex(0x60c0f0ff);
+        static inline const Color tintGreen = Color::fromHex(0x60f089ff);
+        static inline const Color tintPink = Color::fromHex(0xf060c0ff);
+        static inline const Color lightGray = Color::fromHex(0x252525ff);
         static inline const Color transparent = Color::fromHex(0xffffff00);
-
     };
 
      Color Flux::HSV::rgb(Float32 alpha) const {
@@ -150,6 +154,13 @@ namespace Flux {
             return scheme;
 
         }
+
+         static ColorScheme coolScheme(Color const& tint){
+
+            return { tint, Colors::black, Color::fromHex(0x606060ff), Colors::black,
+                               Color::fromHex(0x202020ff) };
+            
+         }
 
         FORCEINLINE static ColorScheme fromColor(Color const& color){
 
@@ -190,7 +201,6 @@ namespace Flux {
         const static ColorScheme treeBrown;
         const static ColorScheme lightOrange;
         const static ColorScheme yellow;
-        const static ColorScheme coolScheme;
 
     };
 

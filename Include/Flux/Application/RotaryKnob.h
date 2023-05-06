@@ -51,9 +51,11 @@ namespace Flux {
 
         void buttonDown(MouseButton button, Float64 x, Float64 y) override;
 
+        void setScheme(const ColorScheme& newScheme);
+
     private:
 
-        ColorScheme scheme = ColorScheme::coolScheme;
+        ColorScheme scheme = ColorScheme::coolScheme(Colors::tintPurple);
         Float64 rotation = 0.0;
         Float64 currentValue = 0.0;
         Float64 defaultValue = 0.5;

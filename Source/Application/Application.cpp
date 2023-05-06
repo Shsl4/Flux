@@ -52,7 +52,7 @@ namespace Flux {
             graphics.setColor(style.scheme.base);
             graphics.drawRect(transform);
             graphics.setColor(style.borderColor);
-            graphics.setStyle(Graphics::Style::Stroke);
+            graphics.setStrokeStyle(Graphics::StrokeStyle::stroke);
             graphics.setStrokeWidth(0.5f);
             graphics.drawRect(transform);
 
@@ -429,7 +429,7 @@ namespace Flux {
             graphics.setColor(Color::fromHex(0x202020ff));
             graphics.drawRect(transform);
             graphics.setColor(Colors::white);
-            graphics.setStyle(Graphics::Style::Stroke);
+            graphics.setStrokeStyle(Graphics::StrokeStyle::stroke);
             graphics.setStrokeWidth(0.5);
             graphics.drawRect(transform);
 

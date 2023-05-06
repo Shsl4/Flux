@@ -59,10 +59,26 @@ namespace Flux {
         realignTexts();
         
     }
-    
+
+    void BodePlot::setScheme(const ColorScheme& newScheme) {
+        
+        this->scheme = newScheme;
+        setColor(scheme.darkest);
+
+        for (const auto& text : gainTexts) {
+            text->setColor(scheme.lightest);
+        }
+
+        for (const auto& entry : frequencyTexts) {
+            entry.value()->setColor(scheme.lightest);
+        }
+        
+    }
+
     void BodePlot::modified() {
 
         realignTexts();
+        recalculatePath();
         
     }
 
@@ -103,7 +119,7 @@ namespace Flux {
 
             size_t i = 0;
             
-            for (auto& elem : gainsToDraw) {
+            for (const auto& elem : gainsToDraw) {
 
                 Text* text = gainTexts[i];
                 const Float32 drawY = Range<Float32>::translateValue(elem, gainRange, sizeRange);
@@ -141,10 +157,11 @@ namespace Flux {
         if(button != MouseButton::Left) return;
 
         // Setup our range objects
+        constexpr auto minCutoff = f32(Audio::Filter::minCutoff);
         const Point pos = globalTransform().position;
-        const Range<Float32> logRange = { log10(9.0f), log10(f32(filter->sampleRate()) / 2.0f) };
-        const Range<Float32> freqRange = { 9.0f, (f32(filter->sampleRate()) / 2.0f) * 0.95f };
-        const Range<Float32> resonanceRange = { 0.1f, 6.0f };
+        const Range<Float32> logRange = { log10(minCutoff), log10(f32(filter->sampleRate()) / 2.0f) };
+        const Range<Float32> freqRange = { minCutoff, (f32(filter->sampleRate()) / 2.0f) * 0.95f };
+        const Range<Float32> resonanceRange = { f32(Audio::Filter::minResonance), f32(Audio::Filter::maxResonance) };
         const Range<Float32> hSizeRange = { pos.x, size().x + pos.x };
         const Range<Float32> vSizeRange = { size().y + pos.y, pos.y };
 
@@ -179,7 +196,7 @@ namespace Flux {
             drawGrid(graphics);
         }
 
-        graphics.setStyle(Graphics::Style::Stroke);
+        graphics.setStrokeStyle(Graphics::StrokeStyle::stroke);
         graphics.setStrokeWidth(2.0f);
         graphics.setColor(scheme.lightest);
         graphics.drawPath(path);
@@ -228,7 +245,7 @@ namespace Flux {
 
         if(mode == DrawMode::frequency) {
             
-            for (auto& elem : gainsToDraw) {
+            for (const auto& elem : gainsToDraw) {
 
                 const auto drawY = Range<Float32>::translateValue(elem, gainRange, sizeRange);
                 graphics.drawLine({position.x, drawY + position.y}, {position.x + scale.x, drawY + position.y});
@@ -238,7 +255,7 @@ namespace Flux {
         }
         else {
 
-            for (auto& elem : phasesToDraw) {
+            for (const auto& elem : phasesToDraw) {
 
                 const auto drawY = Range<Float32>::translateValue(elem, phaseRange, sizeRange);
                 graphics.drawLine({position.x, drawY + position.y}, {position.x + scale.x, drawY + position.y});

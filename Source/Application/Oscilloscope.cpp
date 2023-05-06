@@ -12,7 +12,7 @@ namespace Flux {
         graphics.setColor(color());
         graphics.drawRect(globalTransform());
 
-        graphics.setStyle(Graphics::Style::Stroke);
+        graphics.setStrokeStyle(Graphics::StrokeStyle::stroke);
         graphics.setStrokeWidth(2.0f);
         graphics.setColor(scheme.lightest);
         graphics.drawPath(path);

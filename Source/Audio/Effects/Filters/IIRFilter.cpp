@@ -36,8 +36,8 @@ namespace Flux::Audio {
 
     Float64 IIRFilter::processSingle(const Float64 xn, size_t channel) {
         
-        const Float64& wetMix = this->filterMix;
-        const Float64& dryMix = 1.0 - this->filterMix;
+        const Float64& wetMix = this->mix();
+        const Float64& dryMix = 1.0 - wetMix;
 
         const Float64 compound = wetMix * (coefficients[a0] * xn +
                                            coefficients[a1] * state[channel][x_z1] +
@@ -68,8 +68,8 @@ namespace Flux::Audio {
 
                 const Float64 xn = data[sample];
             
-                const Float64& wetMix = this->filterMix;
-                const Float64& dryMix = 1.0 - this->filterMix;
+                const Float64& wetMix = this->mix();
+                const Float64& dryMix = 1.0 - wetMix;
 
                 const Float64 compound = wetMix * (coefficients[a0] * xn +
                                                    coefficients[a1] * state[channel][x_z1] +
@@ -89,12 +89,6 @@ namespace Flux::Audio {
             }
             
         }
-        
-    }
-
-    void IIRFilter::setMix(Float64 value) {
-        
-        this->filterMix = Math::clamp(value, 0.0, 1.0);
         
     }
     

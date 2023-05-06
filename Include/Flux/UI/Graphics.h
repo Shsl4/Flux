@@ -28,11 +28,11 @@ namespace Flux {
 
     public:
 
-        enum Style {
+        enum StrokeStyle {
 
-            Fill,
-            Stroke,
-            StrokeAndFill
+            fill,
+            stroke,
+            strokeAndFill
 
         };
 
@@ -60,7 +60,7 @@ namespace Flux {
 
         void setAntiAliasing(bool value) const;
 
-        void setStyle(Style style) const;
+        void setStrokeStyle(StrokeStyle style) const;
 
         void setStrokeWidth(Float32 width) const;
 

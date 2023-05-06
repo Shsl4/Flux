@@ -16,7 +16,7 @@ namespace Flux {
         
         drawCircle(graphics);
 
-        graphics.setStyle(Graphics::Style::Stroke);
+        graphics.setStrokeStyle(Graphics::StrokeStyle::stroke);
         graphics.setStrokeWidth(2.0f);
         graphics.setColor(scheme.lightest);
 
@@ -36,7 +36,7 @@ namespace Flux {
     void NyquistPlot::drawCircle(Graphics const& graphics) const {
 
         graphics.setStrokeWidth(2.0f);
-        graphics.setStyle(Graphics::Style::Stroke);
+        graphics.setStrokeStyle(Graphics::StrokeStyle::stroke);
         graphics.setColor(scheme.base);
 
         const Point position = globalTransform().position;

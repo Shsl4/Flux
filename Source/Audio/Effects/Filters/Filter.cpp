@@ -60,10 +60,13 @@ namespace Flux::Audio {
 
     void Filter::setResonance(const Float64 value) {
         
-        assert(value >= 0.0);
-        this->q = value;
+        this->q = Math::clamp(value, minResonance, maxResonance);
         recalculateCoefficients();
         
+    }
+
+    void Filter::setMix(Float64 value) {
+        this->m = Math::clamp(value, 0.0, 1.0);
     }
     
 }
