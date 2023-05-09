@@ -1,16 +1,16 @@
 #pragma once
 
-#include <Nucleus/Nucleus.h>
+#include <MIDI/MidiManager.h>
 
 #include <Audio/AudioEngine.h>
-#include <MIDI/MidiManager.h>
-#include <Application/Oscilloscope.h>
 #include <Audio/AudioPlayer.h>
 #include <Audio/WaveTable.h>
+#include <Audio/Effects/Filters/IIRFilter.h>
 
-#include "Application/FilterComponent.h"
-#include "Application/WaveTableComponent.h"
-#include "Effects/Filters/IIRFilter.h"
+#include <Application/Oscilloscope.h>
+#include <Application/WaveTableComponent.h>
+#include <Application/FilterComponent.h>
+#include <Application/AudioPlayerComponent.h>
 
 namespace Flux {
     
@@ -39,6 +39,8 @@ namespace Flux {
         Audio::LowPassFilter fil;
         FilterComponent* filComponent;
         WaveTableComponent* wtComponent;
+        AudioPlayerComponent* playerComponent;
+
     };
 
 }

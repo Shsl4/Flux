@@ -2,76 +2,36 @@
 
 namespace Flux {
 
+
+    RotaryKnob::RotaryKnob(const Point &p, Float32 radius) : Slider(p, radius, radius) {
+
+    }
+
     void RotaryKnob::drag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) {
 
         if(button == MouseButton::Left){
 
             rotation = Math::clamp(rotation + deltaY * 0.35, 0.0, 300.0);
 
-            if(logarithmicProgress){
+            if(usesLogarithmicProgress()){
 
-                const Range<Float64> logRange = { log10(valueRange.min()), log10(valueRange.max()) };
-                const Float64 logValue = Range<Float64>::translateValue(rotation / 300.0, Range<Float64>::makeLinearRange(), logRange);
-                const Float64 freq = valueRange.clamp(std::pow(10.0f, logValue));
-                this->currentValue = freq;
+                const Range<Float64> logRange = { log10(range().min()), log10(range().max()) };
+                const Float64 logValue = Range<Float64>::translateValue(rotation / 300.0, Range<Float64>::linear, logRange);
+                const Float64 value = range().clamp(std::pow(10.0f, logValue));
+                setValue(value);
 
             }
             else{
 
-                this->currentValue = Range<Float64>::translateValue(rotation / 300.0,
-                                                                    Range<Float64>::makeLinearRange(),
-                                                                    valueRange);
+                const Float64 value = Range<Float64>::translateValue(rotation / 300.0,
+                                                                    Range<Float64>::linear,
+                                                                    range());
+                setValue(value);
 
             }
 
             updateText();
-
-            for(auto const& listener : listeners){
-                listener->valueChanged(this, this->currentValue);
-            }
             
-        }
-
-    }
-
-    void RotaryKnob::doubleClick(MouseButton button, Float64 x, Float64 y) {
-
-        if(button == MouseButton::Left) {
-            setValue(defaultValue, true);
-        }
-
-    }
-
-    void RotaryKnob::updateText() {
-
-        if(precision > 0){
-            const String fmt ="{." + String::fromInteger(precision) + "}{}";
-            this->text->setText(String::format(fmt, currentValue, labelExtension));
-
-        }
-        else{
-            this->text->setText(String::format("{}{}", i32(currentValue), labelExtension));
-        }
-
-    }
-
-    RotaryKnob::RotaryKnob(const Point &p, Float32 radius) : Component(p, { radius, radius * 1.25f }) {
-
-        setColor(scheme.darkest);
-        Point sz = size();
-        this->text = Factory::createComponent<Text>(Point::zero, sz, labelText,
-                                                    sz.x / 6.0f, VAlignment::bottom, HAlignment::center);
-
-    }
-
-    void RotaryKnob::initialize() {
-        addChild(text);
-    }
-
-    void RotaryKnob::buttonUp(MouseButton button, Float64 x, Float64 y, Reactive *upTarget) {
-
-        if(button == MouseButton::Left){
-            text->setText(labelText);
         }
 
     }
@@ -91,120 +51,38 @@ namespace Flux {
         const Point arcPos = {pos.x + diff, pos.y + diff};
         const Point arcSize = {s.x - 2.0f * diff, s.x - 2.0f * diff};
 
-        graphics.setColor(scheme.base);
+        graphics.setColor(colorScheme().base);
         graphics.drawArc(arcPos, arcSize, 120, 300, false);
 
         graphics.setStrokeStyle(Graphics::StrokeStyle::stroke);
         graphics.setStrokeWidth(size().x / 50.0f);
         graphics.setAntiAliasing(true);
 
-        graphics.setColor(scheme.lightest);
+        graphics.setColor(colorScheme().lightest);
         graphics.drawArc(arcPos, arcSize, 120, f32(rotation), false);
 
         graphics.setColor(color());
         graphics.drawCircle({ pos.x + s.x / 2.0f, pos.y + s.x / 2.0f }, rad * 0.6f);
 
-        text->draw(graphics);
-        text->setReactive(false);
-
-    }
-
-    void RotaryKnob::addListener(RotaryKnob::Listener *listener) {
-        if(listener) this->listeners += listener;
-    }
-
-    void RotaryKnob::removeListener(RotaryKnob::Listener* listener) {
-        this->listeners.removeAll(listener);
-    }
-
-    void RotaryKnob::setValue(Float64 newValue, bool notify) {
-
-        if(Math::deq(currentValue, newValue)) return;
-
-        this->currentValue = valueRange.clamp(newValue);
-
-        refreshProgress();
-
-        if(notify){
-
-            for(auto const& listener : listeners){
-                listener->valueChanged(this, this->currentValue);
-            }
-
+        for (auto const& child : children()) {
+            child->draw(graphics);
         }
 
     }
 
-    void RotaryKnob::setRange(const Range<Float64> &range) {
-
-        this->valueRange = range;
-
-        if(this->currentValue < range.min()){
-            setValue(range.min(), false);
-        }
-
-        if(this->currentValue > range.max()){
-            setValue(range.max(), false);
-        }
-
-        this->defaultValue = valueRange.clamp(defaultValue);
-
-        refreshProgress();
-
-    }
-
-    void RotaryKnob::setLabelText(const String &value) {
-        this->labelText = value;
-        this->text->setText(labelText);
-    }
-
-    void RotaryKnob::setLabelExtension(const String &value) {
-        this->labelExtension = value;
-    }
-
-    void RotaryKnob::setLabelPrecision(UInt p) {
-        this->precision = p;
-    }
-
-    void RotaryKnob::setDefaultValue(Float64 value) {
-        this->defaultValue = valueRange.clamp(value);
-        setValue(defaultValue);
-        refreshProgress();
-    }
-
-    void RotaryKnob::buttonDown(MouseButton button, Float64 x, Float64 y) {
-
-        if(button == MouseButton::Left){
-
-            updateText();
-
-        }
-
-    }
-
-    void RotaryKnob::setScheme(const ColorScheme& newScheme) {
-        this->scheme = newScheme;
-        setColor(scheme.darkest);
-
-    }
-
-    void RotaryKnob::useLogarithmicProgress(bool value) {
-        this->logarithmicProgress = value;
-        setValue(this->currentValue, false);
-    }
-
+    
     void RotaryKnob::refreshProgress() {
 
         Range<Float64> fRange = { 0.0, 300.0 };
 
-        if(logarithmicProgress){
+        if(usesLogarithmicProgress()){
 
-            const Range<Float64> logRange = { log10(valueRange.min()), log10(valueRange.max()) };
-            this->rotation = Range<Float64>::translateValue(log10(this->currentValue), logRange, fRange);
+            const Range<Float64> logRange = { log10(range().min()), log10(range().max()) };
+            this->rotation = Range<Float64>::translateValue(log10(this->value()), logRange, fRange);
 
         }
         else{
-            this->rotation = Range<Float64>::translateValue(currentValue, valueRange, fRange);
+            this->rotation = Range<Float64>::translateValue(value(), range(), fRange);
         }
 
     }

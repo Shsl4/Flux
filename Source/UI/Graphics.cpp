@@ -54,6 +54,18 @@ namespace Flux {
 
     }
 
+    void Graphics::setStrokeCap(StrokeCap style) const {
+        
+        static const Map<Graphics::StrokeCap, SkPaint::Cap> map = {
+            { Graphics::StrokeCap::none, SkPaint::Cap::kButt_Cap },
+            { Graphics::StrokeCap::round, SkPaint::Cap::kRound_Cap },
+            { Graphics::StrokeCap::square, SkPaint::Cap::kSquare_Cap }
+        };
+        
+        paint->setStrokeCap(map[style]);
+        
+    }
+
     void Graphics::setStrokeWidth(Float32 width) const {
         paint->setStrokeWidth(width);
     }

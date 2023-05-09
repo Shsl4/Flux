@@ -11,8 +11,6 @@ namespace Flux {
 
         Range(NumberType min, NumberType max) : minValue(min), maxValue(max) {}
 
-        NODISCARD static Range makeLinearRange() { return { static_cast<NumberType>(0), static_cast<NumberType>(1) }; }
-
         NODISCARD FORCEINLINE NumberType min() const{ return this->minValue; }
 
         NODISCARD FORCEINLINE NumberType max() const{ return this->maxValue; }
@@ -28,6 +26,8 @@ namespace Flux {
             return (value - fromRange.min()) * toValue / fromValue + toRange.min();
 
         }
+
+        static const inline Range linear = { static_cast<NumberType>(0), static_cast<NumberType>(1) };
 
     private:
 

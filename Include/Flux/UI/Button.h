@@ -32,8 +32,8 @@ namespace Flux{
 
     private:
 
-        Color fromColor = Colors::white;
-        Color toColor = Colors::white;
+        Color fromColor = Color::white;
+        Color toColor = Color::white;
         Component* target = nullptr;
 
     };
@@ -56,7 +56,7 @@ namespace Flux{
 
             Float32 fontSize = 12.0;
             ColorScheme scheme = ColorScheme::flatBlue;
-            Color borderColor = Colors::white;
+            Color borderColor = Color::white;
             HAlignment hAlign = HAlignment::center;
             VAlignment vAlign = VAlignment::center;
             
@@ -167,7 +167,7 @@ namespace Flux{
         Color hoveredColor = ColorScheme::flatBlue.darker;
         Color defaultColor = ColorScheme::flatBlue.base;
         Color pressedColor = ColorScheme::flatBlue.darkest;
-        Color borderColor = Colors::transparent;
+        Color borderColor = Color::clear;
         ColorFader fader;
         Float32 cornerRadius = 0.0f;
         Function<void(Button*)> action = nullptr;

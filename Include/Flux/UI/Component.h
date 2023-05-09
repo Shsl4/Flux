@@ -119,7 +119,7 @@ namespace Flux {
     private:
 
         Transform localTransform = {};
-        Color renderColor = Colors::white;
+        Color renderColor = Color::white;
         Component* parentComponent = nullptr;
         MutableArray<Component*> childrenArray = {};
         bool bVisible = true;

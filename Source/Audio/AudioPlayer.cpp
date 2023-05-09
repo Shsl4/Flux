@@ -27,7 +27,7 @@ namespace Flux {
         for(size_t sample = 0; sample < maxSample; ++sample){
 
             for(size_t channel = 0; channel < maxChannel; ++channel) {
-                buffer[channel][sample] = wavefile->buffers[channel][st(playHead)];
+                buffer[channel][sample] = wavefile->buffers[channel][st(playHead)] * amplitudeValue;
             }
 
             playHead += increment;
@@ -54,6 +54,10 @@ namespace Flux {
         stop();
         this->wavefile = Factory::loadWaveFile(path);
         resetStartAndEnd();
+
+        for(auto const& listener : listeners){
+            listener->fileLoaded(wavefile);
+        }
         
     }
 
@@ -204,6 +208,20 @@ namespace Flux {
 
     void AudioPlayer::prepare(const Float64 rate, const UInt size) {
         AudioObject::prepare(rate, size);
+    }
+
+    void AudioPlayer::addListener(AudioPlayer::Listener *listener) {
+        if(listener){
+            listeners += listener;
+        }
+    }
+
+    void AudioPlayer::removeListener(AudioPlayer::Listener *listener) {
+        listeners.removeAll(listener);
+    }
+
+    void AudioPlayer::setAmplitude(Float64 amp) {
+        this->amplitudeValue = Math::clamp(amp, 0.0, Audio::toAmplitude(2.0));
     }
 
 }

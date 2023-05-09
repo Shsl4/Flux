@@ -6,7 +6,7 @@ namespace Flux {
 
         constexpr Float32 knobSize = 50.0f;
 
-        const ColorScheme scheme = ColorScheme::coolScheme(Colors::tintGreen);
+        const ColorScheme scheme = ColorScheme::darkScheme(Color::tintGreen);
 
         stack = Factory::createComponent<HStack>(Point::zero, size(), VAlignment::center, HAlignment::center);
         
@@ -18,6 +18,7 @@ namespace Flux {
         frequencyKnob->setLabelText("Frequency");
         frequencyKnob->setLabelExtension("Hz");
         frequencyKnob->setLabelPrecision(0);
+        frequencyKnob->setDefaultValue(440.0);
         frequencyKnob->setScheme(scheme);
         frequencyKnob->addListener(this);
 
@@ -62,7 +63,7 @@ namespace Flux {
         this->filter = newFilter;
     }
 
-    void FilterComponent::valueChanged(RotaryKnob* knob, const Float64 newValue) {
+    void FilterComponent::valueChanged(Slider* knob, const Float64 newValue) {
         
         if (knob == frequencyKnob) {
             filter->setCutoffFrequency(newValue);
@@ -91,12 +92,13 @@ namespace Flux {
     }
 
     void FilterComponent::setFilter(Audio::LowPassFilter* newFilter) {
+
         this->filter = newFilter;
         renderer->setFilter(newFilter);
 
         frequencyKnob->useLogarithmicProgress(true);
         frequencyKnob->setRange({Audio::Filter::minCutoff, (newFilter->sampleRate() / 2.0) * 0.95 });
-        frequencyKnob->setDefaultValue(440.0);
-        
+
     }
+
 }

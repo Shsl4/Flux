@@ -28,11 +28,19 @@ namespace Flux {
 
     public:
 
-        enum StrokeStyle {
+        enum class StrokeStyle {
 
             fill,
             stroke,
             strokeAndFill
+
+        };
+        
+        enum class StrokeCap {
+
+            none,
+            round,
+            square
 
         };
 
@@ -62,6 +70,8 @@ namespace Flux {
 
         void setStrokeStyle(StrokeStyle style) const;
 
+        void setStrokeCap(StrokeCap style) const;
+
         void setStrokeWidth(Float32 width) const;
 
         void drawPath(Path const& path) const;
@@ -82,10 +92,10 @@ namespace Flux {
 
         void updateDeltaTime(Float64 deltaTime);
 
-    private:
-
         void resetPaint() const;
-
+        
+    private:
+        
         SkCanvas* canvas = nullptr;
         SkPaint* paint = nullptr;
         Float64 dt = 0.0;

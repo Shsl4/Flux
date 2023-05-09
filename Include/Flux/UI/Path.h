@@ -31,7 +31,7 @@ namespace Flux {
 
     private:
 
-        Shared<SkPath> path = nullptr;
+        Shared<SkPath> path;
 
     };
 

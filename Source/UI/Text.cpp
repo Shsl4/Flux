@@ -90,7 +90,7 @@ namespace Flux {
 
     TextRenderer::TextRenderer(String const& text, Float32 textSize) : font(Fonts::manrope) {
 
-        setColor(Colors::white);
+        setColor(Color::white);
         setText(text);
         setTextSize(textSize);
         setReactive(false);

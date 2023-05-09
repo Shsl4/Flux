@@ -9,6 +9,16 @@ namespace Flux {
 
     public:
 
+        class Listener {
+
+        public:
+
+            virtual void fileLoaded(WaveFile* newFile) = 0;
+
+            virtual ~Listener() = default;
+
+        };
+
         AudioPlayer();
 
         void prepare(Float64 rate, UInt size) override;
@@ -40,11 +50,17 @@ namespace Flux {
         void setStartSample(size_t sample);
         
         void setEndSample(size_t sample);
-        
-        void resetStartAndEnd();
-        
+
         void setReverse(bool value);
-        
+
+        void setAmplitude(Float64 dB);
+
+        void resetStartAndEnd();
+
+        void addListener(Listener* listener);
+
+        void removeListener(Listener* listener);
+
         NODISCARD WaveFile resample();
         
         NODISCARD FORCEINLINE bool reverses() const { return Math::deq(-1.0, direction); }
@@ -52,6 +68,10 @@ namespace Flux {
         NODISCARD FORCEINLINE bool looping() const { return this->shouldLoop; }
         
         NODISCARD FORCEINLINE Float64 playRate() const { return this->speed; }
+
+        NODISCARD FORCEINLINE Float64 endTime() const { return f64(endSample) / wavefile->sampleRate; }
+
+        NODISCARD FORCEINLINE Float64 startTime() const { return f64(startSample) / wavefile->sampleRate; }
         
         NODISCARD FORCEINLINE Float64 duration() const {
             
@@ -60,6 +80,28 @@ namespace Flux {
             return f64(wavefile->samplesPerChannel) / wavefile->sampleRate;
             
         }
+
+        NODISCARD FORCEINLINE Float64 progress() const {
+
+            if(!wavefile) return 0.0;
+
+            return playHead / f64(wavefile->samplesPerChannel);
+
+        }
+
+        NODISCARD FORCEINLINE Float64 currentTime() const {
+
+            if(!wavefile) return 0.0;
+
+            return progress() * duration();
+
+        }
+
+        NODISCARD FORCEINLINE WaveFile* file() const { return this->wavefile; }
+
+        NODISCARD FORCEINLINE bool isPlaying() const { return playing; }
+
+        NODISCARD FORCEINLINE Float64 amplitude() const { return amplitudeValue; }
         
     private:
         
@@ -76,10 +118,13 @@ namespace Flux {
 
         Float64 direction = 1.0;
         Float64 speed = 1.0;
-        Float64 playHead = 0;
+        Float64 playHead = 0.0;
+        Float64 amplitudeValue = Audio::toAmplitude(-6.0);
 
         size_t startSample = 0;
         size_t endSample = 0;
+
+        MutableArray<Listener*> listeners = {};
 
     };
 

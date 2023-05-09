@@ -16,7 +16,7 @@ namespace Flux {
 
             setReactive(false);
             this->text->setReactive(false);
-            setColor(Colors::transparent);
+            setColor(Color::clear);
         }
 
         void initialize() override {

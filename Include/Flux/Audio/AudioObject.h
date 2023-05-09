@@ -3,6 +3,14 @@
 #include <Audio/AudioBuffer.h>
 
 namespace Flux::Audio {
+
+    NODISCARD FORCEINLINE Float64 toDecibels(Float64 amp){
+        return 20.0 * std::log10(amp);
+    }
+
+    NODISCARD FORCEINLINE Float64 toAmplitude(Float64 dB){
+        return std::pow(10.0, dB / 20.0);
+    }
         
     class AudioObject {
 

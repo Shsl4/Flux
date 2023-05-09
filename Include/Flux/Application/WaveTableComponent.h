@@ -8,7 +8,7 @@
 
 namespace Flux {
 
-    class WaveTableComponent : public Component, public RotaryKnob::Listener {
+    class WaveTableComponent : public Component, public Slider::Listener {
 
         class WaveTableRenderer : public Component {
 
@@ -27,7 +27,7 @@ namespace Flux {
 
         private:
 
-            ColorScheme scheme = ColorScheme::coolScheme(Colors::tintPurple);
+            ColorScheme scheme = ColorScheme::darkScheme(Color::tintPurple);
             Path path;
 
         };
@@ -38,7 +38,7 @@ namespace Flux {
 
         void initialize() override;
 
-        void valueChanged(RotaryKnob *knob, Float64 newValue) override;
+        void valueChanged(Slider *knob, Float64 newValue) override;
 
         void linkWaveTable(WaveTable* wt);
 
@@ -47,7 +47,7 @@ namespace Flux {
         RotaryKnob* frameKnob = nullptr;
         RotaryKnob* phaseKnob = nullptr;
         RotaryKnob* panKnob = nullptr;
-        RotaryKnob* levelKnob = nullptr;
+        RotaryKnob* gainKnob = nullptr;
 
         RotaryKnob* attackKnob = nullptr;
         RotaryKnob* decayKnob = nullptr;

@@ -68,8 +68,6 @@ namespace Flux {
 
         void setCurrentFrame(size_t frame);
 
-        void setLevel(Float64 value);
-
         void setAttack(Float64 value) const;
 
         void setDecay(Float64 value) const;
@@ -77,10 +75,12 @@ namespace Flux {
         void setSustain(Float64 value) const;
 
         void setRelease(Float64 value) const;
-        
+
+        void setAmplitude(Float64 amp);
+
         NODISCARD FORCEINLINE size_t maxFrames() const{ return frames.size(); }
 
-        NODISCARD FORCEINLINE Float64 currentLevel() const{ return level; }
+        NODISCARD FORCEINLINE Float64 amplitude() const{ return amplitudeValue; }
 
         NODISCARD FORCEINLINE size_t samplesPerFrame() const{ return frameSize; }
 
@@ -93,7 +93,7 @@ namespace Flux {
         MutableArray<MutableArray<Float64>> frames;
         SmartArray<Voice> voices = {};
         Map<UInt, Voice*> activeVoices = {};
-        Float64 level = 0.8;
+        Float64 amplitudeValue = Audio::toAmplitude(-6.0);
         size_t frameSize = 0;
         size_t currentFrame = 0;
 

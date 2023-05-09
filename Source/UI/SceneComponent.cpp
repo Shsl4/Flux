@@ -6,7 +6,7 @@ namespace Flux {
 
     SceneComponent::SceneComponent(Point const& p, Point const& s): Component(p, s), scaling(1.0f), zoomAnim(scaling, offset) {
         
-        setColor(Colors::transparent);
+        setColor(Color::clear);
 
         Point textSize = { 100, 20 };
         

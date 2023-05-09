@@ -16,3 +16,6 @@
 [submodule "Libraries/Vulkan-Headers"]
 	path = Libraries/Vulkan-Headers
 	url = https://github.com/KhronosGroup/Vulkan-Headers
+[submodule "Libraries/KissFFT"]
+	path = Libraries/KissFFT
+	url = https://github.com/mborgerding/KissFFT.git

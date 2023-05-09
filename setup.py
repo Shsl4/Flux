@@ -145,6 +145,7 @@ def build(debug):
             cmake_build('rtaudio', debug, ['-DRTAUDIO_BUILD_STATIC_LIBS=1'])
         cmake_build('glfw', debug)
         cmake_build('Nucleus', debug)
+        cmake_build('KissFFT', debug, ['-DKISSFFT_DATATYPE=double', '-DKISSFFT_STATIC=ON', '-DKISSFFT_TOOLS=OFF', '-DKISSFFT_TEST=OFF'])
     except Exception as message:
         print(f'{ConsoleColors.red}{message}{ConsoleColors.reset}')
         sys.stdout.flush()
@@ -166,6 +167,7 @@ def build(debug):
         shutil.copy(f'rtaudio/.build/{path}/rtaudio{postfix}.lib', f'.build/{path}')
         shutil.copy(f'glfw/.build/src/{path}/glfw3.lib', f'.build/{path}')
         shutil.copy(f'Nucleus/.build/{path}/Nucleus{postfix}.lib', f'.build/{path}')
+        shutil.copy('KissFFT/.build/kissfft-double.lib', f'.build/{path}')
 
     else:
         shutil.copy(f'skia/.build/{path}/libskia.a', f'.build/{path}')
@@ -173,6 +175,7 @@ def build(debug):
         shutil.copy('rtaudio/.build/librtaudio.a', f'.build/{path}')
         shutil.copy('glfw/.build/src/libglfw3.a', f'.build/{path}')
         shutil.copy('Nucleus/.build/libNucleus.a', f'.build/{path}')
+        shutil.copy('KissFFT/.build/libkissfft-double.a', f'.build/{path}')
 
     print(f'{ConsoleColors.green}Successfully built all dependencies.{ConsoleColors.reset}')
 

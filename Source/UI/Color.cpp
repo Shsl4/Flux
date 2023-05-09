@@ -2,6 +2,22 @@
 
 namespace Flux {
 
+    const Color Color::white = Color::fromHex(0xffffffff);
+    const Color Color::black = Color::fromHex(0x000000ff);
+    const Color Color::tintPurple = Color::fromHex(0xb160f0ff);
+    const Color Color::tintBlue = Color::fromHex(0x0090ffff);
+    const Color Color::tintOrange = Color::fromHex(0xffae00ff);
+    const Color Color::tintGreen = Color::fromHex(0x60f089ff);
+    const Color Color::tintCyan = Color::fromHex(0x44e3fcff);
+    const Color Color::tintPink = Color::fromHex(0xf060c0ff);
+    const Color Color::tintRed = Color::fromHex(0xfc4444ff);
+    const Color Color::tintYellow = Color::fromHex(0xfcf044ff);
+    const Color Color::tintTurquoise = Color::fromHex(0x44fccbff);
+    const Color Color::darkGray = Color::fromHex(0x202020ff);
+    const Color Color::lightGray = Color::fromHex(0x252525ff);
+    const Color Color::lighterGray = Color::fromHex(0x606060ff);
+    const Color Color::clear = Color::fromHex(0xffffff00);
+
     const ColorScheme ColorScheme::vividPink = ColorScheme::fromHex(0xFE5D9FFF);
     const ColorScheme ColorScheme::pastelGreen = ColorScheme::fromHex(0xC2F9BBFF);
     const ColorScheme ColorScheme::emerald = ColorScheme::fromHex(0x62C370FF);
