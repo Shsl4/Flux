@@ -27,7 +27,7 @@ namespace Flux {
 
         private:
 
-            ColorScheme scheme = ColorScheme::coolScheme(Colors::tintPurple);
+            ColorScheme scheme = ColorScheme::darkScheme(Color::tintPurple);
             Path path;
 
         };
@@ -47,7 +47,7 @@ namespace Flux {
         RotaryKnob* frameKnob = nullptr;
         RotaryKnob* phaseKnob = nullptr;
         RotaryKnob* panKnob = nullptr;
-        RotaryKnob* levelKnob = nullptr;
+        RotaryKnob* gainKnob = nullptr;
 
         RotaryKnob* attackKnob = nullptr;
         RotaryKnob* decayKnob = nullptr;

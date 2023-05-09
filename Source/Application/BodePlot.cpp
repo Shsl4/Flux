@@ -1,4 +1,5 @@
 #include <Application/BodePlot.h>
+#include <thread>
 
 namespace Flux {
     
@@ -6,11 +7,17 @@ namespace Flux {
 
         setColor(scheme.darkest);
         textSize = s.x * 0.0125f;
-        
+
+        this->cplx = MutableArray<kiss_fft_cpx>::filled(spectrumWindowSize);
+        this->cplxOut = MutableArray<kiss_fft_cpx>::filled(spectrumWindowSize);
+        this->bins = MutableArray<Bin>::filled(spectrumWindowSize);
+        this->cfg = kiss_fft_alloc(spectrumWindowSize, 0, nullptr, nullptr);
+        this->lastGains = MutableArray<Float64>::filled(spectrumWindowSize);
+
     }
 
     void BodePlot::initialize() {
-        
+
         const Map<String, Float32> frequencyValues = {
             
             { "10", 10.0f },
@@ -88,7 +95,7 @@ namespace Flux {
         
         const Range<Float32> logRange = { log10(9.0f), log10(f32(filter->sampleRate()) / 2.0f) };
         const Range<Float32> sizeRange = { size().y, 0.0f };
-        const Range<Float32> linRange = Range<Float32>::makeLinearRange();
+        const Range<Float32> linRange = Range<Float32>::linear;
         const Point scale = size();
 
         for (size_t p = 1; p <= 4; ++p) {
@@ -196,6 +203,13 @@ namespace Flux {
             drawGrid(graphics);
         }
 
+        recalculateSpectrum();
+
+        graphics.setStrokeStyle(Graphics::StrokeStyle::stroke);
+        graphics.setStrokeWidth(2.0f);
+        graphics.setColor(scheme.base);
+        graphics.drawPath(spectrumPath);
+
         graphics.setStrokeStyle(Graphics::StrokeStyle::stroke);
         graphics.setStrokeWidth(2.0f);
         graphics.setColor(scheme.lightest);
@@ -208,9 +222,15 @@ namespace Flux {
     }
 
     void BodePlot::setFilter(Audio::Filter* fil) {
+
         this->filter = fil;
         realignTexts();
         recalculatePath();
+
+        timer.loop(0.01, [this](){
+            processFFT();
+        });
+
     }
 
     void BodePlot::keyDown(Key const& key) {
@@ -238,7 +258,7 @@ namespace Flux {
         graphics.setColor(scheme.base);
 
         const Range<Float32> logRange = { log10(9.0f), log10(f32(filter->sampleRate()) / 2.0f) };
-        const Range<Float32> linRange = Range<Float32>::makeLinearRange();
+        const Range<Float32> linRange = Range<Float32>::linear;
         const Range<Float32> sizeRange = { size().y, 0.0f };
         const Point position = globalTransform().position;
         const Point scale = size();
@@ -320,7 +340,7 @@ namespace Flux {
             const Float64 freq = (values[i] / pi) * nyquist;
             const Float64 finalResponse = Math::clamp(response, mindB, maxdB);
             const Range<Float64> logRange = { log10(9.0), log10(nyquist) };
-            const Range<Float64> linRange = Range<Float64>::makeLinearRange();
+            const Range<Float64>& linRange = Range<Float64>::linear;
 
             const Float64 normalizedResponse = (finalResponse - mindB) / (maxdB - mindB);
             const Float64 normalizedFrequency = Range<Float64>::translateValue(log10(freq), logRange, linRange);
@@ -354,6 +374,57 @@ namespace Flux {
         
     }
 
+    void BodePlot::recalculateSpectrum() {
+
+        spectrumPath.reset();
+
+        const Point pos = globalTransform().position;
+        Point lastPoint = pos;
+        lastPoint.y += size().y;
+
+        const Float64 sr = filter->sampleRate();
+        const Float64 nyquist = sr / 2.0;
+        const size_t points = bins.size();
+        constexpr Float64 mindB = -20.0;
+        constexpr Float64 maxdB = 20.0;
+
+        for (UInt i = 0; i < points; i++) {
+
+            const size_t prev = i == 0 ? 0 : i - 1;
+            const size_t next = i + 1 == points ? i : i + 1;
+
+            const Float64 previousResponse = (bins[prev].gain + lastGains[prev]) / 2.0;
+            const Float64 currentResponse = (bins[i].gain + lastGains[i]) / 2.0;
+            const Float64 nextResponse = (bins[next].gain + lastGains[next]) / 2.0;
+            const Float64 response = (previousResponse + currentResponse + nextResponse) / 3.0;
+            const Float64 freq = Math::clamp(bins[i].frequency, 9.0, nyquist);
+            const Float64 finalResponse = Math::clamp(response, mindB, maxdB);
+            const Range<Float64> logRange = { log10(9.0), log10(nyquist) };
+            const Range<Float64>& linRange = Range<Float64>::linear;
+
+            const Float64 normalizedResponse = (finalResponse - mindB) / (maxdB - mindB);
+            const Float64 normalizedFrequency = Range<Float64>::translateValue(log10(freq), logRange, linRange);
+
+            if(!std::isfinite(response)) continue;
+
+            const Float32 drawX = pos.x + f32(normalizedFrequency) * size().x;
+            const Float32 drawY = pos.y + size().y - f32(normalizedResponse) * size().y;
+
+            Point newPoint = { drawX, drawY };
+
+            if(i == 0){
+                spectrumPath.moveTo(newPoint.x, newPoint.y);
+            }
+            else{
+                spectrumPath.lineTo(newPoint.x, newPoint.y);
+            }
+
+            lastGains[i] = response;
+
+        }
+
+    }
+
     void BodePlot::recalculatePhaseResponse() {
 
         if(!filter) return;
@@ -378,7 +449,7 @@ namespace Flux {
             const Float64 response = fmod(Math::toDegrees(phase), 360);
             const Float64 freq = (values[i] / pi) * nyquist;
             const Range logRange = { log10(9.0), log10(nyquist) };
-            const Range<Float64> linRange = Range<Float64>::makeLinearRange();
+            const Range<Float64>& linRange = Range<Float64>::linear;
 
             const Float64 normalizedResponse = Range<Float64>::translateValue(response, phaseRange64, linRange);
             const Float64 normalizedFrequency = Range<Float64>::translateValue(log10(freq), logRange, linRange);
@@ -418,6 +489,39 @@ namespace Flux {
 
     void BodePlot::removeListener(BodePlot::Listener *listener) {
         listeners -= listener;
+    }
+
+    void BodePlot::feedBuffer(Float64 *block) {
+        circularBuffer.feed(block, filter->bufferSize());
+    }
+
+    void BodePlot::willDispose() {
+        kiss_fft_free(cfg);
+    }
+
+    void BodePlot::processFFT() {
+
+        constexpr auto size = spectrumWindowSize;
+        constexpr auto fSize = f64(size);
+
+        const Float64 sampleRate = filter->sampleRate();
+        const Float64* values = circularBuffer.buffer.data();
+
+        for (size_t i = 0; i < size; ++i) {
+            cplx[i].r = values[i] * 0.5 * (1.0 - std::cos((2.0 * Math::pi<Float64> * f64(i)) / (fSize - 1.0)));
+            cplx[i].i = 0.0;
+        }
+
+        kiss_fft(cfg, cplx.data(), cplxOut.data());
+
+        for (size_t i = 0; i < size; ++i) {
+
+            const auto magnitude = std::sqrt(cplxOut[i].r * cplxOut[i].r + cplxOut[i].i * cplxOut[i].i);
+            bins[i].gain = Flux::Audio::toDecibels(magnitude);
+            bins[i].frequency = f64(i) * sampleRate / fSize;
+
+        }
+
     }
 
 }

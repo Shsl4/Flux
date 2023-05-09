@@ -40,7 +40,7 @@ namespace Flux {
     
     Timer::~Timer() {
         stop();
-        timerThread.join();
+        if (timerThread.joinable()) timerThread.join();
     }
     
     void Timer::stop() {

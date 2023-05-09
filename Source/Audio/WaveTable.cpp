@@ -69,7 +69,7 @@ namespace Flux {
                 
                 for(size_t channel = 0; channel < buffer.channels(); ++channel) {
                 
-                    buffer[channel][sample] += t * level * 0.2;
+                    buffer[channel][sample] += t * amplitudeValue;
                     
                 }
             
@@ -133,10 +133,6 @@ namespace Flux {
 
     }
 
-    void WaveTable::setLevel(Float64 value) {
-        this->level = Math::clamp(value, 0.0, 1.0);
-    }
-
     void WaveTable::setAttack(Float64 value) const {
         for (const auto& voice : voices) {
             voice->adsr()->setAttack(value);
@@ -160,5 +156,9 @@ namespace Flux {
             voice->adsr()->setRelease(value);
         }
     }
-    
+
+    void WaveTable::setAmplitude(Float64 amp) {
+        this->amplitudeValue = Math::clamp(amp, 0.0, Audio::toAmplitude(2.0));
+    }
+
 }

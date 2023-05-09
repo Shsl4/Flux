@@ -22,6 +22,8 @@ namespace Flux {
 
         void setFilter(Audio::LowPassFilter* newFilter);
 
+        BodePlot* renderer = nullptr;
+
     private:
 
         RotaryKnob* frequencyKnob = nullptr;
@@ -30,9 +32,8 @@ namespace Flux {
 
         HStack* stack = nullptr;
         
-        BodePlot* renderer = nullptr;
         Audio::Filter* filter = nullptr;
-            
+
     };
     
 }

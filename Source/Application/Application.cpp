@@ -27,7 +27,7 @@ namespace Flux {
         
         PopoutMenu(Point const& p, Float32 width, MutableArray<String> const& choices) : Component(p, { width, choices.size() * 25.0f }) {
 
-            setColor(Colors::transparent);
+            setColor(Color::clear);
             
             for (auto const& choice : choices) {
                 
@@ -78,7 +78,7 @@ namespace Flux {
             this->style = value;
 
             Button::Style st = value;
-            st.borderColor = Colors::transparent;
+            st.borderColor = Color::clear;
             
             for (auto& button : choiceButtons) {
                 button->setStyle(st);
@@ -231,7 +231,7 @@ namespace Flux {
         
         AudioSettings(Point const& p, Point const& s, AudioEngine* engine) : Component(p, s), engine(engine) {
 
-            setColor(Colors::transparent);
+            setColor(Color::clear);
             
             constexpr Float32 textMaxWidth = 150;
             constexpr Float32 textHeight = 35;
@@ -241,7 +241,7 @@ namespace Flux {
             constexpr Float32 elemWidth = textMaxWidth + buttonMaxWidth;
             const ColorScheme buttonScheme = ColorScheme::fromHex(0x202020ff);
 
-            Button::Style style(fontHeight, buttonScheme, Colors::white, HAlignment::left, VAlignment::center);
+            Button::Style style(fontHeight, buttonScheme, Color::white, HAlignment::left, VAlignment::center);
 
             this->driverDropdown = Factory::createComponent<Dropdown>(Point::zero, Point(buttonMaxWidth, buttonHeight));
             this->sampleRateDropdown = Factory::createComponent<Dropdown>(Point::zero, Point(buttonMaxWidth, buttonHeight));
@@ -428,7 +428,7 @@ namespace Flux {
             graphics.setAntiAliasing(true);
             graphics.setColor(Color::fromHex(0x202020ff));
             graphics.drawRect(transform);
-            graphics.setColor(Colors::white);
+            graphics.setColor(Color::white);
             graphics.setStrokeStyle(Graphics::StrokeStyle::stroke);
             graphics.setStrokeWidth(0.5);
             graphics.drawRect(transform);
@@ -468,14 +468,12 @@ namespace Flux {
         constexpr Int windowWidth = 1280;
         constexpr Int windowHeight = 720;
 
-        const auto hStack = Factory::createComponent<HStack>(Point::zero, Point(windowWidth, windowHeight), VAlignment::center, HAlignment::center);
+        const auto hStack = Factory::createComponent<VStack>(Point::zero, Point(windowWidth, windowHeight), VAlignment::center, HAlignment::center);
 
         this->mainWindow = Factory::createWindow(hStack, RenderBackend::Best, "Application", windowWidth, windowHeight);
 
-        hStack->addChild(Factory::createComponent<Slider>(Point::zero, Point(250, 30)));
-        
         initializeAudio();
-        
+
         this->shouldRun = true;
 
         Console::log("Created new Flux Application.\n");

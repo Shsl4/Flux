@@ -31,8 +31,6 @@ namespace Flux {
         path->reset();
     }
 
-    Path::~Path() {
-
-    }
+    Path::~Path() = default;
 
 }

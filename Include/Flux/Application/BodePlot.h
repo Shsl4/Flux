@@ -5,6 +5,63 @@
 #include <Audio/Effects/Filters/Filter.h>
 #include <Utility/Range.h>
 #include <UI/Text.h>
+#include <valarray>
+#include <complex>
+#include <KissFFT/kiss_fft.h>
+#include "Utility/Timer.h"
+
+struct Bin {
+    Float64 gain;
+    Float64 frequency;
+};
+
+struct CircularBuffer {
+
+    explicit CircularBuffer(size_t size) : buffer(MutableArray<Float64>::filled(size)) {
+
+    }
+
+    FORCEINLINE void feed(const Float64* data, size_t size){
+
+        if(!data) return;
+
+        size_t offset = 0;
+        size_t left = size;
+
+        while(head + left > buffer.size()){
+            const size_t diff = buffer.size() - head;
+            memcpy(buffer.data() + head, data + offset, sizeof(Float64) * diff);
+            offset += diff;
+            left -= diff;
+            head = 0;
+        }
+
+        memcpy(buffer.data() + head, data + offset, sizeof(Float64) * left);
+        head = (left + head == buffer.size()) ? 0 : (head + left);
+
+    }
+
+    MutableArray<Float64> buffer = {};
+
+private:
+
+    size_t head = 0;
+
+};
+
+namespace Nucleus{
+
+    template<>
+    class Fmt<Bin>{
+
+    public:
+
+        static String format(Bin const& elem, String const& params) {
+            return String::format("({.2}, {.1})\n", elem.gain, elem.frequency);
+        }
+
+    };
+}
 
 namespace Flux {
         
@@ -61,13 +118,17 @@ namespace Flux {
         void removeListener(Listener* listener);
 
         void realignTexts() const;
-        
-        NODISCARD FORCEINLINE Audio::Filter* fil() const { return this->filter; }
 
         void setScheme(const ColorScheme& newScheme);
 
+        void feedBuffer(Float64* block);
+
+        NODISCARD FORCEINLINE Audio::Filter* fil() const { return this->filter; }
+
     protected:
-        
+
+        void willDispose() override;
+
         void modified() override;
         
     private:
@@ -83,14 +144,20 @@ namespace Flux {
 
         void recalculateFrequencyResponse();
 
+        void recalculateSpectrum();
+
+        void processFFT();
+
         Path path;
+        Path spectrumPath;
         MutableArray<Listener*> listeners = {};
         Audio::Filter* filter = nullptr;
         DrawMode mode = DrawMode::frequency;
-        ColorScheme scheme = ColorScheme::coolScheme(Colors::tintGreen);
+        ColorScheme scheme = ColorScheme::darkScheme(Color::tintGreen);
         Map<Float32, Text*> frequencyTexts = {};
         MutableArray<Text*> gainTexts = {};
         Float32 textSize = 12.0f;
+        Timer timer;
 
         static inline const MutableArray<Float32> gainsToDraw = { -18.0f, -12.0f, -6.0f, 0.0f, 6.0f, 12.0f, 18.0f };
         static inline const MutableArray<Float32> phasesToDraw = { -315.0f, -270.0f, -225.0f, -180.0f, -135.0f, -90.0f, -45.0f };
@@ -98,6 +165,22 @@ namespace Flux {
         static const inline Range<Float32> phaseRange = { -360.0f, 0.0f };
         static const inline Range<Float64> phaseRange64 = { -360.0, 0.0 };
         static const inline Range<Float32> gainRange = { -20.0f, 20.0f };
+
+        static constexpr size_t spectrumWindowSize = 2048;
+
+        CircularBuffer circularBuffer = CircularBuffer(spectrumWindowSize);
+        MutableArray<kiss_fft_cpx> cplx = {};
+        MutableArray<kiss_fft_cpx> cplxOut = {};
+        MutableArray<Bin> bins = {};
+
+        MutableArray<Float64> lastGains = {};
+
+        kiss_fft_cfg cfg = nullptr;
+
+        std::mutex mutex;
+
+        Path lastSpectrumPath;
+
 
     };
 

@@ -3,7 +3,7 @@
 namespace Flux {
 
     Stack::Stack(Point const& p, Point const& s, VAlignment vAlign, HAlignment hAlign, bool stretch) : Component(p, s), vAlign(vAlign), hAlign(hAlign), bStretchChildren(stretch) {
-        setColor(Colors::transparent);
+        setColor(Color::clear);
     }
 
     void Stack::modified() {

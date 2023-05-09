@@ -19,7 +19,9 @@ namespace Flux {
 
         };
 
-        Slider(Point const& p, Point const& s);
+        Slider(Point const& p, Float32 length, Float32 width = 5.0);
+
+        ~Slider() override = default;
 
         void initialize() override;
 
@@ -55,6 +57,8 @@ namespace Flux {
 
         void setScheme(const ColorScheme& newScheme);
 
+        void useCustomFormatFunction(Function<String(Float64, String const&)> const& function);
+
         NODISCARD FORCEINLINE ColorScheme colorScheme() const { return this->scheme; }
 
         NODISCARD FORCEINLINE bool usesLogarithmicProgress() const { return this->logarithmicProgress; }
@@ -71,7 +75,7 @@ namespace Flux {
         
     private:
 
-        ColorScheme scheme = ColorScheme::coolScheme(Colors::tintPurple);
+        ColorScheme scheme = ColorScheme::darkScheme(Color::tintPurple);
         Float64 currentValue = 0.0;
         Float64 defaultValue = 0.5;
         Range<Float64> valueRange = { 0.0, 1.0 };
@@ -80,9 +84,10 @@ namespace Flux {
         String labelExtension = "";
         UInt precision = 2;
         MutableArray<Listener*> listeners = {};
-        
         bool logarithmicProgress = false;
-        
+        Float32 sliderWidth = 5.0;
+        Function<String(Float64, String const&)> formatFunction = nullptr;
+
     };
 
     

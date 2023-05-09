@@ -95,28 +95,26 @@ namespace Flux {
         NODISCARD Float32 blue() const { return b; }
         NODISCARD Float32 alpha() const { return a; }
 
+        static const Color white;
+        static const Color black;
+        static const Color tintPurple;
+        static const Color tintBlue;
+        static const Color tintOrange;
+        static const Color tintGreen;
+        static const Color tintCyan;
+        static const Color tintPink;
+        static const Color tintRed;
+        static const Color tintYellow;
+        static const Color tintTurquoise;
+        static const Color darkGray;
+        static const Color lightGray;
+        static const Color lighterGray;
+        static const Color clear;
+
     private:
 
         Float32 r, g, b, a;
 
-    };
-
-    class Colors {
-
-    public:
-
-        static inline const Color red = Color::fromHex(0xff0000ff);
-        static inline const Color green = Color::fromHex(0x00ff00ff);
-        static inline const Color blue = Color::fromHex(0x0000ffff);
-        static inline const Color white = Color::fromHex(0xffffffff);
-        static inline const Color black = Color::fromHex(0x000000ff);
-        static inline const Color tintPurple = Color::fromHex(0xb160f0ff);
-        static inline const Color tintBlue = Color::fromHex(0x60c0f0ff);
-        static inline const Color tintGreen = Color::fromHex(0x60f089ff);
-        static inline const Color tintPink = Color::fromHex(0xf060c0ff);
-        static inline const Color lightGray = Color::fromHex(0x252525ff);
-        static inline const Color lighterGray = Color::fromHex(0x505050ff);
-        static inline const Color transparent = Color::fromHex(0xffffff00);
     };
 
      Color Flux::HSV::rgb(Float32 alpha) const {
@@ -156,10 +154,10 @@ namespace Flux {
 
         }
 
-         static ColorScheme coolScheme(Color const& tint){
+         static ColorScheme darkScheme(Color const& tint){
 
-            return { tint, Colors::black, Color::fromHex(0x606060ff), Colors::black,
-                               Color::fromHex(0x202020ff) };
+            return { tint, Color::black, Color::lighterGray, Color::black,
+                               Color::darkGray };
             
          }
 
@@ -181,11 +179,11 @@ namespace Flux {
 
         }
 
-        Color lightest = Colors::black;
-        Color lighter = Colors::black;
-        Color base = Colors::black;
-        Color darker = Colors::black;
-        Color darkest = Colors::black;
+        Color lightest = Color::black;
+        Color lighter = Color::black;
+        Color base = Color::black;
+        Color darker = Color::black;
+        Color darkest = Color::black;
 
         const static ColorScheme vividPink;
         const static ColorScheme pastelGreen;

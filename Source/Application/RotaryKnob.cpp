@@ -2,6 +2,11 @@
 
 namespace Flux {
 
+
+    RotaryKnob::RotaryKnob(const Point &p, Float32 radius) : Slider(p, radius, radius) {
+
+    }
+
     void RotaryKnob::drag(MouseButton button, Float64 x, Float64 y, Float64 deltaX, Float64 deltaY) {
 
         if(button == MouseButton::Left){
@@ -11,7 +16,7 @@ namespace Flux {
             if(usesLogarithmicProgress()){
 
                 const Range<Float64> logRange = { log10(range().min()), log10(range().max()) };
-                const Float64 logValue = Range<Float64>::translateValue(rotation / 300.0, Range<Float64>::makeLinearRange(), logRange);
+                const Float64 logValue = Range<Float64>::translateValue(rotation / 300.0, Range<Float64>::linear, logRange);
                 const Float64 value = range().clamp(std::pow(10.0f, logValue));
                 setValue(value);
 
@@ -19,7 +24,7 @@ namespace Flux {
             else{
 
                 const Float64 value = Range<Float64>::translateValue(rotation / 300.0,
-                                                                    Range<Float64>::makeLinearRange(),
+                                                                    Range<Float64>::linear,
                                                                     range());
                 setValue(value);
 
@@ -29,12 +34,6 @@ namespace Flux {
             
         }
 
-    }
-    
-    RotaryKnob::RotaryKnob(const Point &p, Float32 radius) : Slider(p, { radius, radius * 1.25f }) {
-
-        this->label()->setTextSize(radius / 6.0f);
-        
     }
 
     void RotaryKnob::draw(Graphics const& graphics) {

@@ -29,12 +29,17 @@ namespace Flux {
         panKnob->setLabelPrecision(2);
         panKnob->addListener(this);
 
-        levelKnob = Factory::createComponent<RotaryKnob>(Point::zero, knobSize);
-        levelKnob->setRange({0.0, 1.0});
-        levelKnob->setDefaultValue(0.8);
-        levelKnob->setLabelText("Level");
-        levelKnob->setLabelPrecision(2);
-        levelKnob->addListener(this);
+        gainKnob = Factory::createComponent<RotaryKnob>(Point::zero, knobSize);
+        gainKnob->setRange({0.0, Audio::toAmplitude(2.0)});
+        gainKnob->setDefaultValue(Audio::toAmplitude(-6.0));
+        gainKnob->setLabelText("Gain");
+        gainKnob->setLabelExtension("dB");
+        gainKnob->setLabelPrecision(1);
+        gainKnob->addListener(this);
+        gainKnob->useCustomFormatFunction([](Float64 v, String const& extension) {
+            if(Math::deq(0.0, v)) return String::format("-Inf {}", extension);
+            return String::format("{.2} {}", Audio::toDecibels(v), extension);
+        });
 
         attackKnob = Factory::createComponent<RotaryKnob>(Point::zero, knobSize);
         attackKnob->setRange({0.0, 5.0});
@@ -74,17 +79,17 @@ namespace Flux {
         const auto hStack2 = Factory::createComponent<HStack>(Point::zero, Point(size().x, 75), VAlignment::center, HAlignment::center);
 
         hStack->setVisible(true);
-        hStack->setColor(Color::fromHex(0x252525ff));
+        hStack->setColor(Color::lightGray);
         hStack->setSpacing(20.0f);
         
         hStack2->setVisible(true);
-        hStack2->setColor(Color::fromHex(0x252525ff));
+        hStack2->setColor(Color::lightGray);
         hStack2->setSpacing(20.0f);
 
         hStack->addChild(frameKnob);
         hStack->addChild(phaseKnob);
         hStack->addChild(panKnob);
-        hStack->addChild(levelKnob);
+        hStack->addChild(gainKnob);
 
         hStack2->addChild(attackKnob);
         hStack2->addChild(decayKnob);
@@ -112,8 +117,8 @@ namespace Flux {
 
         }
 
-        if(knob == levelKnob){
-            waveTable->setLevel(newValue);
+        if(knob == gainKnob){
+            waveTable->setAmplitude(newValue);
         }
 
         if (knob == attackKnob) {
@@ -141,7 +146,7 @@ namespace Flux {
         frameKnob->setRange({0, f64(waveTable->maxFrames() - 1)});
         frameKnob->setValue(0);
 
-        levelKnob->setValue(waveTable->currentLevel());
+        gainKnob->setValue(waveTable->amplitude());
 
         renderer->calculateWaveform(waveTable->frame(0));
 
