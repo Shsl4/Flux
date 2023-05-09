@@ -5,8 +5,9 @@ namespace Flux {
     Slider::Slider(const Point &p, Float32 length, Float32 width) : Component(p, { length, width + 15 }), sliderWidth(width) {
 
         setColor(scheme.darkest);
+        
         this->text = Factory::createComponent<Text>(Point(0.0, width), Point(length, 15),
-                                                    labelText, 8,
+                                                    labelText, 8.0f,
                                                     VAlignment::center, HAlignment::center);
 
     }

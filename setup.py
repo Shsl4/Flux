@@ -167,7 +167,7 @@ def build(debug):
         shutil.copy(f'rtaudio/.build/{path}/rtaudio{postfix}.lib', f'.build/{path}')
         shutil.copy(f'glfw/.build/src/{path}/glfw3.lib', f'.build/{path}')
         shutil.copy(f'Nucleus/.build/{path}/Nucleus{postfix}.lib', f'.build/{path}')
-        shutil.copy('KissFFT/.build/kissfft-double.lib', f'.build/{path}')
+        shutil.copy(f'KissFFT/.build/{path}/kissfft-double.lib', f'.build/{path}')
 
     else:
         shutil.copy(f'skia/.build/{path}/libskia.a', f'.build/{path}')

@@ -18,7 +18,7 @@ struct Bin {
 struct CircularBuffer {
 
     explicit CircularBuffer(size_t size) : buffer(MutableArray<Float64>::filled(size)) {
-
+        memset(buffer.data(), 0, size * sizeof(Float64));
     }
 
     FORCEINLINE void feed(const Float64* data, size_t size){
@@ -58,6 +58,17 @@ namespace Nucleus{
 
         static String format(Bin const& elem, String const& params) {
             return String::format("({.2}, {.1})\n", elem.gain, elem.frequency);
+        }
+
+    };
+
+    template<>
+    class Fmt<kiss_fft_cpx>{
+
+    public:
+
+        static String format(kiss_fft_cpx const& elem, String const& params) {
+            return String::format("({.2}, {.2})\n",elem.r, elem.i);
         }
 
     };
@@ -124,6 +135,7 @@ namespace Flux {
         void feedBuffer(Float64* block);
 
         NODISCARD FORCEINLINE Audio::Filter* fil() const { return this->filter; }
+        static constexpr size_t spectrumWindowSize = 2048;
 
     protected:
 
@@ -165,9 +177,7 @@ namespace Flux {
         static const inline Range<Float32> phaseRange = { -360.0f, 0.0f };
         static const inline Range<Float64> phaseRange64 = { -360.0, 0.0 };
         static const inline Range<Float32> gainRange = { -20.0f, 20.0f };
-
-        static constexpr size_t spectrumWindowSize = 2048;
-
+        
         CircularBuffer circularBuffer = CircularBuffer(spectrumWindowSize);
         MutableArray<kiss_fft_cpx> cplx = {};
         MutableArray<kiss_fft_cpx> cplxOut = {};

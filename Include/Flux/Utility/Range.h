@@ -27,7 +27,7 @@ namespace Flux {
 
         }
 
-        static const inline Range linear = { static_cast<NumberType>(0), static_cast<NumberType>(1) };
+        static const Range linear;
 
     private:
 
@@ -35,5 +35,8 @@ namespace Flux {
         NumberType maxValue;
 
     };
+
+    template<typename NumberType>
+    inline const Range<NumberType> Range<NumberType>::linear = { static_cast<NumberType>(0), static_cast<NumberType>(1) };
 
 }

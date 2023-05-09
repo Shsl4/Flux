@@ -40,11 +40,11 @@ namespace Flux {
     
     Timer::~Timer() {
         stop();
-        if (timerThread.joinable()) timerThread.join();
     }
     
     void Timer::stop() {
         this->terminate = true;
+        if (timerThread.joinable()) timerThread.join();
     }
 
     void Timer::threadFunc(Timer* timer) {

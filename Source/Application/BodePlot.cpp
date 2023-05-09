@@ -496,11 +496,18 @@ namespace Flux {
     }
 
     void BodePlot::willDispose() {
-        kiss_fft_free(cfg);
+
+        timer.stop();
+        
+        if(cfg) {
+            kiss_fft_free(cfg);
+            cfg = nullptr;
+        }
+        
     }
 
     void BodePlot::processFFT() {
-
+        
         constexpr auto size = spectrumWindowSize;
         constexpr auto fSize = f64(size);
 
@@ -508,16 +515,16 @@ namespace Flux {
         const Float64* values = circularBuffer.buffer.data();
 
         for (size_t i = 0; i < size; ++i) {
-            cplx[i].r = values[i] * 0.5 * (1.0 - std::cos((2.0 * Math::pi<Float64> * f64(i)) / (fSize - 1.0)));
+            cplx[i].r = f32((1.0 - std::cos(2.0 * Math::pi<Float64> * f64(i) / fSize)) * (values[i] * 0.5));
             cplx[i].i = 0.0;
         }
-
+        
         kiss_fft(cfg, cplx.data(), cplxOut.data());
-
+        
         for (size_t i = 0; i < size; ++i) {
 
             const auto magnitude = std::sqrt(cplxOut[i].r * cplxOut[i].r + cplxOut[i].i * cplxOut[i].i);
-            bins[i].gain = Flux::Audio::toDecibels(magnitude);
+            bins[i].gain = Audio::toDecibels(f64(magnitude));
             bins[i].frequency = f64(i) * sampleRate / fSize;
 
         }
