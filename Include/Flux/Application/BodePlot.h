@@ -7,7 +7,7 @@
 #include <UI/Text.h>
 #include <valarray>
 #include <complex>
-#include <KissFFT/kiss_fft.h>
+#include <KissFFT/kissfft.hh>
 #include "Utility/Timer.h"
 
 struct Bin {
@@ -57,21 +57,22 @@ namespace Nucleus{
     public:
 
         static String format(Bin const& elem, String const& params) {
-            return String::format("({.2}, {.1})\n", elem.gain, elem.frequency);
+            return String::format("({.2}, {.1})", elem.gain, elem.frequency);
         }
 
     };
 
-    template<>
-    class Fmt<kiss_fft_cpx>{
+    template<typename T>
+    class Fmt<std::complex<T>>{
 
     public:
 
-        static String format(kiss_fft_cpx const& elem, String const& params) {
-            return String::format("({.2}, {.2})\n",elem.r, elem.i);
+        static String format(std::complex<T> const& elem, String const& params) {
+            return String::format("({.2}, {.1})", elem.real(), elem.imag());
         }
 
     };
+    
 }
 
 namespace Flux {
@@ -132,10 +133,9 @@ namespace Flux {
 
         void setScheme(const ColorScheme& newScheme);
 
-        void feedBuffer(Float64* block);
+        void feedBuffer(const Float64* block);
 
         NODISCARD FORCEINLINE Audio::Filter* fil() const { return this->filter; }
-        static constexpr size_t spectrumWindowSize = 2048;
 
     protected:
 
@@ -158,7 +158,7 @@ namespace Flux {
 
         void recalculateSpectrum();
 
-        void processFFT();
+        void processFFT() const;
 
         Path path;
         Path spectrumPath;
@@ -177,15 +177,18 @@ namespace Flux {
         static const inline Range<Float32> phaseRange = { -360.0f, 0.0f };
         static const inline Range<Float64> phaseRange64 = { -360.0, 0.0 };
         static const inline Range<Float32> gainRange = { -20.0f, 20.0f };
+
+        static constexpr size_t spectrumWindowSize = 4096;
         
         CircularBuffer circularBuffer = CircularBuffer(spectrumWindowSize);
-        MutableArray<kiss_fft_cpx> cplx = {};
-        MutableArray<kiss_fft_cpx> cplxOut = {};
+        
+        MutableArray<std::complex<Float64>> cplx = {};
+        MutableArray<std::complex<Float64>> cplxOut = {};
         MutableArray<Bin> bins = {};
 
         MutableArray<Float64> lastGains = {};
 
-        kiss_fft_cfg cfg = nullptr;
+        kissfft<Float64> kissFFT = kissfft<Float64>(spectrumWindowSize, false);
 
         std::mutex mutex;
 

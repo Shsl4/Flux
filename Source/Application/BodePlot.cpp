@@ -8,10 +8,9 @@ namespace Flux {
         setColor(scheme.darkest);
         textSize = s.x * 0.0125f;
 
-        this->cplx = MutableArray<kiss_fft_cpx>::filled(spectrumWindowSize);
-        this->cplxOut = MutableArray<kiss_fft_cpx>::filled(spectrumWindowSize);
+        this->cplx = MutableArray<std::complex<Float64>>::filled(spectrumWindowSize);
+        this->cplxOut = MutableArray<std::complex<Float64>>::filled(spectrumWindowSize);
         this->bins = MutableArray<Bin>::filled(spectrumWindowSize);
-        this->cfg = kiss_fft_alloc(spectrumWindowSize, 0, nullptr, nullptr);
         this->lastGains = MutableArray<Float64>::filled(spectrumWindowSize);
 
     }
@@ -203,9 +202,9 @@ namespace Flux {
             drawGrid(graphics);
         }
 
-        recalculateSpectrum();
-
-        graphics.setStrokeStyle(Graphics::StrokeStyle::stroke);
+        std::lock_guard m(mutex);
+        
+        graphics.setStrokeStyle(Graphics::StrokeStyle::fill);
         graphics.setStrokeWidth(2.0f);
         graphics.setColor(scheme.base);
         graphics.drawPath(spectrumPath);
@@ -228,7 +227,9 @@ namespace Flux {
         recalculatePath();
 
         timer.loop(0.01, [this](){
+            std::lock_guard m(mutex);
             processFFT();
+            recalculateSpectrum();
         });
 
     }
@@ -378,15 +379,16 @@ namespace Flux {
 
         spectrumPath.reset();
 
-        const Point pos = globalTransform().position;
-        Point lastPoint = pos;
-        lastPoint.y += size().y;
+        const Transform t = globalTransform();
+        const Point pos = t.position;
 
         const Float64 sr = filter->sampleRate();
         const Float64 nyquist = sr / 2.0;
         const size_t points = bins.size();
         constexpr Float64 mindB = -20.0;
         constexpr Float64 maxdB = 20.0;
+
+        spectrumPath.moveTo(pos.x, pos.y + t.size.y);
 
         for (UInt i = 0; i < points; i++) {
 
@@ -396,7 +398,7 @@ namespace Flux {
             const Float64 previousResponse = (bins[prev].gain + lastGains[prev]) / 2.0;
             const Float64 currentResponse = (bins[i].gain + lastGains[i]) / 2.0;
             const Float64 nextResponse = (bins[next].gain + lastGains[next]) / 2.0;
-            const Float64 response = (previousResponse + currentResponse + nextResponse) / 3.0;
+            const Float64 response = (currentResponse + previousResponse + nextResponse) / 3.0;
             const Float64 freq = Math::clamp(bins[i].frequency, 9.0, nyquist);
             const Float64 finalResponse = Math::clamp(response, mindB, maxdB);
             const Range<Float64> logRange = { log10(9.0), log10(nyquist) };
@@ -412,16 +414,13 @@ namespace Flux {
 
             Point newPoint = { drawX, drawY };
 
-            if(i == 0){
-                spectrumPath.moveTo(newPoint.x, newPoint.y);
-            }
-            else{
-                spectrumPath.lineTo(newPoint.x, newPoint.y);
-            }
+            spectrumPath.lineTo(newPoint.x, newPoint.y);
 
             lastGains[i] = response;
 
         }
+
+        spectrumPath.lineTo(pos.x + t.size.x, pos.y + t.size.y);
 
     }
 
@@ -491,7 +490,7 @@ namespace Flux {
         listeners -= listener;
     }
 
-    void BodePlot::feedBuffer(Float64 *block) {
+    void BodePlot::feedBuffer(const Float64 *block) {
         circularBuffer.feed(block, filter->bufferSize());
     }
 
@@ -499,14 +498,9 @@ namespace Flux {
 
         timer.stop();
         
-        if(cfg) {
-            kiss_fft_free(cfg);
-            cfg = nullptr;
-        }
-        
     }
 
-    void BodePlot::processFFT() {
+    void BodePlot::processFFT() const {
         
         constexpr auto size = spectrumWindowSize;
         constexpr auto fSize = f64(size);
@@ -515,15 +509,19 @@ namespace Flux {
         const Float64* values = circularBuffer.buffer.data();
 
         for (size_t i = 0; i < size; ++i) {
-            cplx[i].r = f32((1.0 - std::cos(2.0 * Math::pi<Float64> * f64(i) / fSize)) * (values[i] * 0.5));
-            cplx[i].i = 0.0;
+            auto windowed = values[i] * 0.5 * (1.0 - std::cos((2.0 * Math::pi<Float64> * f64(i)) / (fSize - 1)));
+            cplx[i] = { windowed, 0.0 };
         }
-        
-        kiss_fft(cfg, cplx.data(), cplxOut.data());
+
+        kissFFT.transform(cplx.data(), cplxOut.data());
         
         for (size_t i = 0; i < size; ++i) {
 
-            const auto magnitude = std::sqrt(cplxOut[i].r * cplxOut[i].r + cplxOut[i].i * cplxOut[i].i);
+            const auto r = cplxOut[i].real();
+            const auto im = cplxOut[i].imag();
+            
+            const auto magnitude = std::sqrt(r * r + im * im);
+            
             bins[i].gain = Audio::toDecibels(f64(magnitude));
             bins[i].frequency = f64(i) * sampleRate / fSize;
 
