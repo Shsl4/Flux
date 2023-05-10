@@ -8,10 +8,13 @@ namespace Flux {
         setColor(scheme.darkest);
         textSize = s.x * 0.0125f;
 
-        this->cplx = MutableArray<std::complex<Float64>>::filled(spectrumWindowSize);
-        this->cplxOut = MutableArray<std::complex<Float64>>::filled(spectrumWindowSize);
+        this->fftIn = MutableArray<std::complex<Float64>>::filled(spectrumWindowSize);
+        this->fftOut = MutableArray<std::complex<Float64>>::filled(spectrumWindowSize);
         this->bins = MutableArray<Bin>::filled(spectrumWindowSize);
         this->lastGains = MutableArray<Float64>::filled(spectrumWindowSize);
+        
+        memset(bins.data(), 0, bins.size() * sizeof(Bin));
+        memset(lastGains.data(), 0, lastGains.size() * sizeof(Float64));
 
     }
 
@@ -48,7 +51,7 @@ namespace Flux {
             
         }
 
-        for (size_t i = 0; i < 7; ++i) {
+        for (size_t i = 0; i < gainsToDraw.size(); ++i) {
             
             Text* text = Factory::createComponent<Text>(Point(0.0f, 0.0f), Point(100, 100), "", textSize, VAlignment::bottom, HAlignment::right);
 
@@ -92,9 +95,7 @@ namespace Flux {
 
         if(!filter) return;
         
-        const Range<Float32> logRange = { log10(9.0f), log10(f32(filter->sampleRate()) / 2.0f) };
         const Range<Float32> sizeRange = { size().y, 0.0f };
-        const Range<Float32> linRange = Range<Float32>::linear;
         const Point scale = size();
 
         for (size_t p = 1; p <= 4; ++p) {
@@ -104,7 +105,7 @@ namespace Flux {
             for (size_t d = 1; d <= 9; ++d) {
                 
                 const Float32 freq = pw * f32(d);
-                const Float32 drawX = Range<Float32>::translateValue(log10(freq), logRange, linRange) * scale.x;
+                const Float32 drawX = logFrequencyRange<Float32>().translateTo(log10(freq), Range<Float32>::linear) * scale.x;
                 
                 if(frequencyTexts.containsKey(freq)) {
 
@@ -128,7 +129,7 @@ namespace Flux {
             for (const auto& elem : gainsToDraw) {
 
                 Text* text = gainTexts[i];
-                const Float32 drawY = Range<Float32>::translateValue(elem, gainRange, sizeRange);
+                const Float32 drawY = gainRange<Float32>.translateTo(elem, sizeRange);
                 text->setText(String::format("{}dB", i32(elem)));
                 text->setPosition({ size().x - text->size().x, drawY - text->size().y });
                 ++i;
@@ -143,7 +144,7 @@ namespace Flux {
             for (auto& elem : phasesToDraw) {
 
                 Text* text = gainTexts[i];
-                const Float32 drawY = Range<Float32>::translateValue(elem, phaseRange, sizeRange);
+                const Float32 drawY = phaseRange<Float32>.translateTo(elem, sizeRange);
                 text->setText(String::format("{}", i32(elem)));
                 text->setPosition({ size().x - text->size().x, drawY - text->size().y });
                 ++i;
@@ -163,22 +164,18 @@ namespace Flux {
         if(button != MouseButton::Left) return;
 
         // Setup our range objects
-        constexpr auto minCutoff = f32(Audio::Filter::minCutoff);
         const Point pos = globalTransform().position;
-        const Range<Float32> logRange = { log10(minCutoff), log10(f32(filter->sampleRate()) / 2.0f) };
-        const Range<Float32> freqRange = { minCutoff, (f32(filter->sampleRate()) / 2.0f) * 0.95f };
-        const Range<Float32> resonanceRange = { f32(Audio::Filter::minResonance), f32(Audio::Filter::maxResonance) };
         const Range<Float32> hSizeRange = { pos.x, size().x + pos.x };
         const Range<Float32> vSizeRange = { size().y + pos.y, pos.y };
 
         // Transpose our mouse value to our logarithmic range
-        const Float32 logValue = Range<Float32>::translateValue(f32(x), hSizeRange, logRange);
+        const Float32 logValue = hSizeRange.translateTo(f32(x), logFrequencyRange<Float32>());
 
         // Get the frequency value from our log based value (f-1(log10(x)) = 10^x) and clamp it to our frequency range
-        const Float32 freq = freqRange.clamp(std::pow(10.0f, logValue));
+        const Float32 freq = frequencyRange<Float32>().clamp(std::pow(10.0f, logValue));
 
         // Transpose our mouse value to our resonance range and clamp the value
-        const Float32 q = resonanceRange.clamp(Range<Float32>::translateValue(f32(y), vSizeRange, resonanceRange));
+        const Float32 q = resonanceRange<Float32>.clamp(vSizeRange.translateTo(f32(y), resonanceRange<Float32>));
         
         filter->setResonance(f64(q));
         filter->setCutoffFrequency(f64(freq));
@@ -226,7 +223,10 @@ namespace Flux {
         realignTexts();
         recalculatePath();
 
-        timer.loop(0.01, [this](){
+        timer.stop();
+        
+        // Refresh the spectrum every 10ms
+        timer.loop(0.01, [this] {
             std::lock_guard m(mutex);
             processFFT();
             recalculateSpectrum();
@@ -258,17 +258,18 @@ namespace Flux {
         graphics.setStrokeWidth(0.5f);
         graphics.setColor(scheme.base);
 
-        const Range<Float32> logRange = { log10(9.0f), log10(f32(filter->sampleRate()) / 2.0f) };
         const Range<Float32> linRange = Range<Float32>::linear;
         const Range<Float32> sizeRange = { size().y, 0.0f };
         const Point position = globalTransform().position;
         const Point scale = size();
 
         if(mode == DrawMode::frequency) {
+
+            const auto range = gainRange<Float32>;
             
             for (const auto& elem : gainsToDraw) {
 
-                const auto drawY = Range<Float32>::translateValue(elem, gainRange, sizeRange);
+                const auto drawY = range.translateTo(elem, sizeRange);
                 graphics.drawLine({position.x, drawY + position.y}, {position.x + scale.x, drawY + position.y});
 
             }
@@ -276,15 +277,19 @@ namespace Flux {
         }
         else {
 
+            const auto range = phaseRange<Float32>;
+
             for (const auto& elem : phasesToDraw) {
 
-                const auto drawY = Range<Float32>::translateValue(elem, phaseRange, sizeRange);
+                const auto drawY = range.translateTo(elem, sizeRange);
                 graphics.drawLine({position.x, drawY + position.y}, {position.x + scale.x, drawY + position.y});
 
             }
             
         }
 
+        const Range<Float32> fRange = logFrequencyRange<Float32>();
+        
         for (size_t p = 1; p <= 4; ++p) {
 
             const Float32 pw = std::pow(10.0f, f32(p));
@@ -292,7 +297,7 @@ namespace Flux {
             for (size_t d = 1; d <= 9; ++d) {
 
                 const Float32 freq = pw * f32(d);
-                const Float32 drawX = Range<Float32>::translateValue(log10(freq), logRange, linRange) * scale.x + position.x;
+                const Float32 drawX = fRange.translateTo(log10(freq), linRange) * scale.x + position.x;
 
                 if(drawX > position.x + scale.x) return;
 
@@ -325,26 +330,23 @@ namespace Flux {
         Point lastPoint = pos;
         lastPoint.y += size().y;
 
-        const Float64 sr = filter->sampleRate();
-        const Float64 nyquist = sr / 2.0;
         constexpr Float64 pi = Math::pi<Float64>;
-        constexpr UInt points = 300;
-        constexpr Float64 mindB = -20.0;
-        constexpr Float64 maxdB = 20.0;
+        const Float64 ny = nyquist();
 
-        const auto values = distributeAround(f32(filter->cutoff()), nyquist, points);
+        const auto values = distributeAround(f32(filter->cutoff()), ny, filterResponsePoints);
 
-        for (UInt i = 0; i < points; ++i) {
+        const Range<Float64> logRange = logFrequencyRange<Float64>();
+        const Range<Float64>& linRange = Range<Float64>::linear;
+        
+        for (UInt i = 0; i < filterResponsePoints; ++i) {
 
             const Float64 mag = filter->magnitude(values[i]);
             const Float64 response = 20.0 * log10(mag);
-            const Float64 freq = (values[i] / pi) * nyquist;
+            const Float64 freq = (values[i] / pi) * ny;
             const Float64 finalResponse = Math::clamp(response, mindB, maxdB);
-            const Range<Float64> logRange = { log10(9.0), log10(nyquist) };
-            const Range<Float64>& linRange = Range<Float64>::linear;
 
             const Float64 normalizedResponse = (finalResponse - mindB) / (maxdB - mindB);
-            const Float64 normalizedFrequency = Range<Float64>::translateValue(log10(freq), logRange, linRange);
+            const Float64 normalizedFrequency = logRange.translateTo(log10(freq), linRange);
 
             if(!std::isfinite(normalizedResponse)) continue;
 
@@ -363,7 +365,7 @@ namespace Flux {
                 if(Math::dneq(finalResponse, mindB)){
                     path.lineTo(newPoint.x, newPoint.y);
                 }
-                else if(lastPoint.y != (pos.y + size().y)){
+                else if(Math::fneq(lastPoint.y, pos.y + size().y)){
                     path.lineTo(newPoint.x, pos.y + size().y);
                 }
 
@@ -381,33 +383,31 @@ namespace Flux {
 
         const Transform t = globalTransform();
         const Point pos = t.position;
+        constexpr Float64 ratio = 0.1;
 
-        const Float64 sr = filter->sampleRate();
-        const Float64 nyquist = sr / 2.0;
-        const size_t points = bins.size();
-        constexpr Float64 mindB = -20.0;
-        constexpr Float64 maxdB = 20.0;
-
+        const size_t points = spectrumWindowSize;
+        const Range<Float64> logRange = logFrequencyRange<Float64>();
+        const Range<Float64> fRange = frequencyRange<Float64>();
+        const Range<Float64>& linRange = Range<Float64>::linear;
+        
         spectrumPath.moveTo(pos.x, pos.y + t.size.y);
 
         for (UInt i = 0; i < points; i++) {
 
             const size_t prev = i == 0 ? 0 : i - 1;
             const size_t next = i + 1 == points ? i : i + 1;
-
-            const Float64 previousResponse = (bins[prev].gain + lastGains[prev]) / 2.0;
-            const Float64 currentResponse = (bins[i].gain + lastGains[i]) / 2.0;
-            const Float64 nextResponse = (bins[next].gain + lastGains[next]) / 2.0;
-            const Float64 response = (currentResponse + previousResponse + nextResponse) / 3.0;
-            const Float64 freq = Math::clamp(bins[i].frequency, 9.0, nyquist);
-            const Float64 finalResponse = Math::clamp(response, mindB, maxdB);
-            const Range<Float64> logRange = { log10(9.0), log10(nyquist) };
-            const Range<Float64>& linRange = Range<Float64>::linear;
+            
+            const Float64 previousResponse = Math::lerp(lastGains[prev], bins[prev].gain, ratio);
+            const Float64 currentResponse = Math::lerp(lastGains[i], bins[i].gain, ratio);
+            const Float64 nextResponse = Math::lerp(lastGains[next], bins[next].gain, ratio);
+            const Float64 response = (previousResponse + currentResponse + nextResponse) / 3.0;
+            const Float64 freq = fRange.clamp(bins[i].frequency);
+            const Float64 finalResponse = gainRange<Float64>.clamp(response);
 
             const Float64 normalizedResponse = (finalResponse - mindB) / (maxdB - mindB);
-            const Float64 normalizedFrequency = Range<Float64>::translateValue(log10(freq), logRange, linRange);
+            const Float64 normalizedFrequency = logRange.translateTo(log10(freq), linRange);
 
-            if(!std::isfinite(response)) continue;
+            if(!std::isfinite(response) || std::isnan(response)) continue;
 
             const Float32 drawX = pos.x + f32(normalizedFrequency) * size().x;
             const Float32 drawY = pos.y + size().y - f32(normalizedResponse) * size().y;
@@ -416,7 +416,7 @@ namespace Flux {
 
             spectrumPath.lineTo(newPoint.x, newPoint.y);
 
-            lastGains[i] = response;
+            lastGains[i] = finalResponse;
 
         }
 
@@ -435,23 +435,21 @@ namespace Flux {
         lastPoint.y += size().y;
 
         constexpr Float64 pi = Math::pi<Float64>;
-        constexpr UInt points = 300;
+        const Float64 ny = nyquist();
 
-        const Float64 sr = filter->sampleRate();
-        const Float64 nyquist = sr / 2.0;
+        const auto values = distributeAround(f32(filter->cutoff()), ny, filterResponsePoints);
+        
+        const Range logRange = logFrequencyRange<Float64>();
+        const Range<Float64>& linRange = Range<Float64>::linear;
 
-        const auto values = distributeAround(f32(filter->cutoff()), nyquist, points);
-
-        for (UInt i = 0; i < points; ++i) {
+        for (UInt i = 0; i < filterResponsePoints; ++i) {
 
             const Float64 phase = filter->argument(values[i]) - Math::pi<Float64>;
-            const Float64 response = fmod(Math::toDegrees(phase), 360);
-            const Float64 freq = (values[i] / pi) * nyquist;
-            const Range logRange = { log10(9.0), log10(nyquist) };
-            const Range<Float64>& linRange = Range<Float64>::linear;
+            const Float64 response = std::fmod(Math::toDegrees(phase), 360);
+            const Float64 freq = values[i] / pi * ny;
 
-            const Float64 normalizedResponse = Range<Float64>::translateValue(response, phaseRange64, linRange);
-            const Float64 normalizedFrequency = Range<Float64>::translateValue(log10(freq), logRange, linRange);
+            const Float64 normalizedResponse = phaseRange<Float64>.translateTo(response, linRange);
+            const Float64 normalizedFrequency = logRange.translateTo(log10(freq), linRange);
 
             if(!std::isfinite(normalizedResponse)) continue;
 
@@ -467,10 +465,10 @@ namespace Flux {
 
                 path.moveTo(lastPoint.x, lastPoint.y);
 
-                if(Math::dneq(response, phaseRange64.min())){
+                if(Math::dneq(response, phaseRange<Float64>.min())){
                     path.lineTo(newPoint.x, newPoint.y);
                 }
-                else if(lastPoint.y != (pos.y + size().y)){
+                else if(Math::fneq(lastPoint.y, pos.y + size().y)){
                     path.lineTo(newPoint.x, pos.y + size().y);
                 }
 
@@ -482,11 +480,11 @@ namespace Flux {
         
     }
 
-    void BodePlot::addListener(BodePlot::Listener *listener) {
+    void BodePlot::addListener(Listener*listener) {
         if(listener) listeners += listener;
     }
 
-    void BodePlot::removeListener(BodePlot::Listener *listener) {
+    void BodePlot::removeListener(Listener*listener) {
         listeners -= listener;
     }
 
@@ -509,20 +507,15 @@ namespace Flux {
         const Float64* values = circularBuffer.buffer.data();
 
         for (size_t i = 0; i < size; ++i) {
-            auto windowed = values[i] * 0.5 * (1.0 - std::cos((2.0 * Math::pi<Float64> * f64(i)) / (fSize - 1)));
-            cplx[i] = { windowed, 0.0 };
+            auto windowed = values[i] * 0.5 * (1.0 - std::cos(2.0 * Math::pi<Float64> * f64(i) / (fSize - 1)));
+            fftIn[i] = { windowed, 0.0 };
         }
 
-        kissFFT.transform(cplx.data(), cplxOut.data());
+        kissFFT.transform(fftIn.data(), fftOut.data());
         
         for (size_t i = 0; i < size; ++i) {
-
-            const auto r = cplxOut[i].real();
-            const auto im = cplxOut[i].imag();
             
-            const auto magnitude = std::sqrt(r * r + im * im);
-            
-            bins[i].gain = Audio::toDecibels(f64(magnitude));
+            bins[i].gain = Audio::toDecibels(std::abs(fftOut[i]) / std::sqrt(fSize));
             bins[i].frequency = f64(i) * sampleRate / fSize;
 
         }

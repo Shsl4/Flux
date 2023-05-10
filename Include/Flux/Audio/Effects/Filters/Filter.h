@@ -16,7 +16,7 @@ namespace Flux::Audio {
     public:
 
         constexpr static Float64 minResonance = 0.1;
-        constexpr static Float64 maxResonance = 8.0;
+        constexpr static Float64 maxResonance = 4.0;
         
         constexpr static Float64 minCutoff = 9.0;
         

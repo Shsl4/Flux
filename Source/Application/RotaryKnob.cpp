@@ -16,16 +16,14 @@ namespace Flux {
             if(usesLogarithmicProgress()){
 
                 const Range<Float64> logRange = { log10(range().min()), log10(range().max()) };
-                const Float64 logValue = Range<Float64>::translateValue(rotation / 300.0, Range<Float64>::linear, logRange);
+                const Float64 logValue = Range<Float64>::linear.translateTo(rotation / 300.0, logRange);
                 const Float64 value = range().clamp(std::pow(10.0f, logValue));
                 setValue(value);
 
             }
             else{
 
-                const Float64 value = Range<Float64>::translateValue(rotation / 300.0,
-                                                                    Range<Float64>::linear,
-                                                                    range());
+                const Float64 value = Range<Float64>::linear.translateTo(rotation / 300.0, range());
                 setValue(value);
 
             }
@@ -78,11 +76,11 @@ namespace Flux {
         if(usesLogarithmicProgress()){
 
             const Range<Float64> logRange = { log10(range().min()), log10(range().max()) };
-            this->rotation = Range<Float64>::translateValue(log10(this->value()), logRange, fRange);
+            this->rotation = logRange.translateTo(log10(this->value()), fRange);
 
         }
         else{
-            this->rotation = Range<Float64>::translateValue(value(), range(), fRange);
+            this->rotation = range().translateTo(value(), fRange);
         }
 
     }

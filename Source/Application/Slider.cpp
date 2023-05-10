@@ -19,21 +19,19 @@ namespace Flux {
             Transform t = globalTransform();
             
             Range<Float32> rg = Range<Float32>(t.position.x, t.position.x + t.size.x);
-            auto v= Range<Float32>::translateValue(rg.clamp(f32(x)), rg, Range<Float32>::linear);
+            const auto v = f64(rg.translateTo(rg.clamp(f32(x)), Range<Float32>::linear));
             
             if(usesLogarithmicProgress()){
 
                 const Range<Float64> logRange = { log10(range().min()), log10(range().max()) };
-                const Float64 logValue = Range<Float64>::translateValue(v, Range<Float64>::linear, logRange);
+                const Float64 logValue = Range<Float64>::linear.translateTo(v, logRange);
                 const Float64 value = range().clamp(std::pow(10.0f, logValue));
                 setValue(value);
 
             }
             else{
 
-                const Float64 value = Range<Float64>::translateValue(v,
-                                                                    Range<Float64>::linear,
-                                                                    range());
+                const Float64 value = Range<Float64>::linear.translateTo(v, range());
                 setValue(value);
 
             }
@@ -100,8 +98,8 @@ namespace Flux {
 
         graphics.setColor(scheme.lightest);
 
-        const auto sizeRange = Range<Float64>(0.0f, f64(size().x));
-        const Float64 offset = Range<Float64>::translateValue(currentValue, valueRange, sizeRange);
+        const auto sizeRange = Range<Float64>(0.0, f64(size().x));
+        const Float64 offset = valueRange.translateTo(currentValue, sizeRange);
         const Point end = p + Point(f32(offset), 0.0f);
             
         graphics.drawLine(p, end);

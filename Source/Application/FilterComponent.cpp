@@ -91,13 +91,18 @@ namespace Flux {
         
     }
 
-    void FilterComponent::setFilter(Audio::LowPassFilter* newFilter) {
+    void FilterComponent::setFilter(Audio::Filter* newFilter) {
 
         this->filter = newFilter;
         renderer->setFilter(newFilter);
 
         frequencyKnob->useLogarithmicProgress(true);
         frequencyKnob->setRange({Audio::Filter::minCutoff, (newFilter->sampleRate() / 2.0) * 0.95 });
+        frequencyKnob->setDefaultValue(440.0);
+        
+        frequencyKnob->setValue(filter->cutoff());
+        resonanceKnob->setValue(filter->resonance());
+        mixKnob->setValue(filter->mix());
 
     }
 

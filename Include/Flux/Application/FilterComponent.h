@@ -20,7 +20,7 @@ namespace Flux {
 
         void valueChanged(BodePlot* plot, Float64 f, Float64 q) override;
 
-        void setFilter(Audio::LowPassFilter* newFilter);
+        void setFilter(Audio::Filter* newFilter);
 
         BodePlot* renderer = nullptr;
 

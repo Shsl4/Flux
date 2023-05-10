@@ -49,32 +49,6 @@ private:
 
 };
 
-namespace Nucleus{
-
-    template<>
-    class Fmt<Bin>{
-
-    public:
-
-        static String format(Bin const& elem, String const& params) {
-            return String::format("({.2}, {.1})", elem.gain, elem.frequency);
-        }
-
-    };
-
-    template<typename T>
-    class Fmt<std::complex<T>>{
-
-    public:
-
-        static String format(std::complex<T> const& elem, String const& params) {
-            return String::format("({.2}, {.1})", elem.real(), elem.imag());
-        }
-
-    };
-    
-}
-
 namespace Flux {
         
     inline Float64 freqToRad(Float64 f, Float64 ny) {
@@ -96,6 +70,40 @@ namespace Flux {
     }
 
     class BodePlot : public Component {
+
+        static const inline MutableArray<Float32> gainsToDraw = { -30.0, -24.0f, -18.0f, -12.0f, -6.0f, 0.0f, 6.0 };
+        static const inline MutableArray<Float32> phasesToDraw = { -315.0f, -270.0f, -225.0f, -180.0f, -135.0f, -90.0f, -45.0f };
+
+        static constexpr size_t spectrumWindowSize = 2048;
+        static constexpr inline size_t filterResponsePoints = 300;
+        static constexpr inline Float64 mindB = -36.0;
+        static constexpr inline Float64 maxdB = 12.0;
+        static constexpr inline Float64 minCutoff = Audio::Filter::minCutoff;
+        
+        template<typename T>
+        NODISCARD FORCEINLINE Range<T> logFrequencyRange() const {
+            return { std::log10(static_cast<T>(minCutoff)), std::log10(static_cast<T>(maxCutoff())) };
+        }
+        template<typename T>
+        NODISCARD FORCEINLINE Range<T> frequencyRange() const {
+            return { static_cast<T>(minCutoff), static_cast<T>(maxCutoff()) };
+        }
+        
+        template<typename T>
+        static inline const Range<T> resonanceRange = { static_cast<T>(Audio::Filter::minResonance), static_cast<T>(Audio::Filter::maxResonance) };
+
+        template<typename T>
+        static const inline Range<T> phaseRange = { static_cast<T>(-360.0), static_cast<T>(0.0) };
+
+        template<typename T>
+        static const inline Range<T> gainRange = { static_cast<T>(mindB), static_cast<T>(maxdB) };
+        
+        NODISCARD FORCEINLINE Float64 maxCutoff() const { return nyquist() * 0.95; }
+        
+        NODISCARD FORCEINLINE Float64 nyquist() const { return filter->sampleRate() / 2.0; }
+
+        NODISCARD FORCEINLINE Float64 sampleRate() const { return filter->sampleRate(); }
+
         
     public:
 
@@ -162,39 +170,26 @@ namespace Flux {
 
         Path path;
         Path spectrumPath;
+
+        Float32 textSize = 12.0f;
+        Timer timer;
+        
         MutableArray<Listener*> listeners = {};
         Audio::Filter* filter = nullptr;
         DrawMode mode = DrawMode::frequency;
         ColorScheme scheme = ColorScheme::darkScheme(Color::tintGreen);
         Map<Float32, Text*> frequencyTexts = {};
         MutableArray<Text*> gainTexts = {};
-        Float32 textSize = 12.0f;
-        Timer timer;
-
-        static inline const MutableArray<Float32> gainsToDraw = { -18.0f, -12.0f, -6.0f, 0.0f, 6.0f, 12.0f, 18.0f };
-        static inline const MutableArray<Float32> phasesToDraw = { -315.0f, -270.0f, -225.0f, -180.0f, -135.0f, -90.0f, -45.0f };
-
-        static const inline Range<Float32> phaseRange = { -360.0f, 0.0f };
-        static const inline Range<Float64> phaseRange64 = { -360.0, 0.0 };
-        static const inline Range<Float32> gainRange = { -20.0f, 20.0f };
-
-        static constexpr size_t spectrumWindowSize = 4096;
         
         CircularBuffer circularBuffer = CircularBuffer(spectrumWindowSize);
-        
-        MutableArray<std::complex<Float64>> cplx = {};
-        MutableArray<std::complex<Float64>> cplxOut = {};
+        MutableArray<std::complex<Float64>> fftIn = {};
+        MutableArray<std::complex<Float64>> fftOut = {};
         MutableArray<Bin> bins = {};
-
         MutableArray<Float64> lastGains = {};
-
         kissfft<Float64> kissFFT = kissfft<Float64>(spectrumWindowSize, false);
 
         std::mutex mutex;
-
-        Path lastSpectrumPath;
-
-
+        
     };
 
 }

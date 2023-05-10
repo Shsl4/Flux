@@ -36,7 +36,7 @@ namespace Flux {
 
         AudioPlayer player;
         WaveTable waveTable;
-        Audio::LowPassFilter fil;
+        Audio::HighPassFilter fil;
         FilterComponent* filComponent;
         WaveTableComponent* wtComponent;
         AudioPlayerComponent* playerComponent;

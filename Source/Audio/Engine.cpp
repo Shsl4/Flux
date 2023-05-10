@@ -48,7 +48,6 @@ namespace Flux {
         waveTable.prepare(rate, size);
         fil.prepare(rate, size);
 
-        fil.setCutoffFrequency(20000);
         filComponent->setFilter(&fil);
 
     }
